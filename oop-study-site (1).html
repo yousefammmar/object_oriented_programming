@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OOP — CS11253 · PSUT</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --paper: #f5f0e8;
+  --paper2: #ede8df;
+  --ink: #1a1712;
+  --ink2: #3d3830;
+  --muted: #8a7f70;
+  --rust: #c4532a;
+  --rust-light: #e8c4b4;
+  --rust-pale: #f7ece7;
+  --border: #ccc4b5;
+  --code-bg: #1e1b16;
+  --code-text: #e8dcc8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:'Crimson Pro',Georgia,serif;font-size:17px;line-height:1.7;min-height:100vh;}
+.masthead{border-bottom:3px double var(--ink);padding:0 48px;background:var(--paper);}
+.masthead-top{display:flex;align-items:center;justify-content:space-between;padding:18px 0 14px;border-bottom:1px solid var(--border);}
+.masthead-kicker,.masthead-issue{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);}
+.masthead-title{text-align:center;padding:20px 0 16px;}
+.masthead-title h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(32px,6vw,68px);font-weight:900;letter-spacing:-2px;line-height:1;color:var(--ink);}
+.masthead-title h1 em{font-style:italic;color:var(--rust);}
+.masthead-title .subtitle{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+.nav-strip{display:flex;overflow-x:auto;scrollbar-width:none;}
+.nav-strip::-webkit-scrollbar{display:none;}
+.nav-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink2);padding:13px 22px;border:none;background:none;cursor:pointer;border-right:1px solid var(--border);white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+.nav-btn:first-child{border-left:1px solid var(--border);}
+.nav-btn:hover{background:var(--rust-pale);color:var(--rust);}
+.nav-btn.active{background:var(--ink);color:var(--paper);}
+.page{display:none;animation:pgIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* HOME */
+.home-grid{display:grid;grid-template-columns:1fr 340px;min-height:calc(100vh - 190px);}
+.home-main{padding:56px 56px 56px 48px;border-right:1px solid var(--border);}
+.home-side{padding:40px 36px;background:var(--paper2);}
+.home-lede{font-size:20px;line-height:1.6;font-weight:300;margin-bottom:28px;color:var(--ink2);max-width:560px;}
+.home-lede::first-letter{font-family:'Playfair Display',serif;font-size:5em;font-weight:900;float:left;line-height:0.72;margin-right:8px;margin-top:10px;color:var(--rust);}
+.ornament{text-align:center;color:var(--rust);font-size:18px;letter-spacing:12px;margin:28px 0;opacity:0.55;}
+.section-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--rust);margin-bottom:14px;}
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:36px;}
+.topic-cell{background:var(--paper);padding:20px 22px;cursor:pointer;transition:background 0.15s;}
+.topic-cell:hover{background:var(--rust-pale);}
+.t-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--rust);margin-bottom:3px;}
+.t-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.t-desc{font-size:13px;color:var(--muted);font-style:italic;}
+.how-step{display:flex;gap:14px;margin-bottom:14px;font-size:14.5px;color:var(--ink2);line-height:1.5;}
+.sc{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--rust);color:var(--rust);font-family:'IBM Plex Mono',monospace;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
+.s-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--rust);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.s-links{list-style:none;}
+.s-links li{margin-bottom:9px;}
+.s-links a{color:var(--ink2);text-decoration:none;font-size:14px;display:flex;align-items:flex-start;gap:7px;line-height:1.4;transition:color 0.15s;}
+.s-links a:hover{color:var(--rust);}
+.s-links a::before{content:'→';color:var(--rust);flex-shrink:0;}
+.s-sec{margin-bottom:28px;}
+
+/* INNER */
+.inner{max-width:1100px;margin:0 auto;padding:52px 48px;}
+.pg-head{margin-bottom:36px;padding-bottom:24px;border-bottom:2px solid var(--ink);display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
+.pg-cat{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--rust);margin-bottom:8px;}
+.pg-title{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,46px);font-weight:900;letter-spacing:-1px;line-height:1.05;}
+.pg-by{font-style:italic;color:var(--muted);font-size:15px;margin-top:5px;}
+.pg-icon{font-size:52px;opacity:0.75;flex-shrink:0;}
+.two-col{display:grid;grid-template-columns:1fr 280px;gap:44px;}
+.study-step{display:grid;grid-template-columns:32px 1fr;gap:16px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--border);}
+.study-step:last-child{border-bottom:none;}
+.sn{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--rust);line-height:1;padding-top:3px;}
+.st-title{font-family:'Crimson Pro',serif;font-size:17px;font-weight:600;margin-bottom:7px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border:1px solid var(--border);border-radius:2px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--ink2);text-decoration:none;background:var(--paper);transition:all 0.15s;cursor:pointer;}
+.chip:hover{background:var(--rust);color:var(--paper);border-color:var(--rust);}
+.pull{border-left:4px solid var(--rust);padding:12px 18px;margin:20px 0;background:var(--rust-pale);font-style:italic;font-size:15px;color:var(--ink2);}
+.pull a{color:var(--rust);}
+.sbox{background:var(--paper2);border:1px solid var(--border);padding:22px;margin-bottom:20px;}
+.sbox-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.sbox ul{list-style:none;}
+.sbox ul li{margin-bottom:7px;}
+.sbox ul li a{font-size:13.5px;color:var(--ink2);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.15s;}
+.sbox ul li a:hover{color:var(--rust);}
+
+/* CODE */
+.code-wrap{max-width:1100px;margin:0 auto;padding:48px;}
+.file-tabs{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:0;}
+.ftab{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:8px 13px;background:var(--paper2);border:1px solid var(--border);border-bottom:none;cursor:pointer;color:var(--muted);transition:all 0.15s;border-radius:3px 3px 0 0;}
+.ftab:hover{color:var(--ink);}
+.ftab.active{background:var(--code-bg);color:#e8c06e;border-color:var(--code-bg);}
+.editor{background:var(--code-bg);border:1px solid #3a3530;border-radius:0 4px 4px 4px;overflow:hidden;}
+.ebar{background:#2a2520;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #3a3530;}
+.edots{display:flex;gap:6px;}
+.ed{width:11px;height:11px;border-radius:50%;}
+.ed-r{background:#ff5f57;}.ed-y{background:#febc2e;}.ed-g{background:#28c840;}
+.efname{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8a7f6a;}
+.copybtn{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 12px;background:transparent;border:1px solid #3a3530;color:#8a7f6a;cursor:pointer;border-radius:3px;transition:all 0.15s;}
+.copybtn:hover{color:#e8c06e;border-color:#e8c06e;}
+pre#cv{padding:22px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.75;color:var(--code-text);max-height:520px;scrollbar-width:thin;scrollbar-color:#3a3530 transparent;}
+.kw{color:#e06c75;}.cm{color:#5c6370;font-style:italic;}.st{color:#98c379;}.pp{color:#c678dd;}
+
+/* QUIZZES */
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:36px;}
+.qcard{background:var(--paper);padding:26px;transition:background 0.15s;}
+.qcard:hover{background:var(--rust-pale);}
+.q-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--rust);letter-spacing:0.15em;margin-bottom:5px;}
+.q-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:10px;}
+.qcard ul{list-style:none;}
+.qcard ul li{margin-bottom:6px;}
+.qcard ul li a{font-size:14px;color:var(--ink2);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.15s;}
+.qcard ul li a:hover{color:var(--rust);}
+
+/* LINKS */
+.lcols{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:36px;}
+.lcol{background:var(--paper);padding:26px;}
+.lcol-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--rust);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.lcol ul{list-style:none;}
+.lcol ul li{margin-bottom:9px;}
+.lcol ul li a{font-size:14px;color:var(--ink2);text-decoration:none;display:flex;align-items:flex-start;gap:6px;line-height:1.4;transition:color 0.15s;}
+.lcol ul li a:hover{color:var(--rust);}
+.vidx{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.vl{font-size:12.5px;font-family:'IBM Plex Mono',monospace;color:var(--ink2);text-decoration:none;padding:8px 11px;border:1px solid var(--border);display:block;transition:all 0.15s;}
+.vl:hover{background:var(--rust);color:var(--paper);border-color:var(--rust);}
+
+footer{border-top:3px double var(--ink);padding:22px 48px;display:flex;justify-content:space-between;align-items:center;background:var(--paper2);font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.08em;margin-top:40px;}
+footer a{color:var(--rust);text-decoration:none;}
+
+@media(max-width:900px){
+  .masthead{padding:0 20px;}
+  .home-grid{grid-template-columns:1fr;}
+  .home-main{padding:36px 22px;}
+  .home-side{border-top:1px solid var(--border);padding:28px 22px;}
+  .topic-grid{grid-template-columns:1fr;}
+  .inner{padding:36px 22px;}
+  .two-col{grid-template-columns:1fr;}
+  .code-wrap{padding:28px 22px;}
+  .lcols{grid-template-columns:1fr;}
+  .vidx{grid-template-columns:1fr;}
+  footer{flex-direction:column;gap:6px;text-align:center;padding:18px 22px;}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-top">
+    <span class="masthead-kicker">Princess Sumaya University for Technology</span>
+    <span class="masthead-issue">CS11253 · Spring 2025</span>
+  </div>
+  <div class="masthead-title">
+    <h1>Object <em>Oriented</em> Programming</h1>
+    <p class="subtitle">A Complete Study Guide &nbsp;·&nbsp; C++ &nbsp;·&nbsp; Classes &nbsp;·&nbsp; Composition</p>
+  </div>
+  <nav>
+    <div class="nav-strip">
+      <button class="nav-btn active" onclick="nav('home',this)">Home</button>
+      <button class="nav-btn" onclick="nav('cpp',this)">C++ Basics</button>
+      <button class="nav-btn" onclick="nav('classes',this)">Class Basics</button>
+      <button class="nav-btn" onclick="nav('const',this)">Const &amp; Static</button>
+      <button class="nav-btn" onclick="nav('composition',this)">Composition</button>
+      <button class="nav-btn" onclick="nav('code',this)">Code Files</button>
+      <button class="nav-btn" onclick="nav('quizzes',this)">Quizzes</button>
+      <button class="nav-btn" onclick="nav('links',this)">All Links</button>
+    </div>
+  </nav>
+</header>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="home-grid">
+    <div class="home-main">
+      <p class="home-lede">This guide covers everything you need for CS11253 — Object Oriented Programming at PSUT. Written for students, by a student. Every resource, code example, quiz, and lab is one click away.</p>
+      <div class="ornament">✦ · ✦ · ✦</div>
+      <div class="section-tag">Topics Covered</div>
+      <div class="topic-grid">
+        <div class="topic-cell" onclick="nav('cpp',document.querySelectorAll('.nav-btn')[1])">
+          <div class="t-num">01 ·</div><div class="t-name">C++ Basics</div>
+          <div class="t-desc">Functions, loops, arrays, pointers</div>
+        </div>
+        <div class="topic-cell" onclick="nav('classes',document.querySelectorAll('.nav-btn')[2])">
+          <div class="t-num">02 ·</div><div class="t-name">Class Basics</div>
+          <div class="t-desc">Constructors, destructors, copy constructor</div>
+        </div>
+        <div class="topic-cell" onclick="nav('const',document.querySelectorAll('.nav-btn')[3])">
+          <div class="t-num">03 ·</div><div class="t-name">Const &amp; Static</div>
+          <div class="t-desc">Constant members, shared state</div>
+        </div>
+        <div class="topic-cell" onclick="nav('composition',document.querySelectorAll('.nav-btn')[4])">
+          <div class="t-num">04 ·</div><div class="t-name">Composition</div>
+          <div class="t-desc">Objects inside objects — has-a relationship</div>
+        </div>
+      </div>
+      <div class="ornament">✦ · ✦ · ✦</div>
+      <div class="section-tag">Recommended Study Order</div>
+      <div class="how-step"><div class="sc">1</div><div><strong>Read Ms. Ayat Droos' files</strong> — the most curriculum-aligned starting point for each topic.</div></div>
+      <div class="how-step"><div class="sc">2</div><div><strong>Watch Dr. Ibrahim Albluwi's playlist</strong> — detailed video explanations for every concept.</div></div>
+      <div class="how-step"><div class="sc">3</div><div><strong>Study the code examples</strong> — all .cpp files embedded here with syntax highlighting.</div></div>
+      <div class="how-step"><div class="sc">4</div><div><strong>Practice past quizzes and labs</strong> — every topic links to past papers. Practice is everything.</div></div>
+    </div>
+    <div class="home-side">
+      <div class="s-sec">
+        <div class="s-label">Quick Links</div>
+        <ul class="s-links">
+          <li><a href="https://www.youtube.com/playlist?list=PLpNZbvo-UcMIAwNqyv1PkPlAn7LLSbsZV" target="_blank">Recorded Lectures</a></li>
+          <li><a href="https://drive.google.com/drive/folders/1fTKKSbcEAyym_ivfNNB-kxm5-PWHSjSm" target="_blank">Lecture Slides</a></li>
+          <li><a href="https://psutarchive.com/courses/11206?tab=exam" target="_blank">Past Exams — Archive</a></li>
+          <li><a href="https://drive.google.com/drive/folders/1o8Ae0gTwBTSMBRKtLVBGLt8qNM6WjupF" target="_blank">Past Quizzes Drive</a></li>
+          <li><a href="https://drive.google.com/drive/folders/1pglAkv7Seib3L2HYHUvhogdKQ3L5GWRI" target="_blank">Past Labs Drive</a></li>
+          <li><a href="https://github.com/yousefammmar/OOP" target="_blank">GitHub Repository</a></li>
+          <li><a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e" target="_blank">Dana's Handwritten Notes</a></li>
+        </ul>
+      </div>
+      <div class="s-sec">
+        <div class="s-label">Quiz Solutions</div>
+        <ul class="s-links">
+          <li><a href="https://drive.google.com/file/d/18LVy5ezrBK5PQQXPb3DN0KmpCmXptUMu/view" target="_blank">Quiz 1 — Written</a></li>
+          <li><a href="https://youtu.be/alhYkrjBTWI" target="_blank">Quiz 1 — Video (Yousef Odeh)</a></li>
+          <li><a href="https://drive.google.com/file/d/1sfoG7EZdYhK9idYCkzTleljmQ0gJ3QCV/view" target="_blank">Quiz 2 — Written</a></li>
+          <li><a href="https://youtu.be/yT3sY8VrOl0" target="_blank">Quiz 2 — Video (Yousef Odeh)</a></li>
+        </ul>
+      </div>
+      <div class="s-sec">
+        <div class="s-label">Code Examples</div>
+        <ul class="s-links">
+          <li><a href="#" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision');return false;">Revision 1–4</a></li>
+          <li><a href="#" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('classes1');return false;">Classes 1–2</a></li>
+          <li><a href="#" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('ctor');return false;">Constructors 1–3</a></li>
+          <li><a href="#" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('sep');return false;">File Separation</a></li>
+          <li><a href="#" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const1');return false;">Constants &amp; Statics</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- C++ BASICS -->
+<div class="page" id="page-cpp">
+  <div class="inner">
+    <div class="pg-head">
+      <div><div class="pg-cat">Study Guide · 01</div><h2 class="pg-title">C++ Basics</h2><p class="pg-by">Functions, loops, arrays, pointers — the foundation</p></div>
+      <div class="pg-icon">⚡</div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="study-step"><div class="sn">1</div><div><div class="st-title">Study materials by Ms. Ayat Droos</div><div class="chips"><a class="chip" href="https://drive.google.com/file/d/1Y8PJkWnis6NyZyxWVVhenK0Q7fwx1yA2/view" target="_blank">📄 Basics_1</a><a class="chip" href="https://drive.google.com/file/d/1Y8PJkWnis6NyZyxWVVhenK0Q7fwx1yA2/view" target="_blank">📄 Basics_2</a></div></div></div>
+        <div class="study-step"><div class="sn">2</div><div><div class="st-title">Videos by Dr. Ibrahim Albluwi</div><div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=-2lJ6tO9eK8" target="_blank">▶ Intro</a><a class="chip" href="https://www.youtube.com/watch?v=57iSuILXRec" target="_blank">▶ Functions</a><a class="chip" href="https://www.youtube.com/watch?v=B-yZm2wNW3k" target="_blank">▶ Arrays</a><a class="chip" href="https://www.youtube.com/watch?v=Q6oSeZPjg0M" target="_blank">▶ Pointers 1</a><a class="chip" href="https://www.youtube.com/watch?v=UsJVViySFQ4" target="_blank">▶ Pointers 2</a></div></div></div>
+        <div class="study-step"><div class="sn">3</div><div><div class="st-title">Code examples</div><div class="chips"><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision')">💻 Revision1</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision2')">💻 Revision2</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision3')">💻 Revision3</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision4')">💻 Revision4</span></div></div></div>
+        <div class="study-step"><div class="sn">4</div><div><div class="st-title">Past Quizzes</div><div class="chips"><a class="chip" href="https://api.psutarchive.com/assets/a443282b-d427-4f0e-95c2-e1273d916aeb" target="_blank">📝 Quiz1_2025</a></div></div></div>
+        <div class="study-step"><div class="sn">5</div><div><div class="st-title">Past Labs</div><div class="chips"><a class="chip" href="https://drive.google.com/drive/folders/1Q4LoUGefScYg-avjq8sXxh0hr7w4wSRe" target="_blank">🧪 LAB1_2025</a><a class="chip" href="https://drive.google.com/drive/folders/1_uCxCKr0rHzvwsqNxXPcD8rrCkCkufPS" target="_blank">🧪 LAB1_2024</a><a class="chip" href="https://drive.google.com/drive/folders/1jdW9sdU7ZxhTH8k94JyWxFCN-S2siZxv" target="_blank">🧪 LAB2_2025</a><a class="chip" href="https://drive.google.com/drive/folders/1wJlgMJh1i9XmTcH111BGHmv7hSSegn4g" target="_blank">🧪 LAB2_2024</a></div></div></div>
+      </div>
+      <div>
+        <div class="sbox"><div class="sbox-title">Key Concepts</div><ul><li><a href="#">Variables &amp; data types</a></li><li><a href="#">Functions &amp; return values</a></li><li><a href="#">For / while / do-while</a></li><li><a href="#">1D and 2D arrays</a></li><li><a href="#">Pointers &amp; references</a></li><li><a href="#">Dynamic memory (new/delete)</a></li><li><a href="#">String operations</a></li></ul></div>
+        <div class="pull">Prefer handwritten notes? Dana AL-taher's <a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e" target="_blank">notebook</a>, pages 0–9.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLASS BASICS -->
+<div class="page" id="page-classes">
+  <div class="inner">
+    <div class="pg-head">
+      <div><div class="pg-cat">Study Guide · 02</div><h2 class="pg-title">Class Basics</h2><p class="pg-by">Constructors, destructors, setters, getters, file separation</p></div>
+      <div class="pg-icon">🏗️</div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="study-step"><div class="sn">1</div><div><div class="st-title">Study materials by Ms. Ayat Droos</div><div class="chips"><a class="chip" href="https://drive.google.com/file/d/1HHpBwAlGGg_7Ig45dDCmrMnaPJHBWT-U/view" target="_blank">📄 Classes_Intro_1</a><a class="chip" href="https://drive.google.com/file/d/1MamAEZ2ZJlEu-1FLJvHZYA4S3G3__neA/view" target="_blank">📄 Classes_Intro_2</a></div></div></div>
+        <div class="study-step"><div class="sn">2</div><div><div class="st-title">Videos by Dr. Ibrahim Albluwi</div><div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=Fq3pekWUI3k" target="_blank">▶ Classes 1</a><a class="chip" href="https://www.youtube.com/watch?v=dH2L4aK-HUM" target="_blank">▶ Classes 2</a><a class="chip" href="https://www.youtube.com/watch?v=xV8odFvC1Cc" target="_blank">▶ Constructors</a><a class="chip" href="https://www.youtube.com/watch?v=JQz9qgSnDow" target="_blank">▶ Copy Ctor</a><a class="chip" href="https://www.youtube.com/watch?v=P7wI9rA4Ps0" target="_blank">▶ More Ctors</a><a class="chip" href="https://www.youtube.com/watch?v=qhHN7Cx73rI" target="_blank">▶ File Sep.</a></div></div></div>
+        <div class="study-step"><div class="sn">3</div><div><div class="st-title">Code examples</div><div class="chips"><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('classes1')">💻 Classes1</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('classes2')">💻 Classes2</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('sg')">💻 Setters/Getters</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('ctor')">💻 Constructors</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('dtor')">💻 Destructor</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('sep')">💻 Separation</span></div></div></div>
+        <div class="study-step"><div class="sn">4</div><div><div class="st-title">Past Quizzes</div><div class="chips"><a class="chip" href="https://api.psutarchive.com/assets/51acfd47-69cb-49b2-9d22-960799e6d994" target="_blank">📝 Quiz1_2022</a><a class="chip" href="https://drive.google.com/file/d/1E3QBdOgDINCMC_PR1gcQFvxy1TlYwl8Q/view" target="_blank">📝 Quiz1_2024</a><a class="chip" href="https://drive.google.com/file/d/1Wau2u9MF4Q52XHe0IkOV32IZQ2EyCK5R/view" target="_blank">📝 Q2_2025 s4</a><a class="chip" href="https://drive.google.com/file/d/1D4GyT6Ir5EPchYfps5YdAoo67ssC02_L/view" target="_blank">📝 Q2_2025 s5</a><a class="chip" href="https://drive.google.com/file/d/10nM2TiW5VBTmIrQqD9QZil3vD6PPv1XF/view" target="_blank">📝 Q2_2025 s9</a></div></div></div>
+        <div class="study-step"><div class="sn">5</div><div><div class="st-title">Past Labs</div><div class="chips"><a class="chip" href="https://drive.google.com/drive/folders/1VrVwgwMhSjxsKEUo6AY9zunkAXqjvmrK" target="_blank">🧪 LAB3_2025</a><a class="chip" href="https://drive.google.com/drive/folders/1IeaIJtPU9EvTMS9xcX5sBXyuM2DVnshH" target="_blank">🧪 LAB3_2024</a><a class="chip" href="https://drive.google.com/drive/folders/1aC4kFTitOamYI8uI5zviZdQnM4z8hZVv" target="_blank">🧪 LAB4_2025</a><a class="chip" href="https://drive.google.com/drive/folders/154XF7lAs2mscHpIV5Y9X8QAm-x7CMsi3" target="_blank">🧪 LAB4_2024</a><a class="chip" href="https://drive.google.com/drive/folders/1hVWJ6fbxkLx7Yt-cEg855BobS8ARXhfU" target="_blank">🧪 LAB5_2025</a><a class="chip" href="https://drive.google.com/drive/folders/1cZX3lWXaQA-twjMnWcktQuvHQTS1Bij_" target="_blank">🧪 LAB5_2024</a></div></div></div>
+      </div>
+      <div>
+        <div class="sbox"><div class="sbox-title">Key Concepts</div><ul><li><a href="#">Class definition &amp; members</a></li><li><a href="#">public / private access</a></li><li><a href="#">Setters &amp; getters</a></li><li><a href="#">Default constructor</a></li><li><a href="#">Parameterised constructor</a></li><li><a href="#">Initialiser list syntax</a></li><li><a href="#">Copy constructor</a></li><li><a href="#">Destructor</a></li><li><a href="#">.h / .cpp / Driver separation</a></li></ul></div>
+        <div class="pull">Pages 10–19 in Dana AL-taher's <a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e" target="_blank">notebook</a> cover this topic.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONST & STATIC -->
+<div class="page" id="page-const">
+  <div class="inner">
+    <div class="pg-head">
+      <div><div class="pg-cat">Study Guide · 03</div><h2 class="pg-title">Const &amp; Static</h2><p class="pg-by">Immutable members and class-level shared state</p></div>
+      <div class="pg-icon">🔒</div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="study-step"><div class="sn">📌</div><div><div class="st-title">const member variables</div><p style="font-size:15px;color:var(--ink2)">Must be initialised in the constructor initialiser list. Cannot be modified after construction.</p></div></div>
+        <div class="study-step"><div class="sn">📌</div><div><div class="st-title">const member functions</div><p style="font-size:15px;color:var(--ink2)">Declared with <code style="background:var(--rust-pale);padding:1px 5px;border-radius:2px;font-size:13px;">const</code> after the parameter list. Cannot modify any member variable.</p></div></div>
+        <div class="study-step"><div class="sn">📌</div><div><div class="st-title">static member variables</div><p style="font-size:15px;color:var(--ink2)">Shared across all instances. Must be defined once outside the class. Exists even with no objects.</p></div></div>
+        <div class="study-step"><div class="sn">📌</div><div><div class="st-title">static member functions</div><p style="font-size:15px;color:var(--ink2)">Can only access static members — no <code style="background:var(--rust-pale);padding:1px 5px;border-radius:2px;font-size:13px;">this</code> pointer. Called via <code style="background:var(--rust-pale);padding:1px 5px;border-radius:2px;font-size:13px;">ClassName::method()</code>.</p></div></div>
+        <div class="study-step"><div class="sn">3</div><div><div class="st-title">Code examples</div><div class="chips"><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const1')">💻 Constants1.cpp</span><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const2')">💻 Constants2.cpp</span></div></div></div>
+      </div>
+      <div>
+        <div class="pull">The interaction between <em>const objects</em> and <em>const member functions</em> is a common exam question.</div>
+        <div class="sbox"><div class="sbox-title">Common Mistakes</div><ul><li><a href="#">Forgetting to init const in init-list</a></li><li><a href="#">Calling non-const method on const object</a></li><li><a href="#">Forgetting to define static outside class</a></li><li><a href="#">Accessing instance members from static fn</a></li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSITION -->
+<div class="page" id="page-composition">
+  <div class="inner">
+    <div class="pg-head">
+      <div><div class="pg-cat">Study Guide · 04</div><h2 class="pg-title">Composition</h2><p class="pg-by">The "has-a" relationship — objects as members of other objects</p></div>
+      <div class="pg-icon">🧩</div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="study-step"><div class="sn">1</div><div><div class="st-title">Study material by Ms. Ayat Droos</div><div class="chips"><a class="chip" href="https://drive.google.com/file/d/1df9XeIjAwjSxltvUeb8wHwrUsoXFJznN/view" target="_blank">📄 Composition.pdf</a></div></div></div>
+        <div class="study-step"><div class="sn">2</div><div><div class="st-title">Videos by Dr. Ibrahim Albluwi</div><div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=eTWn5UJmEu8" target="_blank">▶ Composition 1</a><a class="chip" href="https://www.youtube.com/watch?v=ifo3aDkOSW8" target="_blank">▶ Composition 2</a></div></div></div>
+        <div class="study-step"><div class="sn">3</div><div><div class="st-title">Code examples</div><div class="chips"><span class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const2')">💻 Constants2.cpp</span></div></div></div>
+        <div class="study-step"><div class="sn">4</div><div><div class="st-title">Past Quizzes</div><div class="chips"><a class="chip" href="https://drive.google.com/file/d/1QdoB_vrYq9rr2SLdlTMS3ZZhRKTPK3Ub/view" target="_blank">📝 Q3_2025 s4</a><a class="chip" href="https://drive.google.com/file/d/1WE4W7D5-Aj9LMWakdjekzqrcy9SC3OOZ/view" target="_blank">📝 Q3_2025 s5</a><a class="chip" href="https://drive.google.com/file/d/1WIJ15WQ4WUEtnfKnD0fJkgnTr_nbVUom/view" target="_blank">📝 Q3_2025 s9</a></div></div></div>
+        <div class="study-step"><div class="sn">5</div><div><div class="st-title">Past Labs</div><div class="chips"><a class="chip" href="https://drive.google.com/drive/folders/1LS9H3Xm3MKneKbHpgm6plrB01UmB9Gto" target="_blank">🧪 LAB7_2025</a><a class="chip" href="https://drive.google.com/drive/folders/1yzkdoOIAj_EyuuoxgSOQMWkkeKp1s-Ra" target="_blank">🧪 LAB7_2024</a></div></div></div>
+      </div>
+      <div>
+        <div class="sbox"><div class="sbox-title">Key Idea</div><ul><li><a href="#">A class can contain objects of other classes</a></li><li><a href="#">Member object constructor runs first</a></li><li><a href="#">Use initialiser list to construct members</a></li><li><a href="#">Example: Person has-a Date</a></li></ul></div>
+        <div class="pull">Pages 23–25 in Dana's <a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e" target="_blank">notebook</a> cover Composition.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CODE -->
+<div class="page" id="page-code">
+  <div class="code-wrap">
+    <div class="pg-head" style="border-bottom:2px solid var(--ink);margin-bottom:28px;">
+      <div><div class="pg-cat">Repository · All Files</div><h2 class="pg-title">Code Examples</h2></div>
+    </div>
+    <div class="file-tabs" id="ftabs">
+      <div class="ftab active" onclick="ct('revision')" id="tab-revision">Revision1.cpp</div>
+      <div class="ftab" onclick="ct('revision2')" id="tab-revision2">Revision2.cpp</div>
+      <div class="ftab" onclick="ct('revision3')" id="tab-revision3">Revision3.cpp</div>
+      <div class="ftab" onclick="ct('revision4')" id="tab-revision4">Revision4.cpp</div>
+      <div class="ftab" onclick="ct('classes1')" id="tab-classes1">Classes1.cpp</div>
+      <div class="ftab" onclick="ct('classes2')" id="tab-classes2">Classes2.cpp</div>
+      <div class="ftab" onclick="ct('sg')" id="tab-sg">SettersGetters.cpp</div>
+      <div class="ftab" onclick="ct('ctor')" id="tab-ctor">Constructors.cpp</div>
+      <div class="ftab" onclick="ct('dtor')" id="tab-dtor">Destructor.cpp</div>
+      <div class="ftab" onclick="ct('sep')" id="tab-sep">Separation</div>
+      <div class="ftab" onclick="ct('arr')" id="tab-arr">ArrayOfObjects.cpp</div>
+      <div class="ftab" onclick="ct('const1')" id="tab-const1">Constants1.cpp</div>
+      <div class="ftab" onclick="ct('const2')" id="tab-const2">Constants2.cpp</div>
+    </div>
+    <div class="editor">
+      <div class="ebar">
+        <div class="edots"><div class="ed ed-r"></div><div class="ed ed-y"></div><div class="ed ed-g"></div></div>
+        <span class="efname" id="efname">Revision1.cpp</span>
+        <button class="copybtn" onclick="copyCode()">Copy</button>
+      </div>
+      <pre id="cv"></pre>
+    </div>
+    <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);">All files on GitHub → <a href="https://github.com/yousefammmar/OOP/tree/main/code" target="_blank" style="color:var(--rust);">github.com/yousefammmar/OOP</a></div>
+  </div>
+</div>
+
+<!-- QUIZZES -->
+<div class="page" id="page-quizzes">
+  <div class="inner">
+    <div class="pg-head"><div><div class="pg-cat">Practice Material</div><h2 class="pg-title">Quiz Solutions</h2><p class="pg-by">Explained by Yousef Odeh on YouTube — written solutions on Drive</p></div><div class="pg-icon">📝</div></div>
+    <div class="section-tag" style="margin-bottom:14px;">Solutions with Video Explanations</div>
+    <div class="qgrid">
+      <div class="qcard"><div class="q-num">Quiz 01 ·</div><div class="q-title">Quiz One</div><ul><li><a href="https://drive.google.com/file/d/18LVy5ezrBK5PQQXPb3DN0KmpCmXptUMu/view" target="_blank">📄 Written Solution</a></li><li><a href="https://youtu.be/alhYkrjBTWI" target="_blank">▶ YouTube — Yousef Odeh</a></li></ul></div>
+      <div class="qcard"><div class="q-num">Quiz 02 ·</div><div class="q-title">Quiz Two</div><ul><li><a href="https://drive.google.com/file/d/1sfoG7EZdYhK9idYCkzTleljmQ0gJ3QCV/view" target="_blank">📄 Written Solution</a></li><li><a href="https://youtu.be/yT3sY8VrOl0" target="_blank">▶ YouTube — Yousef Odeh</a></li></ul></div>
+      <div class="qcard"><div class="q-num">Quiz 03 ·</div><div class="q-title">Quiz Three</div><ul><li><a href="https://drive.google.com/file/d/1jqrX3ICV-E72HAmsqEFoCVCcmatjKR6B/view?usp=sharing" target="_blank">📄 Written Solution</a></li><li><a href="https://youtu.be/0o426txM_5w" target="_blank">▶ YouTube — Yousef Odeh</a></li></ul></div>
+    </div>
+    <div class="section-tag" style="margin-bottom:14px;margin-top:8px;">All Past Quizzes by Topic</div>
+    <div class="qgrid">
+      <div class="qcard"><div class="q-num">Topic 01 ·</div><div class="q-title">C++ Basics</div><ul><li><a href="https://api.psutarchive.com/assets/a443282b-d427-4f0e-95c2-e1273d916aeb" target="_blank">Quiz1_2025</a></li></ul></div>
+      <div class="qcard"><div class="q-num">Topic 02 ·</div><div class="q-title">Class Basics</div><ul><li><a href="https://api.psutarchive.com/assets/51acfd47-69cb-49b2-9d22-960799e6d994" target="_blank">Quiz1_2022</a></li><li><a href="https://drive.google.com/file/d/1E3QBdOgDINCMC_PR1gcQFvxy1TlYwl8Q/view" target="_blank">Quiz1_2024</a></li><li><a href="https://drive.google.com/file/d/1Wau2u9MF4Q52XHe0IkOV32IZQ2EyCK5R/view" target="_blank">Quiz2_2025 — sec 4</a></li><li><a href="https://drive.google.com/file/d/1D4GyT6Ir5EPchYfps5YdAoo67ssC02_L/view" target="_blank">Quiz2_2025 — sec 5</a></li><li><a href="https://drive.google.com/file/d/10nM2TiW5VBTmIrQqD9QZil3vD6PPv1XF/view" target="_blank">Quiz2_2025 — sec 9</a></li></ul></div>
+      <div class="qcard"><div class="q-num">Topic 04 ·</div><div class="q-title">Composition</div><ul><li><a href="https://drive.google.com/file/d/1QdoB_vrYq9rr2SLdlTMS3ZZhRKTPK3Ub/view" target="_blank">Quiz3_2025 — sec 4</a></li><li><a href="https://drive.google.com/file/d/1WE4W7D5-Aj9LMWakdjekzqrcy9SC3OOZ/view" target="_blank">Quiz3_2025 — sec 5</a></li><li><a href="https://drive.google.com/file/d/1WIJ15WQ4WUEtnfKnD0fJkgnTr_nbVUom/view" target="_blank">Quiz3_2025 — sec 9</a></li></ul></div>
+      <div class="qcard"><div class="q-num">Archive ·</div><div class="q-title">All Exams</div><ul><li><a href="https://psutarchive.com/courses/11206?tab=exam" target="_blank">PSUT Archive</a></li><li><a href="https://drive.google.com/drive/folders/1o8Ae0gTwBTSMBRKtLVBGLt8qNM6WjupF" target="_blank">Past Quizzes Drive</a></li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- ALL LINKS -->
+<div class="page" id="page-links">
+  <div class="inner">
+    <div class="pg-head"><div><div class="pg-cat">Resources</div><h2 class="pg-title">All External Links</h2><p class="pg-by">Every resource from the repository, organised by category</p></div><div class="pg-icon">🔗</div></div>
+    <div class="lcols">
+      <div class="lcol"><div class="lcol-label">Videos</div><ul><li><a href="https://www.youtube.com/playlist?list=PLpNZbvo-UcMIAwNqyv1PkPlAn7LLSbsZV" target="_blank">Dr. Ibrahim — Full Playlist</a></li></ul></div>
+      <div class="lcol"><div class="lcol-label">Files &amp; Slides</div><ul><li><a href="https://drive.google.com/drive/folders/1fTKKSbcEAyym_ivfNNB-kxm5-PWHSjSm" target="_blank">Lecture Slides (Drive)</a></li><li><a href="https://drive.google.com/drive/folders/1pglAkv7Seib3L2HYHUvhogdKQ3L5GWRI" target="_blank">Past Labs (Drive)</a></li><li><a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e" target="_blank">Dana's Handwritten Notebook</a></li></ul></div>
+      <div class="lcol"><div class="lcol-label">Archive &amp; Code</div><ul><li><a href="https://psutarchive.com/courses/11206?tab=exam" target="_blank">Past Exams — PSUT Archive</a></li><li><a href="https://drive.google.com/drive/folders/1o8Ae0gTwBTSMBRKtLVBGLt8qNM6WjupF" target="_blank">Past Quizzes — Drive</a></li><li><a href="https://github.com/yousefammmar/OOP" target="_blank">GitHub Repository</a></li></ul></div>
+    </div>
+    <div class="section-tag" style="margin-bottom:14px;">Video Index — Dr. Ibrahim Albluwi</div>
+    <div class="vidx">
+      <a class="vl" href="https://www.youtube.com/watch?v=-2lJ6tO9eK8" target="_blank">01 · Introduction to C++</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=57iSuILXRec" target="_blank">02 · Functions</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=B-yZm2wNW3k" target="_blank">03 · Arrays</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=Q6oSeZPjg0M" target="_blank">04 · Pointers 1</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=UsJVViySFQ4" target="_blank">05 · Pointers 2</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=Fq3pekWUI3k" target="_blank">06 · Classes 1</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=dH2L4aK-HUM" target="_blank">07 · Classes 2</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=xV8odFvC1Cc" target="_blank">09 · Constructors</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=JQz9qgSnDow" target="_blank">10 · Copy Constructor</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=P7wI9rA4Ps0" target="_blank">11 · More Constructors</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=qhHN7Cx73rI" target="_blank">12 · File Separation</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=eTWn5UJmEu8" target="_blank">19 · Composition 1</a>
+      <a class="vl" href="https://www.youtube.com/watch?v=ifo3aDkOSW8" target="_blank">20 · Composition 2</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>OOP Study Guide · CS11253 · PSUT</span>
+  <span>Built by <a href="https://github.com/yousefammmar" target="_blank">yousefammmar</a> · Spring 2025</span>
+</footer>
+
+<script>
+const cf = {
+  revision:{name:'Revision1.cpp',code:`#include<iostream>\nusing namespace std;\n\nint main() {\n    cout << "Enter width: ";\n    int w; cin >> w;\n    cout << "Enter length: ";\n    int l; cin >> l;\n    cout << "Area: " << l*w;\n}\n\n// Functions\nint calculate_sum(int x, int y) {\n    return x + y;\n}\n\n// for loop\nfor (int i = 0; i < 10; i++) { cout << i << endl; }\n\n// while loop\nint x = 0;\nwhile (x < 10) { cout << x++ << endl; }\n\n// do-while\nint y = 0;\ndo { cout << y++ << endl; } while (y < 10);\n\n// nested — star triangle\nfor (int i = 0; i < 10; i++) {\n    for (int j = 0; j < i; j++) cout << "*";\n    cout << endl;\n}`},
+  revision2:{name:'Revision2.cpp',code:`#include<iostream>\nusing namespace std;\n\nint main() {\n    int arr[5] = {1,2,3,4,5};\n    for (int i = 0; i < 5; i++) cout << arr[i] << " ";\n\n    int matrix[3][3] = {{1,2,3},{4,5,6},{7,8,9}};\n    for (int i = 0; i < 3; i++) {\n        for (int j = 0; j < 3; j++) cout << matrix[i][j] << " ";\n        cout << endl;\n    }\n}\n\nvoid printArray(int arr[], int size) {\n    for (int i = 0; i < size; i++) cout << arr[i] << " ";\n}\n\nint sumArray(int arr[], int size) {\n    int sum = 0;\n    for (int i = 0; i < size; i++) sum += arr[i];\n    return sum;\n}`},
+  revision3:{name:'Revision3.cpp',code:`#include<iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;\n    int* ptr = &x;\n    cout << "Value: " << *ptr << endl;   // 10\n    *ptr = 20;\n    cout << "Modified: " << x << endl;  // 20\n\n    // Pointer arithmetic\n    int arr[5] = {10,20,30,40,50};\n    int* p = arr;\n    for (int i = 0; i < 5; i++) cout << *(p+i) << " ";\n\n    // Dynamic memory\n    int* d = new int(42);\n    cout << *d; delete d;\n    int* da = new int[5];\n    delete[] da;\n}\n\nvoid increment(int* n) { (*n)++; }\nvoid incrementRef(int& n) { n++; }`},
+  revision4:{name:'Revision4.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\nint main() {\n    string name = "PSUT";\n    cout << name.length() << endl;     // 4\n    cout << name.substr(0,2) << endl;  // PS\n    name += " OOP";\n    if (name == "PSUT OOP") cout << "Match!" << endl;\n\n    int n; cin >> n;\n    string s; getline(cin, s);\n\n    int day = 1;\n    switch (day) {\n        case 1: cout << "Monday"; break;\n        case 2: cout << "Tuesday"; break;\n        default: cout << "Other"; break;\n    }\n}`},
+  classes1:{name:'Classes1.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\nclass Student {\npublic:\n    int id_;\n    string name_;\n    double gpa_;\n    string address_;\n\n    void printStudentInfo() {\n        cout << id_ << endl << name_ << endl\n             << gpa_ << endl << address_ << endl;\n    }\n    double addBonus(double amt) { return gpa_ + amt; }\n    void modifyName(string name) { name_ = name; }\n};\n\nint main() {\n    Student st1;\n    st1.id_=1; st1.name_="Samer";\n    st1.address_="Amman"; st1.gpa_=90.0;\n    st1.printStudentInfo();\n\n    Student st3;    // WARNING: garbage data!\n    st3.printStudentInfo();\n}`},
+  classes2:{name:'Classes2.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\nclass BankAccount {\nprivate:\n    string owner_;\n    double balance_;\npublic:\n    BankAccount(string owner, double initial)\n        : owner_(owner), balance_(initial) {}\n\n    void deposit(double amount) {\n        if (amount > 0) balance_ += amount;\n    }\n    bool withdraw(double amount) {\n        if (amount > 0 && amount <= balance_) {\n            balance_ -= amount; return true;\n        }\n        return false;\n    }\n    void printInfo() const {\n        cout << "Owner: " << owner_ << endl;\n        cout << "Balance: " << balance_ << endl;\n    }\n};\n\nint main() {\n    BankAccount acc("Yousef", 1000.0);\n    acc.deposit(500.0);\n    acc.withdraw(200.0);\n    acc.printInfo();\n    // acc.balance_ = 0;  // ERROR: private!\n}`},
+  sg:{name:'SettersandGetters1.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\nclass Student {\nprivate:\n    int id_; string name_; double gpa_;\npublic:\n    int    getId()   const { return id_; }\n    string getName() const { return name_; }\n    double getGpa()  const { return gpa_; }\n\n    void setId(int id)       { if (id>0) id_=id; }\n    void setName(string n)   { if (!n.empty()) name_=n; }\n    void setGpa(double g)    { if (g>=0&&g<=100) gpa_=g; }\n\n    void printInfo() const {\n        cout << id_ << " | " << name_ << " | " << gpa_ << endl;\n    }\n};\n\nint main() {\n    Student s;\n    s.setId(1); s.setName("Yousef"); s.setGpa(95.0);\n    s.printInfo();\n    s.setGpa(-10);   // rejected — validation!\n    s.printInfo();   // GPA unchanged\n}`},
+  ctor:{name:'Constructors1.cpp / 2 / 3',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\n// Default constructor\nclass Point {\npublic:\n    int x_, y_;\n    Point() : x_(0), y_(0) {}\n    void print() { cout << "(" << x_ << "," << y_ << ")"; }\n};\n\n// Parameterised constructor\nclass Circle {\nprivate:\n    double radius_; Point center_;\npublic:\n    Circle(double r, int cx, int cy)\n        : radius_(r) { center_.x_=cx; center_.y_=cy; }\n    Circle() : radius_(1.0) {}\n    double area() { return 3.14159 * radius_ * radius_; }\n};\n\n// Initialiser list (required for const members)\nclass Student {\nprivate:\n    const int id_;\n    string name_; double gpa_;\npublic:\n    Student(int id, string name, double gpa)\n        : id_(id), name_(name), gpa_(gpa) {}\n\n    // Copy constructor\n    Student(const Student& other)\n        : id_(other.id_), name_(other.name_), gpa_(other.gpa_) {\n        cout << "Copy constructor called" << endl;\n    }\n    void print() const {\n        cout << id_ << " " << name_ << " " << gpa_ << endl;\n    }\n};\n\nint main() {\n    Student s1(1, "Yousef", 95.0);\n    Student s2 = s1;   // copy constructor\n    s1.print(); s2.print();\n}`},
+  dtor:{name:'Destructor.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\nclass FileHandler {\nprivate:\n    string filename_;\npublic:\n    FileHandler(string name) : filename_(name) {\n        cout << "Opening: " << filename_ << endl;\n    }\n    void writeData(string data) {\n        cout << "Writing: " << data << endl;\n    }\n    ~FileHandler() {\n        cout << "Closing: " << filename_ << endl;\n    }\n};\n\nclass DynamicArray {\nprivate:\n    int* data_; int size_;\npublic:\n    DynamicArray(int size) : size_(size) {\n        data_ = new int[size];\n        cout << "Allocated " << size << " ints" << endl;\n    }\n    ~DynamicArray() {\n        delete[] data_;   // MUST free!\n        cout << "Freed" << endl;\n    }\n};\n\nint main() {\n    {\n        FileHandler f("notes.txt");   // constructor\n        f.writeData("Hello OOP!");\n    }   // destructor auto-called here\n    DynamicArray arr(10);\n}`},
+  sep:{name:'Separation (.h + .cpp + Driver)',code:`// ── Seperation.h ─────────────────────────\n#pragma once\n#include <string>\nusing namespace std;\n\nclass Student {\nprivate:\n    int id_; string name_; double gpa_;\npublic:\n    Student();\n    Student(int id, string name, double gpa);\n    Student(const Student& other);\n    ~Student();\n    int    getId()   const;\n    string getName() const;\n    double getGpa()  const;\n    void setId(int); void setName(string); void setGpa(double);\n    void printInfo() const;\n};\n\n\n// ── Seperation.cpp ────────────────────────\n#include "Seperation.h"\n#include <iostream>\n\nStudent::Student() : id_(0), name_(""), gpa_(0.0) {}\nStudent::Student(int id, string name, double gpa)\n    : id_(id), name_(name), gpa_(gpa) {}\nStudent::Student(const Student& o)\n    : id_(o.id_), name_(o.name_), gpa_(o.gpa_) {}\nStudent::~Student() {}\n\nint    Student::getId()   const { return id_; }\nstring Student::getName() const { return name_; }\ndouble Student::getGpa()  const { return gpa_; }\n\nvoid Student::setId(int id)    { if (id>0) id_=id; }\nvoid Student::setName(string n){ if (!n.empty()) name_=n; }\nvoid Student::setGpa(double g) { if (g>=0&&g<=100) gpa_=g; }\n\nvoid Student::printInfo() const {\n    cout << id_ << " | " << name_ << " | " << gpa_ << endl;\n}\n\n\n// ── Driver.cpp ────────────────────────────\n#include "Seperation.h"\n\nint main() {\n    Student s1(1, "Yousef", 95.0);\n    Student s2 = s1;\n    s1.printInfo(); s2.printInfo();\n    s2.setGpa(88.5);\n    s2.printInfo();\n}`},
+  arr:{name:'ObjectsArray1.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\nclass Student {\nprivate:\n    int id_; string name_; double gpa_;\npublic:\n    Student() : id_(0), name_(""), gpa_(0.0) {}\n    Student(int id, string name, double gpa)\n        : id_(id), name_(name), gpa_(gpa) {}\n    void print() const {\n        cout << id_ << " | " << name_ << " | " << gpa_ << endl;\n    }\n    double getGpa()  const { return gpa_; }\n    string getName() const { return name_; }\n};\n\nint main() {\n    Student students[3] = {\n        Student(1,"Yousef",95.0),\n        Student(2,"Tasneem",92.0),\n        Student(3,"Fatema",88.5)\n    };\n    for (int i=0;i<3;i++) students[i].print();\n\n    // Find top GPA\n    int best=0;\n    for (int i=1;i<3;i++)\n        if (students[i].getGpa()>students[best].getGpa()) best=i;\n    cout << "Top: " << students[best].getName() << endl;\n\n    // Dynamic array\n    Student* dynArr = new Student[3];\n    dynArr[0] = Student(4,"Ali",78.0);\n    dynArr[0].print();\n    delete[] dynArr;\n}`},
+  const1:{name:'Constants1.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\nclass Circle {\nprivate:\n    const double PI = 3.14159;\n    double radius_;\npublic:\n    Circle(double r) : radius_(r) {}\n    double area()      const { return PI*radius_*radius_; }\n    double perimeter() const { return 2*PI*radius_; }\n};\n\nclass Student {\nprivate:\n    string name_;\n    static int count_;   // shared across all instances\npublic:\n    Student(string name) : name_(name) { count_++; }\n    ~Student() { count_--; }\n    static int getCount() { return count_; }\n    void print() const {\n        cout << name_ << " (total: " << count_ << ")" << endl;\n    }\n};\n\nint Student::count_ = 0;   // define outside class!\n\nint main() {\n    cout << Student::getCount() << endl;  // 0\n    Student s1("Yousef"), s2("Tasneem");\n    cout << Student::getCount() << endl;  // 2\n    { Student s3("Fatema");\n      cout << Student::getCount() << endl; }  // 3, then 2\n    cout << Student::getCount() << endl;  // 2\n    Circle c(5.0);\n    cout << c.area() << endl;\n}`},
+  const2:{name:'Constants2.cpp',code:`#include<iostream>\n#include<string>\nusing namespace std;\n\n// Composition: Person HAS-A Date\nclass Date {\nprivate:\n    int day_, month_, year_;\npublic:\n    Date(int d,int m,int y):day_(d),month_(m),year_(y){}\n    Date():day_(1),month_(1),year_(2025){}\n    void print() const { cout<<day_<<"/"<<month_<<"/"<<year_; }\n    int getYear() const { return year_; }\n};\n\nclass Person {\nprivate:\n    string name_;\n    Date birthDate_;      // composition\npublic:\n    Person(string name, Date dob):name_(name),birthDate_(dob){}\n    int getAge() const { return 2025-birthDate_.getYear(); }\n    void print() const {\n        cout<<"Name: "<<name_<<endl;\n        cout<<"DOB: "; birthDate_.print(); cout<<endl;\n        cout<<"Age: "<<getAge()<<endl;\n    }\n};\n\nclass Course {\nprivate:\n    string title_;\n    static int totalCourses_;\npublic:\n    Course(string t):title_(t){totalCourses_++;}\n    ~Course(){totalCourses_--;}\n    static int getTotal(){return totalCourses_;}\n};\nint Course::totalCourses_=0;\n\nint main() {\n    Date dob(15,3,2003);\n    Person p("Yousef", dob);\n    p.print();\n    Course c1("OOP"), c2("Algorithms");\n    cout << "Courses: " << Course::getTotal() << endl;\n}`}
+};
+
+let activeTab='revision';
+
+function hlCpp(code){
+  const kws=['int','void','return','class','public','private','protected',
+    'if','else','for','while','do','switch','case','break','default','new',
+    'delete','using','namespace','const','static','bool','double','float',
+    'char','string','true','false','nullptr','this','endl','cin','cout',
+    'include','pragma'];
+  code=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  code=code.replace(/(\/\/[^\n]*)/g,'<span class="cm">$1</span>');
+  code=code.replace(/"([^"\\]*)"/g,'<span class="st">"$1"</span>');
+  code=code.replace(/^(#\w+)/gm,'<span class="pp">$1</span>');
+  const re=new RegExp('\\b('+kws.join('|')+')\\b','g');
+  code=code.replace(re,'<span class="kw">$1</span>');
+  return code;
+}
+
+function ct(id){
+  const f=cf[id]; if(!f) return;
+  activeTab=id;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  const el=document.getElementById('tab-'+id);
+  if(el){el.classList.add('active');el.scrollIntoView({block:'nearest',inline:'center'});}
+  document.getElementById('efname').textContent=f.name;
+  document.getElementById('cv').innerHTML=hlCpp(f.code);
+}
+
+function copyCode(){
+  const code=cf[activeTab]?.code||'';
+  navigator.clipboard.writeText(code).then(()=>{
+    const b=document.querySelector('.copybtn');
+    b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',1500);
+  });
+}
+
+function nav(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);
+  if(pg) pg.classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='code') ct(activeTab);
+  window.scrollTo(0,0);
+}
+
+ct('revision');
+</script>
+</body>
+</html>
