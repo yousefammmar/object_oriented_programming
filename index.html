@@ -872,6 +872,7 @@
         <button class="nav-btn" onclick="nav('classes',this)">Class Basics</button>
         <button class="nav-btn" onclick="nav('const',this)">Const &amp; Static</button>
         <button class="nav-btn" onclick="nav('composition',this)">Composition</button>
+        <button class="nav-btn" onclick="nav('labs',this)">Labs</button>
         <button class="nav-btn" onclick="nav('code',this)">Code Files</button>
         <button class="nav-btn" onclick="nav('quizzes',this)">Quizzes</button>
         <button class="nav-btn" onclick="nav('links',this)">All Links</button>
@@ -908,6 +909,11 @@
             <div class="t-name">Composition</div>
             <div class="t-desc">Objects inside objects — has-a relationship</div>
           </div>
+          <div class="topic-cell" onclick="nav('labs',document.querySelectorAll('.nav-btn')[5])">
+            <div class="t-num">05 ·</div>
+            <div class="t-name">Practical Labs</div>
+            <div class="t-desc">Video walkthroughs &amp; solutions (1–10)</div>
+          </div>
         </div>
         <div class="ornament">✦ · ✦ · ✦</div>
         <div class="section-tag">Recommended Study Order</div>
@@ -923,11 +929,15 @@
         </div>
         <div class="how-step">
           <div class="sc">3</div>
-          <div><strong>Study the code examples</strong> — all .cpp files embedded here with syntax highlighting.</div>
+          <div><strong>Practice the labs</strong> — watch the video walkthroughs and study solutions for Lab 1–10 to master the practical side.</div>
         </div>
         <div class="how-step">
           <div class="sc">4</div>
-          <div><strong>Practice past quizzes and labs</strong> — every topic links to past papers. Practice is
+          <div><strong>Study the code examples</strong> — all .cpp files embedded here with syntax highlighting.</div>
+        </div>
+        <div class="how-step">
+          <div class="sc">5</div>
+          <div><strong>Practice past quizzes</strong> — every topic links to past papers. Practice is
             everything.</div>
         </div>
       </div>
@@ -967,18 +977,18 @@
           <div class="s-label">Code Examples</div>
           <ul class="s-links">
             <li><a href="#"
-                onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision');return false;">Revision
+                onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('revision');return false;">Revision
                 1–4</a></li>
             <li><a href="#"
-                onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('classes1');return false;">Classes
+                onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('classes1');return false;">Classes
                 1–2</a></li>
             <li><a href="#"
-                onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('ctor');return false;">Constructors
+                onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('ctor');return false;">Constructors
                 1–3</a></li>
-            <li><a href="#" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('sep');return false;">File
+            <li><a href="#" onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('sep');return false;">File
                 Separation</a></li>
             <li><a href="#"
-                onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const1');return false;">Constants
+                onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('const1');return false;">Constants
                 &amp; Statics</a></li>
           </ul>
         </div>
@@ -1027,12 +1037,12 @@
             <div>
               <div class="st-title">Code examples</div>
               <div class="chips"><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision')">💻 Revision1</span><span
-                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision2')">💻
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('revision')">💻 Revision1</span><span
+                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('revision2')">💻
                   Revision2</span><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision3')">💻
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('revision3')">💻
                   Revision3</span><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('revision4')">💻 Revision4</span>
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('revision4')">💻 Revision4</span>
               </div>
             </div>
           </div>
@@ -1124,14 +1134,14 @@
             <div>
               <div class="st-title">Code examples</div>
               <div class="chips"><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('classes1')">💻 Classes1</span><span
-                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('classes2')">💻
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('classes1')">💻 Classes1</span><span
+                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('classes2')">💻
                   Classes2</span><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('sg')">💻 Setters/Getters</span><span
-                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('ctor')">💻
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('sg')">💻 Setters/Getters</span><span
+                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('ctor')">💻
                   Constructors</span><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('dtor')">💻 Destructor</span><span
-                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('sep')">💻
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('dtor')">💻 Destructor</span><span
+                  class="chip" onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('sep')">💻
                   Separation</span></div>
             </div>
           </div>
@@ -1249,9 +1259,9 @@
             <div>
               <div class="st-title">Code examples</div>
               <div class="chips"><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const1')">💻
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('const1')">💻
                   Constants1.cpp</span><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const2')">💻 Constants2.cpp</span>
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('const2')">💻 Constants2.cpp</span>
               </div>
             </div>
           </div>
@@ -1309,7 +1319,7 @@
             <div>
               <div class="st-title">Code examples</div>
               <div class="chips"><span class="chip"
-                  onclick="nav('code',document.querySelectorAll('.nav-btn')[5]);ct('const2')">💻 Constants2.cpp</span>
+                  onclick="nav('code',document.querySelectorAll('.nav-btn')[6]);ct('const2')">💻 Constants2.cpp</span>
               </div>
             </div>
           </div>
@@ -1351,6 +1361,113 @@
           <div class="pull">Pages 23–25 in Dana's <a
               href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e"
               target="_blank">notebook</a> cover Composition.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LABS -->
+  <div class="page" id="page-labs">
+    <div class="inner">
+      <div class="pg-head">
+        <div>
+          <div class="pg-cat">Practical · Walkthroughs</div>
+          <h2 class="pg-title">Lab Explanations</h2>
+          <p class="pg-by">Step-by-step video guides &amp; written solutions for every Lab</p>
+        </div>
+        <div class="pg-icon">📂</div>
+      </div>
+      
+      <div class="section-tag" style="margin-bottom:14px;">Lab Folders (Video &amp; Solution)</div>
+      <div class="qgrid">
+        <div class="qcard">
+          <div class="q-num">Lab 01 ·</div>
+          <div class="q-title">C++ Revision</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1no30d-22gZ6hkD-3rGYAFuspjy3YzuEO?usp=sharing" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1Q4LoUGefScYg-avjq8sXxh0hr7w4wSRe" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 02 ·</div>
+          <div class="q-title">Pointers &amp; Memory</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1S1uLIxf8XPMeUXWVb2Mgooix-x_YPAdS?usp=sharing" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1jdW9sdU7ZxhTH8k94JyWxFCN-S2siZxv" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 03 ·</div>
+          <div class="q-title">Classes Intro</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1J114TTVzL_LfdHAh2z-Om8hdRW3Tol2A?usp=sharing" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1MPHfrYJVrfe0n1RbSKI57CPP4jPCj_Jt?usp=sharing" target="_blank">📄 Extra Exercises Solutions</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1FZoHDg1SKs98TX1XtEbFRHuBVGc07n9Y?usp=sharing" target="_blank">📄 Lab Solutions</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 04 ·</div>
+          <div class="q-title">Ctors &amp; Dtors</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1k_Ip39y_iPKAajQvSUshrMMCo1fpDI9l?usp=sharing" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1ZMaCqb8TaSh_rUtRPmjo-dy_5EZQKSRg?usp=sharing" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 05 ·</div>
+          <div class="q-title">Const &amp; Static</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1Cp2NvKFJkxRMCUVUbscH2SnsiaVIoh9P?usp=sharing" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/19Bi2zqxlrjZ5FTOJkmiBZFI3SDjxkPxp?usp=sharing" target="_blank">📄 Solution Drive</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1dRHZ2GSaeTYeTkPhRR4-1TKkIEQkH1uD?usp=sharing" target="_blank">📄 Video Codes</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 06 ·</div>
+          <div class="q-title">Composition</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1RP-9FeooXt1ZhYynN6Rra-dl53f9uZEl" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1abN1BPmB8D6cg_eB9NZhUhkAU_fnQ9F3" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 07 ·</div>
+          <div class="q-title">Overloading</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1qh6SyEcJL9-UE9C3jLgZUYzVXNFQTelD" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1LS9H3Xm3MKneKbHpgm6plrB01UmB9Gto" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 08 ·</div>
+          <div class="q-title">Inheritance 1</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1KZ6vWbFT3wncDwH_vuQD4c1HfeVrgB-_?usp=sharing" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/16vOiaY7AEVwSHufk8RYAn452awbIyLEq?usp=sharing" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 09 ·</div>
+          <div class="q-title">Inheritance 2</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1w70x994MrTH0mLJ_Di1JMt493Ikr4wOa?usp=sharing" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1jya4Q5vqQlCk4gH-7ECoroBprAP2URz4?usp=sharing" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard">
+          <div class="q-num">Lab 10 ·</div>
+          <div class="q-title">Polymorphism</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1cnNLE7nVoMiHIYIysPa0OzZI_TI2IOEg" target="_blank">🎬 Video Walkthrough</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1AEOcZpYVnJneD7Bd1I-Cs--1s_M5FjXx" target="_blank">📄 Solution Drive</a></li>
+          </ul>
+        </div>
+        <div class="qcard" style="background:var(--rust-pale);border:1px solid var(--rust);">
+          <div class="q-num" style="color:var(--rust);">TOPIC ·</div>
+          <div class="q-title">Operator Overload</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1ajF3TSj5M6kOsV51jwr7734aNDGqUdT9" target="_blank" style="color:var(--rust);">🎬 Deep Dive Video</a></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -1528,6 +1645,14 @@
             <li><a href="https://drive.google.com/drive/folders/1o8Ae0gTwBTSMBRKtLVBGLt8qNM6WjupF" target="_blank">Past
                 Quizzes — Drive</a></li>
             <li><a href="https://github.com/yousefammmar/OOP" target="_blank">GitHub Repository</a></li>
+          </ul>
+        </div>
+        <div class="lcol">
+          <div class="lcol-label">Practical Tutorials</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1zrMJCG8FYL-qOyRGlHRnK7YHDhot8bKf" target="_blank">🎬
+                Lab Video Walkthroughs (ALL)</a></li>
+            <li><a href="#" onclick="nav('labs',document.querySelectorAll('.nav-btn')[5])">📂 Specific Lab Index (1–10)</a></li>
           </ul>
         </div>
       </div>
