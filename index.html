@@ -21,6 +21,13 @@
       --border: #ccc4b5;
       --code-bg: #1e1b16;
       --code-text: #e8dcc8;
+      --code-ln: #5c6370;
+      --code-kw: #e06c75;
+      --code-st: #98c379;
+      --code-nu: #d19a66;
+      --code-fn: #61afef;
+      --code-cm: #5c6370;
+      --code-pp: #c678dd;
     }
 
     *,
@@ -583,32 +590,68 @@
     }
 
     pre#cv {
-      padding: 22px;
+      padding: 0;
       overflow-x: auto;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 12.5px;
       line-height: 1.75;
       color: var(--code-text);
-      max-height: 520px;
+      max-height: 580px;
       scrollbar-width: thin;
       scrollbar-color: #3a3530 transparent;
+      display: grid;
+    }
+
+    .line {
+      display: flex;
+      min-width: fit-content;
+    }
+
+    .line:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .ln {
+      width: 44px;
+      text-align: right;
+      padding-right: 16px;
+      color: var(--code-ln);
+      user-select: none;
+      border-right: 1px solid #3a3530;
+      background: #2a2520;
+      flex-shrink: 0;
+    }
+
+    .lc {
+      padding-left: 16px;
+      white-space: pre;
+      flex-grow: 1;
     }
 
     .kw {
-      color: #e06c75;
+      color: var(--code-kw);
+      font-weight: 500;
     }
 
     .cm {
-      color: #5c6370;
+      color: var(--code-cm);
       font-style: italic;
     }
 
     .st {
-      color: #98c379;
+      color: var(--code-st);
     }
 
     .pp {
-      color: #c678dd;
+      color: var(--code-pp);
+    }
+
+    .nu {
+      color: var(--code-nu);
+    }
+
+    .fn {
+      color: var(--code-fn);
     }
 
     /* QUIZZES */
@@ -1509,7 +1552,7 @@
 
   <footer>
     <span>OOP Study Guide · CS11253 · PSUT</span>
-    <span>Built by <a href="https://yousefammmar.github.io/profile" target="_blank">yousefammar</a> · Spring 2025</span>
+    <span>Built by <a href="https://yousefammmar.github.io/profile" target="_blank">yousefammmar</a> · Spring 2025</span>
   </footer>
 
   <script>
@@ -1536,14 +1579,33 @@
         'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'break', 'default', 'new',
         'delete', 'using', 'namespace', 'const', 'static', 'bool', 'double', 'float',
         'char', 'string', 'true', 'false', 'nullptr', 'this', 'endl', 'cin', 'cout',
-        'include', 'pragma'];
-      code = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      code = code.replace(/(\/\/[^\n]*)/g, '<span class="cm">$1</span>');
-      code = code.replace(/"([^"\\]*)"/g, '<span class="st">"$1"</span>');
-      code = code.replace(/^(#\w+)/gm, '<span class="pp">$1</span>');
+        'include', 'pragma', 'struct', 'operator', 'template', 'typename', 'virtual', 'override'];
+
+      let html = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const tokens = [];
+      const save = (regex, cls) => {
+        html = html.replace(regex, (m) => {
+          const id = `__T${tokens.length}__`;
+          tokens.push(`<span class="${cls}">${m}</span>`);
+          return id;
+        });
+      };
+
+      save(/(\/\/[^\n]*)/g, 'cm');
+      save(/(\/\*[\s\S]*?\*\/)/g, 'cm');
+      save(/"([^"\\]*(\\.[^"\\]*)*)"/g, 'st');
+      save(/'([^'\\]*(\\.[^'\\]*)*)'/g, 'st');
+      save(/^(#\w+)/gm, 'pp');
+
       const re = new RegExp('\\b(' + kws.join('|') + ')\\b', 'g');
-      code = code.replace(re, '<span class="kw">$1</span>');
-      return code;
+      html = html.replace(re, '<span class="kw">$1</span>');
+      html = html.replace(/\b(\d+(\.\d+)?)\b/g, '<span class="nu">$1</span>');
+      html = html.replace(/\b(\w+)(?=\s*\()/g, '<span class="fn">$1</span>');
+
+      for (let i = tokens.length - 1; i >= 0; i--) {
+        html = html.replace(`__T${i}__`, tokens[i]);
+      }
+      return html;
     }
 
     function ct(id) {
@@ -1551,16 +1613,43 @@
       activeTab = id;
       document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
       const el = document.getElementById('tab-' + id);
-      if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+      if (el) {
+        el.classList.add('active');
+        el.scrollIntoView({ block: 'nearest', inline: 'center' });
+      }
       document.getElementById('efname').textContent = f.name;
-      document.getElementById('cv').innerHTML = hlCpp(f.code);
+
+      let code = f.code;
+      // Special demarcation for Separation tab
+      if (id === 'sep') {
+        code = code.replace(/\/\/ ── (.+?) ─+/g, '\n/* ── $1 ── */');
+      }
+
+      const highlighted = hlCpp(code);
+      const lines = highlighted.split('\n');
+      // If code starts with newline from replacement, remove first empty
+      if (lines[0] === '' && id === 'sep') lines.shift();
+
+      const html = lines.map((l, i) =>
+        `<div class="line"><span class="ln">${i + 1}</span><span class="lc">${l || ' '}</span></div>`
+      ).join('');
+
+      document.getElementById('cv').innerHTML = html;
     }
 
     function copyCode() {
       const code = cf[activeTab]?.code || '';
       navigator.clipboard.writeText(code).then(() => {
         const b = document.querySelector('.copybtn');
-        b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy', 1500);
+        const old = b.textContent;
+        b.textContent = 'Copied!';
+        b.style.borderColor = '#e8c06e';
+        b.style.color = '#e8c06e';
+        setTimeout(() => {
+          b.textContent = old;
+          b.style.borderColor = '';
+          b.style.color = '';
+        }, 1500);
       });
     }
 
