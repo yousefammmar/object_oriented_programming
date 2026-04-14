@@ -134,7 +134,7 @@ Full source on GitHub → [`github.com/yousefammmar/OOP/tree/main/code`](https:/
  
 Built and maintained by **Yousef Ammmar** ([@yousefammmar](https://github.com/yousefammmar)) — 2nd-year Software Engineering student at PSUT — as a community resource for classmates taking CS11253.
  
-Quiz solutions are also explained on the [**Yousef Odeh YouTube channel**](https://www.youtube.com/@yousefodeh).
+Quiz solutions are also explained on the [**Yousef Odeh YouTube channel**](https://www.youtube.com/@YousefOdeh-t1s).
  
 ---
  
