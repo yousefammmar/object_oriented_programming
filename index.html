@@ -49,6 +49,49 @@
       font-size: 17px;
       line-height: 1.7;
       min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("https://www.transparenttextures.com/patterns/p6.png");
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 2000;
+    }
+
+    .bg-symbols {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-sym {
+      position: absolute;
+      color: var(--rust);
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      opacity: 0.04;
+      user-select: none;
+      animation: floatAround 60s linear infinite;
+    }
+
+    @keyframes floatAround {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(50px, 100px) rotate(90deg); }
+      50% { transform: translate(100px, 50px) rotate(180deg); }
+      75% { transform: translate(50px, -50px) rotate(270deg); }
+      100% { transform: translate(0, 0) rotate(360deg); }
     }
 
     .masthead {
@@ -142,9 +185,25 @@
       color: var(--paper);
     }
 
+    .nav-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--rust);
+      transform: scaleX(0);
+      transition: transform 0.25s ease;
+    }
+
+    .nav-btn:hover::after {
+      transform: scaleX(1);
+    }
+
     .page {
       display: none;
-      animation: pgIn 0.3s ease;
+      animation: pgIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .page.active {
@@ -154,7 +213,19 @@
     @keyframes pgIn {
       from {
         opacity: 0;
-        transform: translateY(6px)
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes entryUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
       }
 
       to {
@@ -231,12 +302,27 @@
       background: var(--paper);
       padding: 20px 22px;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity: 0;
+    }
+
+    .page.active .topic-cell {
+      animation: entryUp 0.6s ease both;
     }
 
     .topic-cell:hover {
-      background: var(--rust-pale);
+      background: var(--paper2);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      border-color: var(--rust);
+      z-index: 2;
     }
+
+    .topic-cell:nth-child(1) { animation-delay: 0.1s; }
+    .topic-cell:nth-child(2) { animation-delay: 0.15s; }
+    .topic-cell:nth-child(3) { animation-delay: 0.2s; }
+    .topic-cell:nth-child(4) { animation-delay: 0.25s; }
+    .topic-cell:nth-child(5) { animation-delay: 0.3s; }
 
     .t-num {
       font-family: 'IBM Plex Mono', monospace;
@@ -667,12 +753,27 @@
     .qcard {
       background: var(--paper);
       padding: 26px;
-      transition: background 0.15s;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity: 0;
+    }
+
+    .page.active .qcard {
+      animation: entryUp 0.6s ease both;
     }
 
     .qcard:hover {
-      background: var(--rust-pale);
+      background: var(--paper2);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      z-index: 2;
     }
+
+    .qgrid .qcard:nth-child(1) { animation-delay: 0.05s; }
+    .qgrid .qcard:nth-child(2) { animation-delay: 0.1s; }
+    .qgrid .qcard:nth-child(3) { animation-delay: 0.15s; }
+    .qgrid .qcard:nth-child(4) { animation-delay: 0.2s; }
+    .qgrid .qcard:nth-child(5) { animation-delay: 0.25s; }
+    .qgrid .qcard:nth-child(6) { animation-delay: 0.3s; }
 
     .q-num {
       font-family: 'IBM Plex Mono', monospace;
@@ -774,14 +875,25 @@
       padding: 8px 11px;
       border: 1px solid var(--border);
       display: block;
-      transition: all 0.15s;
+      transition: all 0.2s ease;
+      opacity: 0;
+    }
+
+    .page.active .vl {
+      animation: entryUp 0.5s ease both;
     }
 
     .vl:hover {
       background: var(--rust);
       color: var(--paper);
       border-color: var(--rust);
+      transform: translateX(4px);
     }
+
+    .vidx .vl:nth-child(4n+1) { animation-delay: 0.05s; }
+    .vidx .vl:nth-child(4n+2) { animation-delay: 0.1s; }
+    .vidx .vl:nth-child(4n+3) { animation-delay: 0.15s; }
+    .vidx .vl:nth-child(4n+4) { animation-delay: 0.2s; }
 
     footer {
       border-top: 3px double var(--ink);
@@ -854,7 +966,18 @@
   </style>
 </head>
 
-<body>
+<body onclick="void(0)">
+
+  <div class="bg-symbols">
+    <div class="bg-sym" style="top:10%; left:5%; animation-duration:45s;">{ }</div>
+    <div class="bg-sym" style="top:25%; left:85%; animation-duration:70s; font-size:40px;">*</div>
+    <div class="bg-sym" style="top:60%; left:15%; animation-duration:55s;">-&gt;</div>
+    <div class="bg-sym" style="top:80%; left:70%; animation-duration:80s;">::</div>
+    <div class="bg-sym" style="top:40%; left:40%; animation-duration:65s; font-size:32px;">&amp;</div>
+    <div class="bg-sym" style="top:15%; left:60%; animation-duration:50s;">[ ]</div>
+    <div class="bg-sym" style="top:70%; left:5%; animation-duration:75s;">( )</div>
+    <div class="bg-sym" style="top:5%; left:45%; animation-duration:60s;">#</div>
+  </div>
 
   <header class="masthead">
     <div class="masthead-top">
@@ -1605,6 +1728,16 @@
                 target="_blank">📄 Mid Spring 23/24 Answer Key</a></li>
           </ul>
         </div>
+        <div class="qcard" style="border-top: 2px solid var(--rust-light);">
+          <div class="q-num">Extra ·</div>
+          <div class="q-title">Practice Sheets</div>
+          <ul>
+            <li><a href="https://drive.google.com/file/d/1gVt7qKQ_yPI5lOXCjCpwKQ81iHPagPdW/view?usp=sharing"
+                target="_blank">📄 Find the errors.pdf</a></li>
+            <li><a href="https://drive.google.com/file/d/1AJpn9Dxhg92pFGKUlPq4xeC3cs6Cx-Ec/view?usp=drive_link"
+                target="_blank">📄 Tracing .pdf</a></li>
+          </ul>
+        </div>
         <div class="qcard" style="border-top: 2px solid var(--ink);">
           <div class="q-num">Archive ·</div>
           <div class="q-title">Final Exams</div>
@@ -1695,6 +1828,10 @@
                 Labs (Drive)</a></li>
             <li><a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e" target="_blank">Dana's
                 Handwritten Notebook</a></li>
+            <li><a href="https://drive.google.com/file/d/1gVt7qKQ_yPI5lOXCjCpwKQ81iHPagPdW/view?usp=sharing"
+                target="_blank">Find the Errors (PDF)</a></li>
+            <li><a href="https://drive.google.com/file/d/1AJpn9Dxhg92pFGKUlPq4xeC3cs6Cx-Ec/view?usp=drive_link"
+                target="_blank">Tracing Exercises (PDF)</a></li>
           </ul>
         </div>
         <div class="lcol">
@@ -1761,7 +1898,7 @@
 
   <footer>
     <span>OOP Study Guide · CS11253 · PSUT</span>
-    <span>Built by <a href="https://yousefammmar.github.io/profile" target="_blank">yousef ammar</a> · Spring
+    <span>Built by <a href="https://yousefammmar.github.io/profile" target="_blank">yousefammar</a> · Spring
       2025</span>
   </footer>
 
