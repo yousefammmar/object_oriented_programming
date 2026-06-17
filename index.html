@@ -9,25 +9,48 @@
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
   <style>
+    /* ── LIGHT THEME (cream + royal blue) ── */
     :root {
-      --paper: #f5f0e8;
-      --paper2: #ede8df;
-      --ink: #1a1712;
-      --ink2: #3d3830;
-      --muted: #8a7f70;
-      --rust: #c4532a;
-      --rust-light: #e8c4b4;
-      --rust-pale: #f7ece7;
-      --border: #ccc4b5;
-      --code-bg: #1e1b16;
-      --code-text: #e8dcc8;
-      --code-ln: #5c6370;
-      --code-kw: #e06c75;
-      --code-st: #98c379;
-      --code-nu: #d19a66;
-      --code-fn: #61afef;
-      --code-cm: #5c6370;
-      --code-pp: #c678dd;
+      --paper: #f4f1eb;
+      --paper2: #eae6dd;
+      --ink: #1b1f3a;
+      --ink2: #2e3460;
+      --muted: #7a7f9a;
+      --rust: #2a52be;
+      --rust-light: #b4c4f0;
+      --rust-pale: #e8edf9;
+      --border: #c5c9de;
+      --code-bg: #0d1117;
+      --code-text: #c9d1d9;
+      --code-ln: #484f58;
+      --code-kw: #ff7b72;
+      --code-st: #a5d6a7;
+      --code-nu: #ffa657;
+      --code-fn: #79c0ff;
+      --code-cm: #8b949e;
+      --code-pp: #d2a8ff;
+    }
+
+    /* ── DARK THEME (deep navy + electric blue) ── */
+    html.dark {
+      --paper: #0d1b2a;
+      --paper2: #112240;
+      --ink: #ccd6f6;
+      --ink2: #a8b2d8;
+      --muted: #637aad;
+      --rust: #64ffda;
+      --rust-light: #1d3d5c;
+      --rust-pale: #0a192f;
+      --border: #1e3a5f;
+      --code-bg: #060f1a;
+      --code-text: #ccd6f6;
+      --code-ln: #334166;
+      --code-kw: #ff79c6;
+      --code-st: #50fa7b;
+      --code-nu: #ffb86c;
+      --code-fn: #64dfdf;
+      --code-cm: #6272a4;
+      --code-pp: #bd93f9;
     }
 
     *,
@@ -36,6 +59,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
     }
 
     html {
@@ -87,11 +111,25 @@
     }
 
     @keyframes floatAround {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(50px, 100px) rotate(90deg); }
-      50% { transform: translate(100px, 50px) rotate(180deg); }
-      75% { transform: translate(50px, -50px) rotate(270deg); }
-      100% { transform: translate(0, 0) rotate(360deg); }
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      25% {
+        transform: translate(50px, 100px) rotate(90deg);
+      }
+
+      50% {
+        transform: translate(100px, 50px) rotate(180deg);
+      }
+
+      75% {
+        transform: translate(50px, -50px) rotate(270deg);
+      }
+
+      100% {
+        transform: translate(0, 0) rotate(360deg);
+      }
     }
 
     .masthead {
@@ -318,11 +356,25 @@
       z-index: 2;
     }
 
-    .topic-cell:nth-child(1) { animation-delay: 0.1s; }
-    .topic-cell:nth-child(2) { animation-delay: 0.15s; }
-    .topic-cell:nth-child(3) { animation-delay: 0.2s; }
-    .topic-cell:nth-child(4) { animation-delay: 0.25s; }
-    .topic-cell:nth-child(5) { animation-delay: 0.3s; }
+    .topic-cell:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .topic-cell:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .topic-cell:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    .topic-cell:nth-child(4) {
+      animation-delay: 0.25s;
+    }
+
+    .topic-cell:nth-child(5) {
+      animation-delay: 0.3s;
+    }
 
     .t-num {
       font-family: 'IBM Plex Mono', monospace;
@@ -768,12 +820,29 @@
       z-index: 2;
     }
 
-    .qgrid .qcard:nth-child(1) { animation-delay: 0.05s; }
-    .qgrid .qcard:nth-child(2) { animation-delay: 0.1s; }
-    .qgrid .qcard:nth-child(3) { animation-delay: 0.15s; }
-    .qgrid .qcard:nth-child(4) { animation-delay: 0.2s; }
-    .qgrid .qcard:nth-child(5) { animation-delay: 0.25s; }
-    .qgrid .qcard:nth-child(6) { animation-delay: 0.3s; }
+    .qgrid .qcard:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .qgrid .qcard:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .qgrid .qcard:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .qgrid .qcard:nth-child(4) {
+      animation-delay: 0.2s;
+    }
+
+    .qgrid .qcard:nth-child(5) {
+      animation-delay: 0.25s;
+    }
+
+    .qgrid .qcard:nth-child(6) {
+      animation-delay: 0.3s;
+    }
 
     .q-num {
       font-family: 'IBM Plex Mono', monospace;
@@ -890,10 +959,21 @@
       transform: translateX(4px);
     }
 
-    .vidx .vl:nth-child(4n+1) { animation-delay: 0.05s; }
-    .vidx .vl:nth-child(4n+2) { animation-delay: 0.1s; }
-    .vidx .vl:nth-child(4n+3) { animation-delay: 0.15s; }
-    .vidx .vl:nth-child(4n+4) { animation-delay: 0.2s; }
+    .vidx .vl:nth-child(4n+1) {
+      animation-delay: 0.05s;
+    }
+
+    .vidx .vl:nth-child(4n+2) {
+      animation-delay: 0.1s;
+    }
+
+    .vidx .vl:nth-child(4n+3) {
+      animation-delay: 0.15s;
+    }
+
+    .vidx .vl:nth-child(4n+4) {
+      animation-delay: 0.2s;
+    }
 
     footer {
       border-top: 3px double var(--ink);
@@ -963,6 +1043,65 @@
         padding: 18px 22px;
       }
     }
+
+    /* ── THEME TOGGLE BUTTON ── */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--rust-pale);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px 5px 8px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--ink2);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.25s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--rust);
+      color: var(--paper);
+      border-color: var(--rust);
+    }
+
+    .theme-toggle:hover .toggle-icon {
+      filter: brightness(10);
+    }
+
+    .toggle-track {
+      width: 34px;
+      height: 18px;
+      background: var(--border);
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    html.dark .toggle-track {
+      background: var(--rust);
+    }
+
+    .toggle-thumb {
+      width: 12px;
+      height: 12px;
+      background: var(--paper);
+      border-radius: 50%;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    html.dark .toggle-thumb {
+      transform: translateX(16px);
+    }
   </style>
 </head>
 
@@ -982,6 +1121,10 @@
   <header class="masthead">
     <div class="masthead-top">
       <span class="masthead-kicker">Princess Sumaya University for Technology</span>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <span id="themeLabel">DARK</span>
+      </button>
       <span class="masthead-issue">CS11253 · Spring 2025</span>
     </div>
     <div class="masthead-title">
@@ -1251,7 +1394,8 @@
                   Constructors</a><a class="chip" href="https://www.youtube.com/watch?v=JQz9qgSnDow" target="_blank">▶
                   Copy Ctor</a><a class="chip" href="https://www.youtube.com/watch?v=P7wI9rA4Ps0" target="_blank">▶ More
                   Ctors</a><a class="chip" href="https://www.youtube.com/watch?v=qhHN7Cx73rI" target="_blank">▶ File
-                  Sep.</a><a class="chip" href="https://www.youtube.com/watch?v=Nezino_3k7M" target="_blank">▶ Obj Arrays</a>
+                  Sep.</a><a class="chip" href="https://www.youtube.com/watch?v=Nezino_3k7M" target="_blank">▶ Obj
+                  Arrays</a>
               </div>
             </div>
           </div>
@@ -1724,6 +1868,8 @@
           <ul>
             <li><a href="https://drive.google.com/file/d/1TW6cF0NGqGIl-f9h9kxg2Mi49iIHr_dK/view?usp=sharing"
                 target="_blank">📄 Mid Exam 2024/2025 (Form 1)</a></li>
+            <li><a href="https://docs.google.com/document/d/1-YTMLpBlocwx0ImlhaJsjMO4LuDNqCYF/view" target="_blank">📄
+                Mid Exam 2025/2026 </a></li>
             <li><a href="https://drive.google.com/file/d/1F2bw9uWimRqsggTnArvatbPcxao3CCPe/view?usp=sharing"
                 target="_blank">📄 Mid Spring 23/24 Answer Key</a></li>
           </ul>
@@ -1746,6 +1892,17 @@
                 target="_blank">📄 Final Exam 2023/2024</a></li>
             <li><a href="https://drive.google.com/file/d/1tvzLkKd9ihsETTnBgH_ctudoRYT3dGaz/view?usp=sharing"
                 target="_blank">📄 Mixed Questions Final</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="section-tag" style="margin-bottom:14px;margin-top:28px;">Final Exam Solution — Recordings</div>
+      <div class="qgrid">
+        <div class="qcard" style="border-top: 2px solid var(--ink); grid-column: 1 / -1;">
+          <div class="q-num">2024/2025 ·</div>
+          <div class="q-title">Final Exam Solution Recordings</div>
+          <ul>
+            <li><a href="https://drive.google.com/drive/folders/1dRlvpHrDqB2xEhdxyEVp6OVlhTeWYAnN?usp=sharing"
+                target="_blank">🎬 Final Exam Solution Recordings (Drive)</a></li>
           </ul>
         </div>
       </div>
@@ -1885,7 +2042,8 @@
         <a class="vl" href="https://www.youtube.com/watch?v=eniwNVGZvCw" target="_blank">27 · Inheritance Intro</a>
         <a class="vl" href="https://www.youtube.com/watch?v=l68U8BDaoSs" target="_blank">28 · Function Overriding</a>
         <a class="vl" href="https://www.youtube.com/watch?v=2nvqzEvCp8Y" target="_blank">29 · Homework 3</a>
-        <a class="vl" href="https://www.youtube.com/watch?v=bLFKe_7SJCw" target="_blank">30 · Multi-level Inheritance</a>
+        <a class="vl" href="https://www.youtube.com/watch?v=bLFKe_7SJCw" target="_blank">30 · Multi-level
+          Inheritance</a>
         <a class="vl" href="https://www.youtube.com/watch?v=FyKyUDGRswc" target="_blank">31 · Polymorphism Intro</a>
         <a class="vl" href="https://www.youtube.com/watch?v=piUs08wgI5I" target="_blank">32 · Polymorphism 2</a>
         <a class="vl" href="https://www.youtube.com/watch?v=-472ho8CktA" target="_blank">33 · Polymorphism 3</a>
@@ -2009,6 +2167,24 @@
       if (id === 'code') ct(activeTab);
       window.scrollTo(0, 0);
     }
+
+    /* ── THEME TOGGLE ── */
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('oop-theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeLabel').textContent = isDark ? 'LIGHT' : 'DARK';
+    }
+
+    // Apply saved theme on page load
+    (function initTheme() {
+      const saved = localStorage.getItem('oop-theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+        const lbl = document.getElementById('themeLabel');
+        if (lbl) lbl.textContent = 'LIGHT';
+      }
+    })();
 
     ct('revision');
   </script>
