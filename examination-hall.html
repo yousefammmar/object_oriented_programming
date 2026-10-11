@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examination Hall · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Examination Hall" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="quizzes">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--quizzes" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Practice Material</div>
+              <h2 class="pg-title" tabindex="-1">Examination Hall</h2>
+              <p class="pg-by">Past papers, quizzes, and detailed solutions</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> </div>
+          </div>
+          <h3 class="section-tag">Solutions with Video Explanations</h3>
+          <div class="qgrid">
+            <div class="qcard">
+              <div class="q-num">Quiz 01 ·</div>
+              <h4 class="q-title">Quiz One</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/18LVy5ezrBK5PQQXPb3DN0KmpCmXptUMu/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Written Solution</a></li>
+                <li><a href="https://youtu.be/alhYkrjBTWI" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> YouTube — Yousef Odeh</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Quiz 02 ·</div>
+              <h4 class="q-title">Quiz Two</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1sfoG7EZdYhK9idYCkzTleljmQ0gJ3QCV/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Written Solution</a></li>
+                <li><a href="https://youtu.be/yT3sY8VrOl0" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> YouTube — Yousef Odeh</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Quiz 03 ·</div>
+              <h4 class="q-title">Quiz Three</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1jqrX3ICV-E72HAmsqEFoCVCcmatjKR6B/view?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Written Solution</a></li>
+                <li><a href="https://youtu.be/0o426txM_5w" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> YouTube — Yousef Odeh</a></li>
+              </ul>
+            </div>
+          </div>
+          <h3 class="section-tag">Major Exams (Mid & Final)</h3>
+          <div class="qgrid">
+            <div class="qcard qcard--accent">
+              <div class="q-num">Spring 2025 ·</div>
+              <h4 class="q-title">Mid Exams</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1TW6cF0NGqGIl-f9h9kxg2Mi49iIHr_dK/view?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Mid Exam 2024/2025 (Form 1)</a></li>
+                <li><a href="https://docs.google.com/document/d/1-YTMLpBlocwx0ImlhaJsjMO4LuDNqCYF/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Mid Exam 2025/2026 </a></li>
+                <li><a href="https://drive.google.com/file/d/1F2bw9uWimRqsggTnArvatbPcxao3CCPe/view?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Mid Spring 23/24 Answer Key</a></li>
+              </ul>
+            </div>
+            <div class="qcard qcard--soft">
+              <div class="q-num">Extra ·</div>
+              <h4 class="q-title">Practice Sheets</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1gVt7qKQ_yPI5lOXCjCpwKQ81iHPagPdW/view?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Find the errors.pdf</a></li>
+                <li><a href="https://drive.google.com/file/d/1AJpn9Dxhg92pFGKUlPq4xeC3cs6Cx-Ec/view?usp=drive_link"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Tracing .pdf</a></li>
+              </ul>
+            </div>
+            <div class="qcard qcard--ink">
+              <div class="q-num">Archive ·</div>
+              <h4 class="q-title">Final Exams</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1EIQimjHekPpdfkh-M54xZE2hLbpRDHsJ/view?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Final Exam 2023/2024</a></li>
+                <li><a href="https://drive.google.com/file/d/1tvzLkKd9ihsETTnBgH_ctudoRYT3dGaz/view?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Mixed Questions Final</a></li>
+              </ul>
+            </div>
+          </div>
+          <h3 class="section-tag">Final Exam Solution — Recordings</h3>
+          <div class="qgrid">
+            <div class="qcard qcard--ink qcard--wide">
+              <div class="q-num">2024/2025 ·</div>
+              <h4 class="q-title">Final Exam Solution Recordings</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1dRlvpHrDqB2xEhdxyEVp6OVlhTeWYAnN?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Final Exam Solution Recordings (Drive)</a></li>
+              </ul>
+            </div>
+          </div>
+          <h3 class="section-tag">All Past Quizzes by Topic</h3>
+          <div class="qgrid">
+            <div class="qcard">
+              <div class="q-num">Topic 01 ·</div>
+              <h4 class="q-title">C++ Basics</h4>
+              <ul>
+                <li><a href="https://api.psutarchive.com/assets/a443282b-d427-4f0e-95c2-e1273d916aeb"
+                    target="_blank" rel="noopener noreferrer">Quiz1_2025</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 02 ·</div>
+              <h4 class="q-title">Class Basics</h4>
+              <ul>
+                <li><a href="https://api.psutarchive.com/assets/51acfd47-69cb-49b2-9d22-960799e6d994"
+                    target="_blank" rel="noopener noreferrer">Quiz1_2022</a></li>
+                <li><a href="https://drive.google.com/file/d/1E3QBdOgDINCMC_PR1gcQFvxy1TlYwl8Q/view"
+                    target="_blank" rel="noopener noreferrer">Quiz1_2024</a></li>
+                <li><a href="https://drive.google.com/file/d/1Wau2u9MF4Q52XHe0IkOV32IZQ2EyCK5R/view"
+                    target="_blank" rel="noopener noreferrer">Quiz2_2025 — sec 4</a></li>
+                <li><a href="https://drive.google.com/file/d/1D4GyT6Ir5EPchYfps5YdAoo67ssC02_L/view"
+                    target="_blank" rel="noopener noreferrer">Quiz2_2025 — sec 5</a></li>
+                <li><a href="https://drive.google.com/file/d/10nM2TiW5VBTmIrQqD9QZil3vD6PPv1XF/view"
+                    target="_blank" rel="noopener noreferrer">Quiz2_2025 — sec 9</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 04 ·</div>
+              <h4 class="q-title">Composition</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1QdoB_vrYq9rr2SLdlTMS3ZZhRKTPK3Ub/view"
+                    target="_blank" rel="noopener noreferrer">Quiz3_2025 — sec 4</a></li>
+                <li><a href="https://drive.google.com/file/d/1WE4W7D5-Aj9LMWakdjekzqrcy9SC3OOZ/view"
+                    target="_blank" rel="noopener noreferrer">Quiz3_2025 — sec 5</a></li>
+                <li><a href="https://drive.google.com/file/d/1WIJ15WQ4WUEtnfKnD0fJkgnTr_nbVUom/view"
+                    target="_blank" rel="noopener noreferrer">Quiz3_2025 — sec 9</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Archive ·</div>
+              <h4 class="q-title">All Exams</h4>
+              <ul>
+                <li><a href="https://psutarchive.com/courses/11206?tab=exam" target="_blank" rel="noopener noreferrer">PSUT Archive</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1o8Ae0gTwBTSMBRKtLVBGLt8qNM6WjupF" target="_blank" rel="noopener noreferrer">Past
+                    Exams Archive</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

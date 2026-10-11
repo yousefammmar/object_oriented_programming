@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Links · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — All Links" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="links">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--links" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Resources</div>
+              <h2 class="pg-title" tabindex="-1">All External Links</h2>
+              <p class="pg-by">Every resource from the repository, organised by category</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-link"/></svg> </div>
+          </div>
+          <div class="lcols">
+            <div class="lcol">
+              <h3 class="lcol-label">Videos</h3>
+              <ul>
+                <li><a href="https://www.youtube.com/playlist?list=PLpNZbvo-UcMIAwNqyv1PkPlAn7LLSbsZV" target="_blank" rel="noopener noreferrer">Dr.
+                    Ibrahim — Full Playlist</a></li>
+              </ul>
+            </div>
+            <div class="lcol">
+              <h3 class="lcol-label">Files &amp; Slides</h3>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1fTKKSbcEAyym_ivfNNB-kxm5-PWHSjSm"
+                    target="_blank" rel="noopener noreferrer">Lecture Slides (Drive)</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1pglAkv7Seib3L2HYHUvhogdKQ3L5GWRI" target="_blank" rel="noopener noreferrer">Past
+                    Labs (Drive)</a></li>
+                <li><a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e" target="_blank" rel="noopener noreferrer">Dana's
+                    Handwritten Notebook</a></li>
+                <li><a href="https://drive.google.com/file/d/1gVt7qKQ_yPI5lOXCjCpwKQ81iHPagPdW/view?usp=sharing"
+                    target="_blank" rel="noopener noreferrer">Find the Errors (PDF)</a></li>
+                <li><a href="https://drive.google.com/file/d/1AJpn9Dxhg92pFGKUlPq4xeC3cs6Cx-Ec/view?usp=drive_link"
+                    target="_blank" rel="noopener noreferrer">Tracing Exercises (PDF)</a></li>
+              </ul>
+            </div>
+            <div class="lcol">
+              <h3 class="lcol-label">Archive &amp; Code</h3>
+              <ul>
+                <li><a href="https://psutarchive.com/courses/11206?tab=exam" target="_blank" rel="noopener noreferrer">Past Exams — PSUT Archive</a>
+                </li>
+                <li><a href="https://drive.google.com/drive/folders/1o8Ae0gTwBTSMBRKtLVBGLt8qNM6WjupF" target="_blank" rel="noopener noreferrer">Past
+                    Exams Archive</a></li>
+                <li><a href="https://github.com/yousefammmar/OOP" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+              </ul>
+            </div>
+            <div class="lcol">
+              <h3 class="lcol-label">Practical Tutorials</h3>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1zrMJCG8FYL-qOyRGlHRnK7YHDhot8bKf" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Lab Video Walkthroughs (ALL)</a></li>
+                <li><a href="labs.html"><svg class="i" aria-hidden="true"><use href="#i-folder"/></svg> Specific Lab Index
+                    (1–10)</a></li>
+              </ul>
+            </div>
+          </div>
+          <h3 class="section-tag">Video Index — Dr. Ibrahim Albluwi</h3>
+          <div class="vidx">
+            <a class="vl" href="https://www.youtube.com/watch?v=-2lJ6tO9eK8" target="_blank" rel="noopener noreferrer">01 · Introduction to C++</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=57iSuILXRec" target="_blank" rel="noopener noreferrer">02 · Functions</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=B-yZm2wNW3k" target="_blank" rel="noopener noreferrer">03 · Arrays</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=Q6oSeZPjg0M" target="_blank" rel="noopener noreferrer">04 · Pointers and Arrays</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=UsJVViySFQ4" target="_blank" rel="noopener noreferrer">05 · OOP Pointers</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=Fq3pekWUI3k" target="_blank" rel="noopener noreferrer">06 · Classes Intro</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=dH2L4aK-HUM" target="_blank" rel="noopener noreferrer">07 · Classes Basics 2</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=-PaErlnIVqw" target="_blank" rel="noopener noreferrer">08 · Assignment Point2D</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=xV8odFvC1Cc" target="_blank" rel="noopener noreferrer">09 · Constructors</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=JQz9qgSnDow" target="_blank" rel="noopener noreferrer">10 · Copy Constructor</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=P7wI9rA4Ps0" target="_blank" rel="noopener noreferrer">11 · More Constructors</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=qhHN7Cx73rI" target="_blank" rel="noopener noreferrer">12 · Compilation Separation</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=Nezino_3k7M" target="_blank" rel="noopener noreferrer">13 · Arrays of Objects</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=_vED74pdDx0" target="_blank" rel="noopener noreferrer">14 · Initializer List</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=IlXYIso0R1o" target="_blank" rel="noopener noreferrer">15 · HW2 Initializer List</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=Y1E4j-qPYG0" target="_blank" rel="noopener noreferrer">16 · Constant Members</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=gVIuCrbm-2Q" target="_blank" rel="noopener noreferrer">17 · Static Members</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=pKllmpeIF-0" target="_blank" rel="noopener noreferrer">18 · Static Math Utility</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=eTWn5UJmEu8" target="_blank" rel="noopener noreferrer">19 · Composition 1</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=ifo3aDkOSW8" target="_blank" rel="noopener noreferrer">20 · Composition 2</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=k9kYLYlW04Q" target="_blank" rel="noopener noreferrer">21 · Cascading & Dynamic</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=keo3Km8ps70" target="_blank" rel="noopener noreferrer">22 · Dynamic Memory 1</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=kTMD8XaZrOU" target="_blank" rel="noopener noreferrer">23 · Enhanced Array</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=919l_06xRUE" target="_blank" rel="noopener noreferrer">24 · Dynamic Memory 2</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=ZeWVv0pQIEs" target="_blank" rel="noopener noreferrer">25 · Dynamic Memory 3</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=JpAZZngxI8s" target="_blank" rel="noopener noreferrer">26 · 2D Arrays & Friend</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=eniwNVGZvCw" target="_blank" rel="noopener noreferrer">27 · Inheritance Intro</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=l68U8BDaoSs" target="_blank" rel="noopener noreferrer">28 · Function Overriding</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=2nvqzEvCp8Y" target="_blank" rel="noopener noreferrer">29 · Homework 3</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=bLFKe_7SJCw" target="_blank" rel="noopener noreferrer">30 · Multi-level
+              Inheritance</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=FyKyUDGRswc" target="_blank" rel="noopener noreferrer">31 · Polymorphism Intro</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=piUs08wgI5I" target="_blank" rel="noopener noreferrer">32 · Polymorphism 2</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=-472ho8CktA" target="_blank" rel="noopener noreferrer">33 · Polymorphism 3</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=go9dzrMami8" target="_blank" rel="noopener noreferrer">34 · Operator Overloading 1</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=s9P6Odjmtq4" target="_blank" rel="noopener noreferrer">35 · Operator Overloading 2</a>
+            <a class="vl" href="https://www.youtube.com/watch?v=v4I_PEWZag0" target="_blank" rel="noopener noreferrer">36 · Operator Overloading 3</a>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

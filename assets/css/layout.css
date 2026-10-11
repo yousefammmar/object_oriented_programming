@@ -1,0 +1,520 @@
+/*
+ * layout.css — the site shell that assets/js/layout.js builds around each page's <main>:
+ *
+ *   .app
+ *   ├── .sidebar   (desktop: fixed column · mobile: slide-in drawer)
+ *   ├── .scrim     (dark overlay behind the open drawer)
+ *   └── .shell
+ *       ├── .topbar     (sticky: menu button, breadcrumb, search, tools)
+ *       ├── .masthead   (course title; large hero on Home, compact bar elsewhere)
+ *       ├── main        (page content, styled in pages.css)
+ *       └── footer
+ */
+
+/* ───────────── 1. App grid ───────────── */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.shell {
+  min-width: 0; /* lets wide children (code blocks) scroll inside instead of stretching the page */
+  display: flex;
+  flex-direction: column;
+}
+
+.shell > main {
+  flex: 1;
+}
+
+/* ───────────── 2. Sidebar ───────────── */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  background: var(--bg-2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: var(--r-md);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--on-accent);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+html.dark .brand-mark {
+  color: #07102a;
+}
+
+.icon-btn.sb-close {
+  display: none; /* only shown inside the mobile drawer (selector is more specific than .icon-btn) */
+}
+
+/* Navigation groups & items */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-group {
+  margin: var(--s-3) 10px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.nav-group:first-child {
+  margin-top: 0;
+}
+
+.nav-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  color: var(--text-2);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background-color var(--t-fast), color var(--t-fast);
+}
+
+.nav-btn:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.nav-btn .i {
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.nav-btn:hover .i {
+  transform: translateX(2px);
+}
+
+/* Current page: tinted pill + animated accent bar (the bar is also a non-colour cue) */
+.nav-btn[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform var(--t-med) var(--ease);
+}
+
+.nav-btn[aria-current='page']::before {
+  transform: scaleY(1);
+}
+
+/* Small tick shown when the student has marked that topic complete */
+.nav-done {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.nav-done .i {
+  width: 12px;
+  height: 12px;
+  stroke-width: 3;
+}
+
+/* Overall progress card pinned to the bottom of the sidebar */
+.sb-foot {
+  margin-top: auto;
+}
+
+/* ───────────── 3. Mobile drawer ───────────── */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-med);
+}
+
+@media (max-width: 1023.98px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: var(--z-drawer);
+    width: min(320px, 86vw);
+    box-shadow: var(--shadow-3);
+    transform: translateX(-102%);
+    visibility: hidden;          /* closed drawer must not be focusable or announced */
+    transition: transform var(--t-med) var(--ease), visibility 0s linear var(--t-med);
+  }
+
+  body.nav-open .sidebar {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--t-med) var(--ease), visibility 0s;
+  }
+
+  body.nav-open .scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .icon-btn.sb-close {
+    display: inline-grid;
+  }
+
+  .nav-btn::before {
+    left: -16px;
+  }
+}
+
+/* ───────────── 4. Top bar ───────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--topbar-h);
+  padding: 8px var(--s-4);
+  background: var(--bar-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.icon-btn.menu-btn {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  .icon-btn.menu-btn {
+    display: inline-grid;
+  }
+}
+
+.crumbs {
+  flex: 1;
+  min-width: 0;
+}
+
+.crumbs ol {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  font-size: 0.875rem;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.crumbs li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.crumbs li:last-child {
+  color: var(--text);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crumbs a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.crumbs .i {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+.topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* Narrow phones: show only the current page in the breadcrumb to save room */
+@media (max-width: 520px) {
+  .topbar {
+    padding-inline: 12px;
+    gap: 6px;
+  }
+
+  .crumbs li:not(:last-child),
+  .crumbs li:last-child .i {
+    display: none;
+  }
+
+  .hide-sm {
+    display: none !important;
+  }
+}
+
+/* ───────────── 5. Masthead (course title) ───────────── */
+.masthead {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 0 var(--s-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.masthead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-3) 0 var(--s-2);
+}
+
+.masthead-kicker,
+.masthead-issue {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.masthead-title h1 {
+  font-size: clamp(1.7rem, 5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+/* Gradient only on the one word that carries the brand colour */
+.masthead-title h1 em {
+  font-style: normal;
+  color: var(--accent);
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.masthead-title .subtitle {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* Compact variant (every page except Home): a slim title strip */
+body:not([data-page='home']) .masthead {
+  padding-block: var(--s-3);
+}
+
+/* University + term stay visible on every page, just tucked into a small line above the title */
+body:not([data-page='home']) .masthead-top {
+  padding: 0 0 4px;
+  justify-content: flex-start;
+  gap: var(--s-2) var(--s-3);
+  flex-wrap: wrap;
+}
+
+body:not([data-page='home']) .masthead-kicker,
+body:not([data-page='home']) .masthead-issue {
+  font-size: 10px;
+}
+
+body:not([data-page='home']) .masthead-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px var(--s-3);
+}
+
+body:not([data-page='home']) .masthead-title h1 {
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+
+body:not([data-page='home']) .masthead-title .subtitle {
+  margin: 0;
+  font-size: 10.5px;
+}
+
+/* Home hero: generous spacing, soft glows and a faint dotted grid behind the title */
+body[data-page='home'] .masthead {
+  padding-bottom: var(--s-5);
+  background:
+    radial-gradient(ellipse 60% 90% at 12% 0%, var(--hero-glow-a), transparent 70%),
+    radial-gradient(ellipse 50% 80% at 95% 100%, var(--hero-glow-b), transparent 70%),
+    var(--bg);
+}
+
+body[data-page='home'] .masthead::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(var(--grid-line) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent);
+}
+
+/* Floating C++ symbols — decorative only (aria-hidden), transform-only animation, Home hero only */
+.bg-symbols {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+body:not([data-page='home']) .bg-symbols {
+  display: none;
+}
+
+.bg-sym {
+  position: absolute;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+  opacity: 0.12;
+  user-select: none;
+  animation: floatAround 60s linear infinite;
+}
+
+@keyframes floatAround {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(24px, 36px) rotate(20deg); }
+  50%  { transform: translate(48px, 12px) rotate(0deg); }
+  75%  { transform: translate(20px, -24px) rotate(-20deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@media (max-width: 640px) {
+  .masthead {
+    padding-inline: 16px;
+  }
+
+  .masthead-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
+
+/* ───────────── 6. Footer ───────────── */
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  flex-wrap: wrap;
+  margin-top: var(--s-6);
+  padding: var(--s-4) var(--s-5);
+  border-top: 1px solid var(--border);
+  background: var(--bg-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-2);
+  letter-spacing: 0.04em;
+}
+
+.site-footer a {
+  color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    flex-direction: column;
+    text-align: center;
+    padding-inline: 16px;
+  }
+}
+
+/* ───────────── 7. Reading mode (distraction-free) ───────────── */
+body.reading-mode .sidebar,
+body.reading-mode .masthead {
+  display: none;
+}
+
+body.reading-mode .app {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.reading-mode main > * {
+  max-width: 880px;
+  margin-inline: auto;
+}
+
+/* ───────────── 8. No-JS note ───────────── */
+.noscript-note {
+  padding: var(--s-3);
+  background: var(--accent-soft);
+  font-size: 0.9rem;
+}

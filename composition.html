@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Composition · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Composition" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="composition">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--composition" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 04</div>
+              <h2 class="pg-title" tabindex="-1">Composition</h2>
+              <p class="pg-by">The "has-a" relationship — objects as members of other objects</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-boxes"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Study material by Ms. Ayat Droos</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://drive.google.com/file/d/1df9XeIjAwjSxltvUeb8wHwrUsoXFJznN/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Composition.pdf</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=eTWn5UJmEu8" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Composition 1</a><a class="chip" href="https://www.youtube.com/watch?v=ifo3aDkOSW8" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Composition 2</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#const2"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Constants2.cpp</a>
+                  </div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">4</div>
+                <div>
+                  <h3 class="st-title">Past Quizzes</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://drive.google.com/file/d/1QdoB_vrYq9rr2SLdlTMS3ZZhRKTPK3Ub/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Q3_2025 s4</a><a class="chip"
+                      href="https://drive.google.com/file/d/1WE4W7D5-Aj9LMWakdjekzqrcy9SC3OOZ/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Q3_2025 s5</a><a class="chip"
+                      href="https://drive.google.com/file/d/1WIJ15WQ4WUEtnfKnD0fJkgnTr_nbVUom/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Q3_2025 s9</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">5</div>
+                <div>
+                  <h3 class="st-title">Past Labs</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://drive.google.com/drive/folders/1LS9H3Xm3MKneKbHpgm6plrB01UmB9Gto" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB7_2025</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1yzkdoOIAj_EyuuoxgSOQMWkkeKp1s-Ra" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB7_2024</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Idea</h3>
+                <ul>
+                  <li><a href="#">A class can contain objects of other classes</a></li>
+                  <li><a href="#">Member object constructor runs first</a></li>
+                  <li><a href="#">Use initialiser list to construct members</a></li>
+                  <li><a href="#">Example: Person has-a Date</a></li>
+                </ul>
+              </div>
+              <div class="pull">Pages 23–25 in Dana's <a
+                  href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e"
+                  target="_blank" rel="noopener noreferrer">notebook</a> cover Composition.</div>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

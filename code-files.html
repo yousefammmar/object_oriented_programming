@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Files · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Code Files" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="code">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--code" tabindex="-1">
+    <div class="code-wrap">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Repository · All Files</div>
+              <h2 class="pg-title" tabindex="-1">Code Examples</h2>
+            </div>
+          </div>
+          <div class="file-tabs" id="ftabs" role="tablist" aria-label="Code files">
+            <button type="button" class="ftab active" role="tab" id="tab-revision" data-tab="revision" aria-selected="true" aria-controls="cv" tabindex="0">Revision1.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-revision2" data-tab="revision2" aria-selected="false" aria-controls="cv" tabindex="-1">Revision2.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-revision3" data-tab="revision3" aria-selected="false" aria-controls="cv" tabindex="-1">Revision3.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-revision4" data-tab="revision4" aria-selected="false" aria-controls="cv" tabindex="-1">Revision4.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-classes1" data-tab="classes1" aria-selected="false" aria-controls="cv" tabindex="-1">Classes1.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-classes2" data-tab="classes2" aria-selected="false" aria-controls="cv" tabindex="-1">Classes2.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-sg" data-tab="sg" aria-selected="false" aria-controls="cv" tabindex="-1">SettersGetters.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-ctor" data-tab="ctor" aria-selected="false" aria-controls="cv" tabindex="-1">Constructors.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-dtor" data-tab="dtor" aria-selected="false" aria-controls="cv" tabindex="-1">Destructor.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-sep" data-tab="sep" aria-selected="false" aria-controls="cv" tabindex="-1">Separation</button>
+            <button type="button" class="ftab" role="tab" id="tab-arr" data-tab="arr" aria-selected="false" aria-controls="cv" tabindex="-1">ArrayOfObjects.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-const1" data-tab="const1" aria-selected="false" aria-controls="cv" tabindex="-1">Constants1.cpp</button>
+            <button type="button" class="ftab" role="tab" id="tab-const2" data-tab="const2" aria-selected="false" aria-controls="cv" tabindex="-1">Constants2.cpp</button>
+          </div>
+          <div class="editor" id="editor">
+            <div class="ebar">
+              <div class="edots" aria-hidden="true">
+                <div class="ed ed-r"></div>
+                <div class="ed ed-y"></div>
+                <div class="ed ed-g"></div>
+              </div>
+              <span class="efname" id="efname">Revision1.cpp</span>
+              <span class="emeta" id="emeta" data-ui></span>
+              <div class="etools" data-ui>
+                <button type="button" class="tool-btn" id="wrapBtn" aria-pressed="false" title="Toggle line wrapping">
+                  <svg class="i" aria-hidden="true"><use href="#i-wrap"/></svg><span>Wrap</span></button>
+                <button type="button" class="tool-btn" id="fullBtn" aria-pressed="false" title="Toggle full-screen code view">
+                  <svg class="i" aria-hidden="true"><use href="#i-maximize"/></svg><span>Full screen</span></button>
+                <button type="button" class="tool-btn" id="markBtn" aria-pressed="false" title="Bookmark this file">
+                  <svg class="i" aria-hidden="true"><use href="#i-bookmark"/></svg><span>Bookmark</span></button>
+              </div>
+              <button class="copybtn" id="copyBtn" onclick="copyCode()">Copy</button>
+            </div>
+            <pre id="cv" role="tabpanel" tabindex="0" aria-label="Code listing"></pre>
+          </div>
+          <div class="repo-note">All files on
+            GitHub → <a href="https://github.com/yousefammmar/OOP/tree/main/code" target="_blank" rel="noopener noreferrer">github.com/yousefammmar/OOP</a></div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/code-data.js"></script>
+  <script src="assets/js/code-viewer.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Const &amp; Static · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Const &amp; Static" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="const">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--const" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 03</div>
+              <h2 class="pg-title" tabindex="-1">Const &amp; Static</h2>
+              <p class="pg-by">Immutable members and class-level shared state</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg> </div>
+                <div>
+                  <h3 class="st-title">const member variables</h3>
+                  <p class="step-note">Must be initialised in the constructor initialiser list.
+                    Cannot be modified after construction.</p>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg> </div>
+                <div>
+                  <h3 class="st-title">const member functions</h3>
+                  <p class="step-note">Declared with <code>const</code>
+                    after the parameter list. Cannot modify any member variable.</p>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg> </div>
+                <div>
+                  <h3 class="st-title">static member variables</h3>
+                  <p class="step-note">Shared across all instances. Must be defined once outside the
+                    class. Exists even with no objects.</p>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg> </div>
+                <div>
+                  <h3 class="st-title">static member functions</h3>
+                  <p class="step-note">Can only access static members — no <code>this</code>
+                    pointer. Called via <code>ClassName::method()</code>.
+                  </p>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=_vED74pdDx0" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Init List</a><a class="chip" href="https://www.youtube.com/watch?v=Y1E4j-qPYG0" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Const</a><a class="chip" href="https://www.youtube.com/watch?v=gVIuCrbm-2Q" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Static</a><a class="chip" href="https://www.youtube.com/watch?v=pKllmpeIF-0" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Math Util</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#const1"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Constants1.cpp</a><a class="chip" href="code-files.html#const2"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Constants2.cpp</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="pull">The interaction between <em>const objects</em> and <em>const member functions</em> is a
+                common exam question.</div>
+              <div class="sbox">
+                <h3 class="sbox-title">Common Mistakes</h3>
+                <ul>
+                  <li><a href="#">Forgetting to init const in init-list</a></li>
+                  <li><a href="#">Calling non-const method on const object</a></li>
+                  <li><a href="#">Forgetting to define static outside class</a></li>
+                  <li><a href="#">Accessing instance members from static fn</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

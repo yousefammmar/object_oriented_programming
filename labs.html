@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Labs · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Labs" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="labs">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--labs" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Practical · Walkthroughs</div>
+              <h2 class="pg-title" tabindex="-1">Lab Explanations</h2>
+              <p class="pg-by">Step-by-step video guides &amp; written solutions for every Lab</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-folder"/></svg> </div>
+          </div>
+
+          <h3 class="section-tag">Lab Folders (Video &amp; Solution)</h3>
+          <div class="qgrid">
+            <div class="qcard">
+              <div class="q-num">Lab 01 ·</div>
+              <h4 class="q-title">C++ Revision</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1no30d-22gZ6hkD-3rGYAFuspjy3YzuEO?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1Q4LoUGefScYg-avjq8sXxh0hr7w4wSRe" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 02 ·</div>
+              <h4 class="q-title">Pointers &amp; Memory</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1S1uLIxf8XPMeUXWVb2Mgooix-x_YPAdS?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1jdW9sdU7ZxhTH8k94JyWxFCN-S2siZxv" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 03 ·</div>
+              <h4 class="q-title">Classes Intro</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1J114TTVzL_LfdHAh2z-Om8hdRW3Tol2A?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1MPHfrYJVrfe0n1RbSKI57CPP4jPCj_Jt?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Extra Exercises Solutions</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1FZoHDg1SKs98TX1XtEbFRHuBVGc07n9Y?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Lab Solutions</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 04 ·</div>
+              <h4 class="q-title">Ctors &amp; Dtors</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1k_Ip39y_iPKAajQvSUshrMMCo1fpDI9l?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1ZMaCqb8TaSh_rUtRPmjo-dy_5EZQKSRg?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 05 ·</div>
+              <h4 class="q-title">Const &amp; Static</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1Cp2NvKFJkxRMCUVUbscH2SnsiaVIoh9P?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/19Bi2zqxlrjZ5FTOJkmiBZFI3SDjxkPxp?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1dRHZ2GSaeTYeTkPhRR4-1TKkIEQkH1uD?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Video Codes</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 06 ·</div>
+              <h4 class="q-title">Composition</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1RP-9FeooXt1ZhYynN6Rra-dl53f9uZEl" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1abN1BPmB8D6cg_eB9NZhUhkAU_fnQ9F3" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 07 ·</div>
+              <h4 class="q-title">Overloading</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1qh6SyEcJL9-UE9C3jLgZUYzVXNFQTelD" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1LS9H3Xm3MKneKbHpgm6plrB01UmB9Gto" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 08 ·</div>
+              <h4 class="q-title">Inheritance 1</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1KZ6vWbFT3wncDwH_vuQD4c1HfeVrgB-_?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/16vOiaY7AEVwSHufk8RYAn452awbIyLEq?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 09 ·</div>
+              <h4 class="q-title">Inheritance 2</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1w70x994MrTH0mLJ_Di1JMt493Ikr4wOa?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1jya4Q5vqQlCk4gH-7ECoroBprAP2URz4?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Lab 10 ·</div>
+              <h4 class="q-title">Polymorphism</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1cnNLE7nVoMiHIYIysPa0OzZI_TI2IOEg" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Video Walkthrough</a></li>
+                <li><a href="https://drive.google.com/drive/folders/1AEOcZpYVnJneD7Bd1I-Cs--1s_M5FjXx" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Solution Drive</a></li>
+              </ul>
+            </div>
+            <div class="qcard qcard--feature">
+              <div class="q-num">TOPIC ·</div>
+              <h4 class="q-title">Operator Overload</h4>
+              <ul>
+                <li><a href="https://drive.google.com/drive/folders/1ajF3TSj5M6kOsV51jwr7734aNDGqUdT9" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Deep Dive Video</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

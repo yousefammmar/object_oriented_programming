@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Class Basics · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Class Basics" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="classes">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--classes" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 02</div>
+              <h2 class="pg-title" tabindex="-1">Class Basics</h2>
+              <p class="pg-by">Constructors, destructors, setters, getters, file separation</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-boxes"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Study materials by Ms. Ayat Droos</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://drive.google.com/file/d/1HHpBwAlGGg_7Ig45dDCmrMnaPJHBWT-U/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Classes_Intro_1</a><a class="chip"
+                      href="https://drive.google.com/file/d/1MamAEZ2ZJlEu-1FLJvHZYA4S3G3__neA/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Classes_Intro_2</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=Fq3pekWUI3k" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Classes 1</a><a class="chip" href="https://www.youtube.com/watch?v=dH2L4aK-HUM" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Classes 2</a><a class="chip" href="https://www.youtube.com/watch?v=-PaErlnIVqw" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Point2D HW</a><a class="chip" href="https://www.youtube.com/watch?v=xV8odFvC1Cc" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Constructors</a><a class="chip" href="https://www.youtube.com/watch?v=JQz9qgSnDow" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Copy Ctor</a><a class="chip" href="https://www.youtube.com/watch?v=P7wI9rA4Ps0" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> More
+                      Ctors</a><a class="chip" href="https://www.youtube.com/watch?v=qhHN7Cx73rI" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> File
+                      Sep.</a><a class="chip" href="https://www.youtube.com/watch?v=Nezino_3k7M" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Obj
+                      Arrays</a>
+                  </div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#classes1"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Classes1</a><a class="chip" href="code-files.html#classes2"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Classes2</a><a class="chip" href="code-files.html#sg"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Setters/Getters</a><a class="chip" href="code-files.html#ctor"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Constructors</a><a class="chip" href="code-files.html#dtor"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Destructor</a><a class="chip" href="code-files.html#sep"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Separation</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">4</div>
+                <div>
+                  <h3 class="st-title">Past Quizzes</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://api.psutarchive.com/assets/51acfd47-69cb-49b2-9d22-960799e6d994" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Quiz1_2022</a><a class="chip"
+                      href="https://drive.google.com/file/d/1E3QBdOgDINCMC_PR1gcQFvxy1TlYwl8Q/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Quiz1_2024</a><a class="chip"
+                      href="https://drive.google.com/file/d/1Wau2u9MF4Q52XHe0IkOV32IZQ2EyCK5R/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Q2_2025 s4</a><a class="chip"
+                      href="https://drive.google.com/file/d/1D4GyT6Ir5EPchYfps5YdAoo67ssC02_L/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Q2_2025 s5</a><a class="chip"
+                      href="https://drive.google.com/file/d/10nM2TiW5VBTmIrQqD9QZil3vD6PPv1XF/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Q2_2025 s9</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">5</div>
+                <div>
+                  <h3 class="st-title">Past Labs</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://drive.google.com/drive/folders/1VrVwgwMhSjxsKEUo6AY9zunkAXqjvmrK" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB3_2025</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1IeaIJtPU9EvTMS9xcX5sBXyuM2DVnshH" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB3_2024</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1aC4kFTitOamYI8uI5zviZdQnM4z8hZVv" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB4_2025</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/154XF7lAs2mscHpIV5Y9X8QAm-x7CMsi3" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB4_2024</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1hVWJ6fbxkLx7Yt-cEg855BobS8ARXhfU" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB5_2025</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1cZX3lWXaQA-twjMnWcktQuvHQTS1Bij_" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB5_2024</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">Class definition &amp; members</a></li>
+                  <li><a href="#">public / private access</a></li>
+                  <li><a href="#">Setters &amp; getters</a></li>
+                  <li><a href="#">Default constructor</a></li>
+                  <li><a href="#">Parameterised constructor</a></li>
+                  <li><a href="#">Initialiser list syntax</a></li>
+                  <li><a href="#">Copy constructor</a></li>
+                  <li><a href="#">Destructor</a></li>
+                  <li><a href="#">.h / .cpp / Driver separation</a></li>
+                </ul>
+              </div>
+              <div class="pull">Pages 10–19 in Dana AL-taher's <a
+                  href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e"
+                  target="_blank" rel="noopener noreferrer">notebook</a> cover this topic.</div>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

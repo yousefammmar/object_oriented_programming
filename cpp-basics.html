@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C++ Basics · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — C++ Basics" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="cpp">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-basics.html">C++ Basics</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--cpp" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 01</div>
+              <h2 class="pg-title" tabindex="-1">C++ Basics</h2>
+              <p class="pg-by">Functions, loops, arrays, pointers — the foundation</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-zap"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Study materials by Ms. Ayat Droos</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://drive.google.com/file/d/1Y8PJkWnis6NyZyxWVVhenK0Q7fwx1yA2/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Basics_1</a><a class="chip"
+                      href="https://drive.google.com/file/d/1Y8PJkWnis6NyZyxWVVhenK0Q7fwx1yA2/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Basics_2</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=-2lJ6tO9eK8" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Intro</a><a class="chip" href="https://www.youtube.com/watch?v=57iSuILXRec" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Functions</a><a class="chip" href="https://www.youtube.com/watch?v=B-yZm2wNW3k" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Arrays</a><a class="chip" href="https://www.youtube.com/watch?v=Q6oSeZPjg0M" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Pointers 1</a><a class="chip" href="https://www.youtube.com/watch?v=UsJVViySFQ4" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Pointers 2</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#revision"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision1</a><a class="chip" href="code-files.html#revision2"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision2</a><a class="chip" href="code-files.html#revision3"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision3</a><a class="chip" href="code-files.html#revision4"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision4</a>
+                  </div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">4</div>
+                <div>
+                  <h3 class="st-title">Past Quizzes</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://api.psutarchive.com/assets/a443282b-d427-4f0e-95c2-e1273d916aeb" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-clipboard"/></svg> Quiz1_2025</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">5</div>
+                <div>
+                  <h3 class="st-title">Past Labs</h3>
+                  <div class="chips"><a class="chip"
+                      href="https://drive.google.com/drive/folders/1Q4LoUGefScYg-avjq8sXxh0hr7w4wSRe" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB1_2025</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1_uCxCKr0rHzvwsqNxXPcD8rrCkCkufPS" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB1_2024</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1jdW9sdU7ZxhTH8k94JyWxFCN-S2siZxv" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB2_2025</a><a class="chip"
+                      href="https://drive.google.com/drive/folders/1wJlgMJh1i9XmTcH111BGHmv7hSSegn4g" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> LAB2_2024</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">Variables &amp; data types</a></li>
+                  <li><a href="#">Functions &amp; return values</a></li>
+                  <li><a href="#">For / while / do-while</a></li>
+                  <li><a href="#">1D and 2D arrays</a></li>
+                  <li><a href="#">Pointers &amp; references</a></li>
+                  <li><a href="#">Dynamic memory (new/delete)</a></li>
+                  <li><a href="#">String operations</a></li>
+                </ul>
+              </div>
+              <div class="pull">Prefer handwritten notes? Dana AL-taher's <a
+                  href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e"
+                  target="_blank" rel="noopener noreferrer">notebook</a>, pages 0–9.</div>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

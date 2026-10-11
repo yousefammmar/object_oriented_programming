@@ -1,0 +1,13 @@
+{
+  "name": "oop-cs11253-study-guide",
+  "private": true,
+  "description": "Static multi-page study guide for CS11253 Object Oriented Programming (PSUT). No build step — the dev dependency is only used by the content-preservation check.",
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "build:search": "python3 tools/build_search_index.py",
+    "verify": "node tools/verify_preservation.cjs --report docs/PRESERVATION-REPORT.md"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

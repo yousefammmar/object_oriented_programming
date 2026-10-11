@@ -1,0 +1,154 @@
+/*
+ * tokens.css — design tokens (CSS custom properties) for the whole site.
+ *
+ * Everything visual (colours, spacing, radii, shadows, type, motion) is defined here ONCE.
+ * The other stylesheets only reference these variables, so re-theming the site means
+ * editing this file only.
+ *
+ * Theme switching: light values live on :root, dark values on `html.dark`
+ * (the class is toggled by assets/js/theme.js and pre-applied by an inline script in <head>).
+ */
+
+/* ───────────────────────── 1. LIGHT THEME (default) ───────────────────────── */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg: #f8faff;            /* page background */
+  --bg-2: #eef2fb;          /* sidebar / subtle bands */
+  --card: #ffffff;          /* cards & panels */
+  --card-hover: #fbfcff;
+  --border: #d9e0f0;
+  --border-strong: #b9c4de;
+
+  /* Text */
+  --text: #18243d;          /* main text */
+  --text-2: #52627a;        /* secondary text (≥ 4.5:1 on --bg and --card) */
+  --text-3: #5f6e86;        /* tertiary / meta text, still ≥ 4.5:1 on --card */
+
+  /* Accents */
+  --accent: #315ceb;        /* primary: links, active states, buttons */
+  --accent-2: #087f8c;      /* secondary: teal highlights */
+  --accent-3: #6d4fd6;      /* optional violet highlight */
+  --accent-soft: #e8eefe;   /* tinted backgrounds for accent items */
+  --accent-2-soft: #e0f3f4;
+  --on-accent: #ffffff;     /* text on solid accent */
+  --success: #0b7a4b;
+  --success-soft: #e0f5ea;
+  --warn: #8a5a00;
+
+  /* Chip "kinds" (resource type colours; always paired with an emoji, never colour alone) */
+  --kind-doc: #315ceb;
+  --kind-video: #b4265f;
+  --kind-code: #087f8c;
+  --kind-quiz: #8a5a00;
+  --kind-lab: #6d4fd6;
+
+  /* Chrome */
+  --bar-bg: rgba(248, 250, 255, 0.92);
+  --overlay: rgba(11, 16, 32, 0.45);
+  --shadow-1: 0 1px 2px rgba(24, 36, 61, 0.06), 0 1px 1px rgba(24, 36, 61, 0.04);
+  --shadow-2: 0 8px 24px rgba(24, 36, 61, 0.10);
+  --shadow-3: 0 24px 60px rgba(24, 36, 61, 0.18);
+  --hero-glow-a: rgba(49, 92, 235, 0.14);
+  --hero-glow-b: rgba(8, 127, 140, 0.12);
+  --grid-line: rgba(24, 36, 61, 0.05);
+
+  /* Code editor palette (the editor stays dark in both themes, like a real IDE) */
+  --code-bg: #0d1424;
+  --code-bar: #151e33;
+  --code-border: #26324d;
+  --code-text: #e3eaf8;
+  --code-ln: #7d8aa8;
+  --code-kw: #ff7b9c;
+  --code-st: #9be29f;
+  --code-nu: #ffb86c;
+  --code-fn: #7cc4ff;
+  --code-cm: #8f9bb8;
+  --code-pp: #c8a7ff;
+  --code-accent: #54e2d0;
+}
+
+/* ───────────────────────── 2. DARK THEME ───────────────────────── */
+html.dark {
+  color-scheme: dark;
+
+  --bg: #0b1020;
+  --bg-2: #111a30;
+  --card: #172238;
+  --card-hover: #1b2842;
+  --border: #25324f;
+  --border-strong: #354568;
+
+  --text: #f1f5ff;
+  --text-2: #a5b4d0;
+  --text-3: #93a3c2;
+
+  --accent: #4f8cff;
+  --accent-2: #54e2d0;
+  --accent-3: #a78bfa;
+  --accent-soft: #162547;   /* ≥ 4.5:1 with --accent text on top */
+  --accent-2-soft: #14343c;
+  --on-accent: #07102a;
+  --success: #5ee9a4;
+  --success-soft: #10352a;
+  --warn: #ffcb6b;
+
+  --kind-doc: #7fb0ff;
+  --kind-video: #ff8fb6;
+  --kind-code: #54e2d0;
+  --kind-quiz: #ffcb6b;
+  --kind-lab: #c1adff;
+
+  --bar-bg: rgba(11, 16, 32, 0.92);
+  --overlay: rgba(2, 5, 14, 0.62);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 10px 28px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 28px 70px rgba(0, 0, 0, 0.6);
+  --hero-glow-a: rgba(79, 140, 255, 0.20);
+  --hero-glow-b: rgba(84, 226, 208, 0.12);
+  --grid-line: rgba(241, 245, 255, 0.045);
+
+  --code-bg: #080d1b;
+  --code-bar: #0f1730;
+  --code-border: #1f2b48;
+}
+
+/* ───────────────────────── 3. THEME-INDEPENDENT TOKENS ───────────────────────── */
+:root {
+  /* Typography */
+  --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* 8px spacing scale */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 16px;
+  --s-4: 24px;
+  --s-5: 32px;
+  --s-6: 48px;
+  --s-7: 64px;
+
+  /* Radii */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* Layout */
+  --sidebar-w: 280px;
+  --topbar-h: 60px;
+  --content-w: 1120px;
+
+  /* Motion (150–300ms, transform/opacity only) */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-fast: 150ms;
+  --t-med: 250ms;
+
+  /* Stacking order */
+  --z-topbar: 40;
+  --z-overlay: 55;
+  --z-drawer: 60;
+  --z-fab: 30;
+  --z-toast: 90;
+}
