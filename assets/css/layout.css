@@ -509,7 +509,34 @@ body:not([data-page='home']) .bg-symbols {
   transition: transform var(--t-fast) var(--ease);
 }
 
-.site-footer .signature:hover img { transform: scale(1.08); }
+.site-footer .signature { position: relative; }
+
+/* soft pulsing ring behind the photo */
+.site-footer .signature img { position: relative; animation: sig-pulse 2.8s ease-out infinite; }
+
+@keyframes sig-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.site-footer .signature:hover img { transform: scale(1.1) rotate(-6deg); animation-play-state: paused; }
+
+/* name slides in when the footer scrolls into view, then a wave on hover */
+.site-footer .signature span { animation: sig-in 0.7s var(--ease) both; }
+@keyframes sig-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+
+.site-footer .signature strong {
+  background: linear-gradient(90deg, var(--text) 0 40%, var(--accent) 50%, var(--text) 60% 100%) 100% 0 / 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  transition: background-position 0.8s var(--ease);
+}
+.site-footer .signature:hover strong { background-position: 0 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer .signature img, .site-footer .signature span { animation: none; }
+  .site-footer .signature:hover img { transform: none; }
+}
 
 .site-footer .signature span { display: grid; text-align: left; line-height: 1.3; }
 .site-footer .signature small { color: var(--text-2); font-size: 11px; }

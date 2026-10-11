@@ -74,7 +74,8 @@ main:focus {
   color: var(--accent);
 }
 .pg-icon .i { width: 34px; height: 34px; }
-.ornament .i { width: 10px; height: 10px; fill: currentColor; stroke: none; margin: 0 6px; }
+.ornament { display: flex; justify-content: center; align-items: center; gap: 12px; }
+.ornament .i { width: 10px; height: 10px; fill: currentColor; stroke: none; }
 .sn .i { width: 20px; height: 20px; }
 
 /* Action row injected under the page header: complete / bookmark (page-features.js) */
