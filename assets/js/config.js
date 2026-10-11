@@ -49,7 +49,9 @@
       subtitleHtml: 'A Complete Study Guide &nbsp;·&nbsp; C++ &nbsp;·&nbsp; Classes &nbsp;·&nbsp; Composition',
       footerLeftHtml: 'OOP Study Guide · CS11253 · PSUT',
       footerRightHtml:
-        'Built by <a href="https://yousefammmar.github.io/profile" target="_blank" rel="noopener noreferrer">yousefammar</a> · Spring 2025'
+        '<a class="signature" href="https://yousefammmar.github.io/profile" target="_blank" rel="noopener noreferrer" aria-label="Yousef Odeh, open portfolio">' +
+        '<img src="assets/img/yousef.png" alt="Yousef Odeh" width="44" height="44" loading="lazy">' +
+        '<span><strong>Yousef Odeh</strong><small>Built by Yousef &middot; Spring 2025</small></span></a>'
     },
 
     /** Decorative floating symbols in the Home hero ([symbol, top %, left %, animation seconds, font-size px | null]). */

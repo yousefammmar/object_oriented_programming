@@ -489,6 +489,31 @@ body:not([data-page='home']) .bg-symbols {
   color: var(--accent);
 }
 
+.site-footer .signature {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.site-footer .signature::after { display: none; }
+
+.site-footer .signature img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: #fff;
+  object-fit: cover;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.site-footer .signature:hover img { transform: scale(1.08); }
+
+.site-footer .signature span { display: grid; text-align: left; line-height: 1.3; }
+.site-footer .signature small { color: var(--text-2); font-size: 11px; }
+
 @media (max-width: 640px) {
   .site-footer {
     flex-direction: column;
