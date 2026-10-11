@@ -44,14 +44,14 @@
     site: {
       homeLabel: 'OOP — CS11253', // used for the brand link and breadcrumb root (from the original <title>)
       kicker: 'Princess Sumaya University for Technology',
-      issue: 'CS11253 · Spring 2025',
+      issue: 'CS11253 · Winter 2026',
       titleHtml: 'Object <em>Oriented</em> Programming',
       subtitleHtml: 'A Complete Study Guide &nbsp;·&nbsp; C++ &nbsp;·&nbsp; Classes &nbsp;·&nbsp; Composition',
       footerLeftHtml: 'OOP Study Guide · CS11253 · PSUT',
       footerRightHtml:
         '<a class="signature" href="https://yousefammmar.github.io/profile" target="_blank" rel="noopener noreferrer" aria-label="Yousef Odeh, open portfolio">' +
         '<img src="assets/img/yousef.png" alt="Yousef Odeh" width="44" height="44" loading="lazy">' +
-        '<span><strong>Yousef Odeh</strong><small>Built by Yousef &middot; Spring 2025</small></span></a>'
+        '<span><strong>Yousef Odeh</strong><small>Built by Yousef &middot; Winter 2026</small></span></a>'
     },
 
     /** Decorative floating symbols in the Home hero ([symbol, top %, left %, animation seconds, font-size px | null]). */
