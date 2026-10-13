@@ -82,6 +82,7 @@
     OOP.progress.init();
     OOP.features.init();
     OOP.search.init();
+    OOP.consent.init();
     if (document.body.getAttribute('data-page') === 'code') OOP.codeViewer.init();
 
     document.getElementById('readingBtn').addEventListener('click', function () {
