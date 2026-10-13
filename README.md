@@ -206,9 +206,9 @@ Script order (each page): `config → storage → theme → layout → progress 
 - **Themes**: light/dark (saved; follows the OS until you choose). **Reading mode** (`R`). **Shortcuts help** (`?`).
 - **Accessibility**: semantic headings, labelled controls, visible focus, focus-managed native `<dialog>`s, `aria-current`/`aria-pressed`/`aria-live` status, reduced-motion support, touch targets ≥ 44px on touch devices.
 
-### Analytics (Google tag) and consent
+### Analytics
 
-Every page's `<head>` contains the Google tag (`G-4JHKFQBZ63`). It is preceded by `consent-init.js`, which sets Google Consent Mode to **denied** until a visitor clicks **Accept** in the small notice bar (`consent.js`). The choice is saved in `localStorage` (`oop-consent`) and can be changed any time from **Cookie settings** in the footer. The bar never blocks the page. To remove analytics entirely, delete the "Consent defaults" and "Google tag" blocks from each page's `<head>` and the `consent.js` include.
+Every page's `<head>` contains the Google tag (`G-4JHKFQBZ63`). To remove it, delete the "Google tag (gtag.js)" block from each page.
 
 ### Run locally
 
