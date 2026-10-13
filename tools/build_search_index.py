@@ -29,8 +29,12 @@ from html.parser import HTMLParser
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGES = [  # (id, file, label) — keep in sync with assets/js/config.js
     ('home', 'index.html', 'Home'), ('cpp', 'cpp-revision.html', 'C++ Revision'),
-    ('classes', 'class-revision.html', 'Class Revision'), ('const', 'const-static.html', 'Const & Static'),
-    ('composition', 'composition.html', 'Composition'), ('labs', 'labs.html', 'Labs'),
+    ('classes', 'class-basics.html', 'Class Basics'), ('const', 'const-static.html', 'Const & Static'),
+    ('composition', 'composition.html', 'Composition'),
+    ('dma', 'dynamic-memory.html', 'Dynamic Memory'), ('this', 'this-pointer.html', 'this Pointer'),
+    ('friend', 'friend-functions.html', 'Friend Functions'), ('inheritance', 'inheritance.html', 'Inheritance'),
+    ('polymorphism', 'polymorphism.html', 'Polymorphism'), ('operators', 'operator-overloading.html', 'Operator Overloading'),
+    ('labs', 'labs.html', 'Labs'),
     ('code', 'code-files.html', 'Code Files'), ('quizzes', 'examination-hall.html', 'Examination Hall'),
     ('links', 'all-links.html', 'All Links'),
 ]

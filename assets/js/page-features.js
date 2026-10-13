@@ -9,7 +9,7 @@
  * Sections:
  *   1. Markup enhancements   (chips, placeholder links, stagger animation)
  *   2. Topic completion      (page actions, lab toggles, Home badges)
- *   3. Home dashboard        (continue learning, progress, bookmarks / recent)
+ *   3. Home dashboard        (continue learning, progress, bookmarks / recent, achievements)
  *   4. Previous / next pager
  *   5. All Links filter
  *   6. Entry point           OOP.features.init()
@@ -217,12 +217,32 @@
     return el('div', { class: 'dash-card' }, children);
   }
 
+  /** Card 4 — achievements: earned ones ticked, locked ones padlocked, plus a nudge toward the next. */
+  function achievementsCard() {
+    const list = OOP.progress.achievements();
+    const got = list.filter(function (a) { return a.unlocked; }).length;
+    const next = list.filter(function (a) { return !a.unlocked; })[0];
+    const badges = el('div', { class: 'chips' }, list.map(function (a) {
+      return el('span', { class: 'badge' + (a.unlocked ? ' badge--done' : ''), title: a.desc }, [
+        icon(a.unlocked ? 'check' : 'lock'),
+        a.name,
+        el('span', { class: 'sr-only', text: (a.unlocked ? ' — unlocked: ' : ' — locked: ') + a.desc })
+      ]);
+    }));
+    return el('div', { class: 'dash-card' }, [
+      el('h2', { text: 'Achievements' }),
+      el('p', { class: 'big', text: got + ' of ' + list.length + ' unlocked' }),
+      badges,
+      el('p', { class: 'dash-empty', text: next ? 'Next: ' + next.desc + ' to unlock “' + next.name + '”.' : 'Every achievement unlocked — legendary!' })
+    ]);
+  }
+
   /** (Re)render the dashboard; runs again whenever progress or the library changes. */
   function renderDashboard() {
     const host = document.getElementById('dashboard');
     if (!host) return;
     host.textContent = '';
-    [continueCard(), progressCard(), shortcutsCard()].forEach(function (c) { host.appendChild(c); });
+    [continueCard(), progressCard(), shortcutsCard(), achievementsCard()].forEach(function (c) { host.appendChild(c); });
   }
 
   /* ───────────── 4. Previous / next pager ───────────── */

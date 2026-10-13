@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polymorphism · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Polymorphism" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JHKFQBZ63"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4JHKFQBZ63');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="polymorphism">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-revision.html">C++ Revision</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="dynamic-memory.html">Dynamic Memory</a> · <a href="this-pointer.html">this Pointer</a> · <a href="friend-functions.html">Friend Functions</a> · <a href="inheritance.html">Inheritance</a> · <a href="polymorphism.html">Polymorphism</a> · <a href="operator-overloading.html">Operator Overloading</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--polymorphism" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 09</div>
+              <h2 class="pg-title" tabindex="-1">Polymorphism</h2>
+              <p class="pg-by">One interface, many implementations — chosen at runtime with virtual</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-shapes"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Notes</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/file/d/1SKzF4uh2_o3dJRGniSBj0BjXqkNDFjNH/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Polymorphism.pdf</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=FyKyUDGRswc" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Polymorphism Intro</a><a class="chip" href="https://www.youtube.com/watch?v=piUs08wgI5I" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Polymorphism 2</a><a class="chip" href="https://www.youtube.com/watch?v=-472ho8CktA" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Polymorphism 3</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#poly"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Polymorphism.cpp</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">4</div>
+                <div>
+                  <h3 class="st-title">Lab walkthroughs</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/drive/folders/1cnNLE7nVoMiHIYIysPa0OzZI_TI2IOEg" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 10 video</a><a class="chip" href="https://drive.google.com/drive/folders/1AEOcZpYVnJneD7Bd1I-Cs--1s_M5FjXx" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 10 solution</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">Base-class pointer to a derived object</a></li>
+                  <li><a href="#">Static vs dynamic (late) binding</a></li>
+                  <li><a href="#">virtual functions and override</a></li>
+                  <li><a href="#">Pure virtual functions &amp; abstract classes</a></li>
+                  <li><a href="#">Virtual destructors</a></li>
+                  <li><a href="#">Array of base-class pointers</a></li>
+                </ul>
+              </div>
+              <div class="pull">This page is a short summary. The full notes are in <a
+                  href="https://drive.google.com/file/d/1SKzF4uh2_o3dJRGniSBj0BjXqkNDFjNH/view"
+                  target="_blank" rel="noopener noreferrer">Polymorphism.pdf</a> on Google Drive.</div>
+            </div>
+          </div>
+          <h3 class="section-tag">Summary</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">01 · What is polymorphism?</h4>
+                <ul>
+                  <li><a href="#"><span>"Many forms": the same call behaves differently depending on the actual object type.</span></a></li>
+                  <li><a href="#"><span>You write general code with base-class pointers or references that works for every derived class.</span></a></li>
+                  <li><a href="#"><span>A base pointer can point to a derived object — <code>Shape* s = new Circle();</code> — but not the other way round.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">02 · Static vs dynamic binding</h4>
+                <ul>
+                  <li><a href="#"><span>Without <code>virtual</code>, <code>s-&gt;draw()</code> follows the pointer type and prints "Drawing a shape" — static binding, decided at compile time.</span></a></li>
+                  <li><a href="#"><span>With <code>virtual void draw()</code> in the base and <code>void draw() override</code> in the derived class, the real object decides at runtime — dynamic (late) binding.</span></a></li>
+                  <li><a href="#"><span>Calling through an object name (<code>c.draw();</code>) is always compile-time; only pointers and references are polymorphic.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">03 · The four rules</h4>
+                <ul>
+                  <li><a href="#"><span>Polymorphism needs: inheritance, a base-class pointer or reference, the function declared <code>virtual</code>, and the function overridden in the derived class.</span></a></li>
+                  <li><a href="#"><span><code>override</code> is optional but recommended — the compiler then catches mismatched signatures.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">04 · Abstract classes</h4>
+                <ul>
+                  <li><a href="#"><span>A pure virtual function has no body in the base: <code>virtual void draw() = 0;</code></span></a></li>
+                  <li><a href="#"><span>A class with at least one is abstract — <code>Shape s;</code> is not allowed, but <code>Shape*</code> and <code>Shape&amp;</code> are.</span></a></li>
+                  <li><a href="#"><span>A derived class becomes concrete only once it implements every pure virtual function.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">05 · Virtual destructors</h4>
+                <ul>
+                  <li><a href="#"><span>Without one, deleting through a base pointer runs only the base destructor — a memory leak.</span></a></li>
+                  <li><a href="#"><span>Declare <code>virtual ~Shape() = default;</code> so the derived destructor runs first, then the base.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">06 · Arrays of base pointers</h4>
+                <ul>
+                  <li><a href="#"><span><code>Shape* shapes[3];</code> can hold a Circle, a Rectangle and a Triangle; <code>shapes[i]-&gt;draw();</code> calls each one's own version.</span></a></li>
+                  <li><a href="#"><span>Free them with <code>delete shapes[i];</code> in a loop — this is why the destructor must be virtual.</span></a></li>
+                  <li><a href="#"><span>This replaces error-prone <code>switch</code> statements on type: each class handles its own behaviour, so adding a shape is easy.</span></a></li>
+                </ul>
+              </div>
+          </div>
+          <h3 class="section-tag">Extra Notes · beyond the PDF</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">Good to know</h4>
+                <ul>
+                  <li><a href="#"><span><code>virtual</code> is only needed in the base class — overrides stay virtual automatically (still write <code>override</code>).</span></a></li>
+                  <li><a href="#"><span>Polymorphism only works through pointers or references. Copying a derived object into a base object slices off the derived part (object slicing).</span></a></li>
+                  <li><a href="#"><span>An abstract class can still have data members, constructors and normal functions.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Common mistakes</h4>
+                <ul>
+                  <li><a href="#"><span>Forgetting <code>virtual</code> in the base — calls go to the base version (static binding).</span></a></li>
+                  <li><a href="#"><span>A different signature (a missing <code>const</code>, another parameter type) makes a new function instead of an override — <code>override</code> catches it.</span></a></li>
+                  <li><a href="#"><span>No virtual destructor in a base class used through pointers — the derived destructor never runs.</span></a></li>
+                  <li><a href="#"><span>Trying to create an object of an abstract class.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Exam tip: which function runs?</h4>
+                <ul>
+                  <li><a href="#"><span>Is the call through a pointer or reference, and is the function virtual? If both, the real object's type decides.</span></a></li>
+                  <li><a href="#"><span>Otherwise the declared type of the pointer or variable decides.</span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

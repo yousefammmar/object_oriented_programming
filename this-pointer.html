@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>this Pointer · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — this Pointer" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JHKFQBZ63"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4JHKFQBZ63');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="this">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-revision.html">C++ Revision</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="dynamic-memory.html">Dynamic Memory</a> · <a href="this-pointer.html">this Pointer</a> · <a href="friend-functions.html">Friend Functions</a> · <a href="inheritance.html">Inheritance</a> · <a href="polymorphism.html">Polymorphism</a> · <a href="operator-overloading.html">Operator Overloading</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--this" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 06</div>
+              <h2 class="pg-title" tabindex="-1">this Pointer</h2>
+              <p class="pg-by">The hidden pointer to the object that called the function</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-pointer"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Notes</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/file/d/1BzaJME4SFMAgLB9sA78xjfZrWA1Dtmac/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> this pointer.pdf</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=k9kYLYlW04Q" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Cascading &amp; Dynamic</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#this"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> ThisPointer.cpp</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">this points to the calling object</a></li>
+                  <li><a href="#">this-&gt;member vs a same-named parameter</a></li>
+                  <li><a href="#">Initialiser list avoids shadowing</a></li>
+                  <li><a href="#">return *this returns the object</a></li>
+                  <li><a href="#">Static functions have no this</a></li>
+                  <li><a href="#">const vs static member functions</a></li>
+                </ul>
+              </div>
+              <div class="pull">This page is a short summary. The full notes are in <a
+                  href="https://drive.google.com/file/d/1BzaJME4SFMAgLB9sA78xjfZrWA1Dtmac/view"
+                  target="_blank" rel="noopener noreferrer">this pointer.pdf</a> on Google Drive.</div>
+            </div>
+          </div>
+          <h3 class="section-tag">Summary</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">01 · What is this?</h4>
+                <ul>
+                  <li><a href="#"><span><code>this</code> is a pointer to the object that called the member function.</span></a></li>
+                  <li><a href="#"><span>It is passed automatically to every non-static member function.</span></a></li>
+                  <li><a href="#"><span>It can only be used inside non-static member functions — never outside the class.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">02 · Member vs parameter</h4>
+                <ul>
+                  <li><a href="#"><span>When a parameter has the same name as a data member, <code>this-&gt;grade = grade;</code> assigns the member.</span></a></li>
+                  <li><a href="#"><span>Without it, <code>grade = grade;</code> assigns the parameter to itself and the member stays unchanged — a logical error.</span></a></li>
+                  <li><a href="#"><span>Alternative: the initialiser list <code>Student(int grade) : grade(grade) { }</code> — often preferred.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">03 · Returning the object</h4>
+                <ul>
+                  <li><a href="#"><span><code>return *this;</code> returns the current object, e.g. from <code>Student&amp; test()</code>.</span></a></li>
+                  <li><a href="#"><span>Used as <code>Student s1 = s.test();</code></span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">04 · The object&#x27;s address</h4>
+                <ul>
+                  <li><a href="#"><span><code>cout &lt;&lt; this;</code> prints the address of the object that called the function.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">05 · Static vs const functions</h4>
+                <ul>
+                  <li><a href="#"><span>A static member function belongs to the class, not to an object, so it has no <code>this</code>.</span></a></li>
+                  <li><a href="#"><span>A const member function works on a specific object (it has a hidden <code>this</code>) and promises not to modify its data members.</span></a></li>
+                  <li><a href="#"><span>A member function can't be both: const needs an object to protect, and static has none.</span></a></li>
+                </ul>
+              </div>
+          </div>
+          <h3 class="section-tag">Extra Notes · beyond the PDF</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">Good to know</h4>
+                <ul>
+                  <li><a href="#"><span><code>*this</code> is the object itself; <code>this</code> is its address.</span></a></li>
+                  <li><a href="#"><span>Cascading works because each setter returns <code>*this</code> by reference: <code>s.setName("Sara").setGrade(95);</code></span></a></li>
+                  <li><a href="#"><span>In a const member function, <code>this</code> points to a const object, so it can't be used to change data members.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Common mistakes</h4>
+                <ul>
+                  <li><a href="#"><span>Returning <code>Student</code> by value from a setter — the chain then changes a temporary copy, not the original object.</span></a></li>
+                  <li><a href="#"><span>Writing <code>this.grade</code> — <code>this</code> is a pointer, so use <code>this-&gt;grade</code> or <code>(*this).grade</code>.</span></a></li>
+                  <li><a href="#"><span>Using <code>this</code> inside a static member function — compile error.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Where you&#x27;ll see it again</h4>
+                <ul>
+                  <li><a href="#"><span>Self-assignment check in <code>operator=</code>: <code>if (this != &amp;other)</code>.</span></a></li>
+                  <li><a href="#"><span>Operators like <code>+=</code> and prefix <code>++</code> end with <code>return *this;</code></span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

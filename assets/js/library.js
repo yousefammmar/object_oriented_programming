@@ -5,12 +5,14 @@
  * An "entry" describes one place on the site:
  *   { key: "page:cpp" | "code:sep", label: "C++ Revision", href: "cpp-revision.html" }
  *
- * Storage keys: "last" (entry + timestamp), "recent" (array, newest first, max 6), "bookmarks" (array).
+ * Storage keys: "last" (entry + timestamp), "recent" (array, newest first, max 6), "bookmarks" (array),
+ * "seen" (every key ever visited — used by achievements).
  *
  * API:
  *   OOP.library.visit(entry)       record a visit (updates last + recent)
  *   OOP.library.last()             most recent entry or null
  *   OOP.library.recent()           recent entries
+ *   OOP.library.seen()             keys of every entry ever visited
  *   OOP.library.bookmarks()        bookmarked entries
  *   OOP.library.isBookmarked(key)
  *   OOP.library.toggleBookmark(entry) → true if it is bookmarked afterwards
@@ -42,7 +44,14 @@
     const list = readList('recent').filter(function (e) { return e.key !== slim.key; });
     list.unshift(slim);
     OOP.store.setJSON('recent', list.slice(0, MAX_RECENT));
+    const seen = readList('seen');
+    if (seen.indexOf(slim.key) === -1) OOP.store.setJSON('seen', seen.concat(slim.key));
     changed();
+  }
+
+  /** Keys of everything ever visited ("page:cpp", "code:sep" …). */
+  function seen() {
+    return readList('seen');
   }
 
   /** Last visited entry (or null). */
@@ -80,5 +89,5 @@
     return !exists;
   }
 
-  OOP.library = { visit, last, recent, bookmarks, isBookmarked, toggleBookmark };
+  OOP.library = { visit, last, recent, seen, bookmarks, isBookmarked, toggleBookmark };
 })();

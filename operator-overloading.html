@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operator Overloading · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Operator Overloading" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JHKFQBZ63"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4JHKFQBZ63');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="operators">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-revision.html">C++ Revision</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="dynamic-memory.html">Dynamic Memory</a> · <a href="this-pointer.html">this Pointer</a> · <a href="friend-functions.html">Friend Functions</a> · <a href="inheritance.html">Inheritance</a> · <a href="polymorphism.html">Polymorphism</a> · <a href="operator-overloading.html">Operator Overloading</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--operators" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 10</div>
+              <h2 class="pg-title" tabindex="-1">Operator Overloading</h2>
+              <p class="pg-by">Making your objects work with +, ==, ++ and &lt;&lt; like built-in types</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-operator"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Notes</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/file/d/1wT4qcgs3_MyIMwNFaGGyj5zBjqcq0AV9/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Operator overloading.pdf</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=go9dzrMami8" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Operator Overloading 1</a><a class="chip" href="https://www.youtube.com/watch?v=s9P6Odjmtq4" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Operator Overloading 2</a><a class="chip" href="https://www.youtube.com/watch?v=v4I_PEWZag0" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Operator Overloading 3</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#ops"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> OperatorOverloading.cpp</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">4</div>
+                <div>
+                  <h3 class="st-title">Lab walkthroughs</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/drive/folders/1qh6SyEcJL9-UE9C3jLgZUYzVXNFQTelD" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 07 video</a><a class="chip" href="https://drive.google.com/drive/folders/1LS9H3Xm3MKneKbHpgm6plrB01UmB9Gto" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 07 solution</a><a class="chip" href="https://drive.google.com/drive/folders/1ajF3TSj5M6kOsV51jwr7734aNDGqUdT9" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Deep dive video</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">Redefine operators for your own classes</a></li>
+                  <li><a href="#">Arithmetic operators as const members</a></li>
+                  <li><a href="#">Compound assignment returns *this</a></li>
+                  <li><a href="#">Prefix vs postfix (the int parameter)</a></li>
+                  <li><a href="#">&lt;&lt; and &gt;&gt; as friend functions</a></li>
+                  <li><a href="#">Member vs friend overloading</a></li>
+                </ul>
+              </div>
+              <div class="pull">This page is a short summary. The full notes are in <a
+                  href="https://drive.google.com/file/d/1wT4qcgs3_MyIMwNFaGGyj5zBjqcq0AV9/view"
+                  target="_blank" rel="noopener noreferrer">Operator overloading.pdf</a> on Google Drive.</div>
+            </div>
+          </div>
+          <h3 class="section-tag">Summary</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">01 · What &amp; why</h4>
+                <ul>
+                  <li><a href="#"><span>Redefines operators (+, -, ==, ++, &lt;&lt; …) for your own classes, so objects behave like built-in types.</span></a></li>
+                  <li><a href="#"><span>Write <code>p1 + p2</code> instead of <code>p1.add(p2)</code> — cleaner code that reads like maths.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">02 · Arithmetic operators</h4>
+                <ul>
+                  <li><a href="#"><span>As a member function: <code>Point operator+(const Point&amp; p) const { return Point(x + p.x, y + p.y); }</code></span></a></li>
+                  <li><a href="#"><span><code>const</code> guarantees the current object isn't modified. -, * and / work the same way.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">03 · Compound assignment</h4>
+                <ul>
+                  <li><a href="#"><span><code>Point&amp; operator+=(const Point&amp; p)</code> changes the current object and ends with <code>return *this;</code></span></a></li>
+                  <li><a href="#"><span>Returning <code>*this</code> allows chaining, and no temporary object is created.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">04 · Comparison</h4>
+                <ul>
+                  <li><a href="#"><span><code>bool operator==(const Point&amp; p) const</code> — equal when both x and y match; <code>!=</code> works the same way.</span></a></li>
+                  <li><a href="#"><span><code>bool operator&lt;(const Point&amp; p) const</code> — in the notes, smaller only when both coordinates are smaller; same idea for &gt;, &lt;= and &gt;=.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">05 · Increment &amp; decrement</h4>
+                <ul>
+                  <li><a href="#"><span>Prefix <code>Point&amp; operator++()</code> increments first, then returns <code>*this</code> — no temporary needed.</span></a></li>
+                  <li><a href="#"><span>Postfix <code>Point operator++(int)</code> saves <code>Point temp = *this;</code>, increments, and returns the old value. The unused <code>int</code> is what tells them apart.</span></a></li>
+                  <li><a href="#"><span>Decrement (--) follows the same pattern.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">06 · Stream operators</h4>
+                <ul>
+                  <li><a href="#"><span><code>friend ostream&amp; operator&lt;&lt;(ostream&amp; out, const Point&amp; p);</code> ends with <code>return out;</code> and enables <code>cout &lt;&lt; p1;</code></span></a></li>
+                  <li><a href="#"><span><code>friend istream&amp; operator&gt;&gt;(istream&amp; in, Point&amp; p);</code> reads <code>in &gt;&gt; p.x &gt;&gt; p.y;</code> for <code>cin &gt;&gt; p1;</code></span></a></li>
+                  <li><a href="#"><span>They must be friends because the left operand (cout / cin) is not a Point.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">07 · Member vs friend</h4>
+                <ul>
+                  <li><a href="#"><span>Member function: the left operand must be an object of the class.</span></a></li>
+                  <li><a href="#"><span>Friend (non-member): when the left operand isn't — e.g. <code>cout &lt;&lt; obj</code>.</span></a></li>
+                  <li><a href="#"><span>Don't overload the same operator as both — the compiler can't tell which one to call.</span></a></li>
+                </ul>
+              </div>
+          </div>
+          <h3 class="section-tag">Extra Notes · beyond the PDF</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">Rules</h4>
+                <ul>
+                  <li><a href="#"><span>You can't invent new operators or change precedence, associativity or the number of operands.</span></a></li>
+                  <li><a href="#"><span>These can't be overloaded: <code>::</code>, <code>.</code>, <code>.*</code>, <code>?:</code> and <code>sizeof</code>.</span></a></li>
+                  <li><a href="#"><span>At least one operand must be a class type — you can't redefine <code>int + int</code>.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Member or friend?</h4>
+                <ul>
+                  <li><a href="#"><span><code>=</code>, <code>[]</code>, <code>()</code> and <code>-&gt;</code> must be member functions.</span></a></li>
+                  <li><a href="#"><span>If the left operand isn't your class (<code>cout &lt;&lt; p</code>, <code>2 * p</code>), it must be a non-member, usually a friend.</span></a></li>
+                  <li><a href="#"><span>As a member, the left operand is <code>*this</code> and the right one is the parameter.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Good practice</h4>
+                <ul>
+                  <li><a href="#"><span>Return a new object from <code>+</code>, <code>-</code> and <code>*</code>; return <code>*this</code> by reference from <code>+=</code>, <code>=</code> and prefix <code>++</code>.</span></a></li>
+                  <li><a href="#"><span>Mark operators that don't change the object as <code>const</code>.</span></a></li>
+                  <li><a href="#"><span>Write <code>!=</code> using <code>==</code> (<code>return !(*this == p);</code>) so they can never disagree.</span></a></li>
+                  <li><a href="#"><span>Keep the meaning natural — <code>+</code> should add, not print.</span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

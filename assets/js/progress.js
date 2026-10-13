@@ -6,9 +6,13 @@
  *
  * Storage key "progress" (JSON):  { topics: { cpp: true, … }, labs: { "01": true, … } }
  *
+ * Achievements are derived from that progress (plus visits and bookmarks from library.js); see
+ * ACHIEVEMENTS below. Storage key "achievements" only remembers which ones were already announced.
+ *
  * What this module renders:
- *   - the progress card at the bottom of the sidebar
+ *   - the progress card at the bottom of the sidebar (topics + achievements count)
  *   - small ticks next to completed topics in the sidebar
+ *   - an "Achievement unlocked" toast when one is earned
  * (Buttons on the pages and the Home dashboard are built in page-features.js using this API.)
  *
  * API:
@@ -18,6 +22,7 @@
  *   OOP.progress.count() / total() / percent()
  *   OOP.progress.reset()           (callers must confirm first — see confirmReset in page-features.js)
  *   OOP.progress.ring(pct)         → a progress-ring element
+ *   OOP.progress.achievements()    → [{ id, name, desc, unlocked }]
  * Fires the DOM event "oop:progress" on every change.
  */
 (function () {
@@ -106,6 +111,66 @@
     return wrap;
   }
 
+  /* ───────────── Achievements ───────────── */
+
+  /** Numbered labs on labs.html (Lab 01 … Lab 10). */
+  const LAB_COUNT = 10;
+
+  /**
+   * Achievements are derived from what is already tracked (topics, labs, visits, bookmarks), so they
+   * can never drift out of sync — un-marking a topic re-locks what depended on it.
+   * test(s) receives a snapshot: { done, total, labs, seen, marks }.
+   */
+  const ACHIEVEMENTS = [
+    { id: 'first-topic', name: 'First Step', desc: 'Complete your first topic', test: function (s) { return s.done >= 1; } },
+    { id: 'foundations', name: 'Solid Foundations', desc: 'Complete C++ Revision, Class Basics, Const & Static and Composition',
+      test: function () { return ['cpp', 'classes', 'const', 'composition'].every(isDone); } },
+    { id: 'pillars', name: 'Pillars of OOP', desc: 'Complete Inheritance and Polymorphism',
+      test: function () { return ['inheritance', 'polymorphism'].every(isDone); } },
+    { id: 'halfway', name: 'Halfway There', desc: 'Complete half of the topics', test: function (s) { return s.done >= Math.ceil(s.total / 2); } },
+    { id: 'all-topics', name: 'Course Complete', desc: 'Complete every topic', test: function (s) { return s.done === s.total; } },
+    { id: 'first-lab', name: 'Lab Rat', desc: 'Mark your first lab done', test: function (s) { return s.labs >= 1; } },
+    { id: 'all-labs', name: 'Lab Legend', desc: 'Mark all ' + LAB_COUNT + ' labs done', test: function (s) { return s.labs >= LAB_COUNT; } },
+    { id: 'explorer', name: 'Explorer', desc: 'Open every topic page',
+      test: function (s) { return topics().every(function (p) { return s.seen.indexOf('page:' + p.id) !== -1; }); } },
+    { id: 'code-reader', name: 'Code Reader', desc: 'Open 5 code files',
+      test: function (s) { return s.seen.filter(function (k) { return k.indexOf('code:') === 0; }).length >= 5; } },
+    { id: 'collector', name: 'Collector', desc: 'Bookmark 3 pages or code files', test: function (s) { return s.marks >= 3; } }
+  ];
+
+  /** Every achievement with its current state: [{ id, name, desc, unlocked }]. */
+  function achievements() {
+    const s = {
+      done: count(),
+      total: total(),
+      labs: Object.keys(read().labs).length,
+      seen: OOP.library.seen(),
+      marks: OOP.library.bookmarks().length
+    };
+    return ACHIEVEMENTS.map(function (a) { return { id: a.id, name: a.name, desc: a.desc, unlocked: a.test(s) }; });
+  }
+
+  /**
+   * Announce achievements that became unlocked since the last check. Storage key "achievements"
+   * holds the ids unlocked at that check, so each unlock is celebrated once.
+   */
+  function announceAchievements() {
+    const list = achievements();
+    const before = OOP.store.getJSON('achievements', []);
+    const prev = Array.isArray(before) ? before : [];
+    const fresh = list.filter(function (a) { return a.unlocked && prev.indexOf(a.id) === -1; });
+    OOP.store.setJSON('achievements', list.filter(function (a) { return a.unlocked; }).map(function (a) { return a.id; }));
+    if (fresh.length === 1) OOP.ui.toast('Achievement unlocked: ' + fresh[0].name, 'award');
+    else if (fresh.length > 1) OOP.ui.toast(fresh.length + ' achievements unlocked', 'award');
+  }
+
+  let announceTimer = null;
+  /** Check shortly after a change, so the unlock toast follows the action's own toast. */
+  function scheduleAnnounce() {
+    clearTimeout(announceTimer);
+    announceTimer = setTimeout(announceAchievements, 400);
+  }
+
   /* ───────────── Sidebar rendering ───────────── */
 
   /** Rebuild the sidebar progress card and the completion ticks next to nav items. */
@@ -119,7 +184,8 @@
             ring(percent()),
             el('div', {}, [
               el('strong', { text: 'Your progress' }),
-              el('small', { text: count() + ' of ' + total() + ' topics completed' })
+              el('small', { text: count() + ' of ' + total() + ' topics completed' }),
+              el('small', { class: 'sb-achievements', text: achievements().filter(function (a) { return a.unlocked; }).length + ' of ' + ACHIEVEMENTS.length + ' achievements' })
             ])
           ])
         ])
@@ -140,7 +206,11 @@
   function init() {
     renderSidebar();
     document.addEventListener('oop:progress', renderSidebar);
+    document.addEventListener('oop:library', renderSidebar);
+    document.addEventListener('oop:progress', scheduleAnnounce);
+    document.addEventListener('oop:library', scheduleAnnounce);
+    scheduleAnnounce();
   }
 
-  OOP.progress = { init, topics, isDone, setDone, toggle, isLabDone, toggleLab, count, total, percent, reset, ring };
+  OOP.progress = { init, topics, isDone, setDone, toggle, isLabDone, toggleLab, count, total, percent, reset, ring, achievements };
 })();

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friend Functions · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Friend Functions" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JHKFQBZ63"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4JHKFQBZ63');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="friend">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-revision.html">C++ Revision</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="dynamic-memory.html">Dynamic Memory</a> · <a href="this-pointer.html">this Pointer</a> · <a href="friend-functions.html">Friend Functions</a> · <a href="inheritance.html">Inheritance</a> · <a href="polymorphism.html">Polymorphism</a> · <a href="operator-overloading.html">Operator Overloading</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--friend" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 07</div>
+              <h2 class="pg-title" tabindex="-1">Friend Functions</h2>
+              <p class="pg-by">Non-member functions allowed to reach a class&#x27;s private members</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-users"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Notes</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/file/d/1cxPEQ6beOjRHL1Ye_26dX4f_OUjFX549/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Friend Function.pdf</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=JpAZZngxI8s" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> 2D Arrays &amp; Friend</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#friend"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> FriendFunctions.cpp</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">Declared inside the class with friend</a></li>
+                  <li><a href="#">Accesses private and protected members</a></li>
+                  <li><a href="#">Not a member — no this pointer</a></li>
+                  <li><a href="#">Called as f(obj), not obj.f()</a></li>
+                  <li><a href="#">One friend shared by two classes</a></li>
+                  <li><a href="#">Forward declaration of the second class</a></li>
+                </ul>
+              </div>
+              <div class="pull">This page is a short summary. The full notes are in <a
+                  href="https://drive.google.com/file/d/1cxPEQ6beOjRHL1Ye_26dX4f_OUjFX549/view"
+                  target="_blank" rel="noopener noreferrer">Friend Function.pdf</a> on Google Drive.</div>
+            </div>
+          </div>
+          <h3 class="section-tag">Summary</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">01 · What is a friend function?</h4>
+                <ul>
+                  <li><a href="#"><span>A function that is not a member of the class but can access its private and protected members.</span></a></li>
+                  <li><a href="#"><span>Declared inside the class with the <code>friend</code> keyword, and defined outside like a normal function.</span></a></li>
+                  <li><a href="#"><span>It isn't called on an object, so it has no <code>this</code> pointer. Often used for operator overloading.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">02 · Example</h4>
+                <ul>
+                  <li><a href="#"><span><code>friend void printGrade(const Student&amp; s);</code> inside <code>Student</code> — the definition reads <code>s.grade</code> directly.</span></a></li>
+                  <li><a href="#"><span>Called as <code>printGrade(s1);</code>, not <code>s1.printGrade();</code></span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">03 · Friend of several classes</h4>
+                <ul>
+                  <li><a href="#"><span>One function can be a friend of more than one class, reading each one's private data while belonging to none.</span></a></li>
+                  <li><a href="#"><span>Both classes declare <code>friend void showSum(const ClassA&amp; a, const ClassB&amp; b);</code> and it is called as <code>showSum(objA, objB);</code></span></a></li>
+                  <li><a href="#"><span>Forward-declare the second class before the first one uses it: <code>class ClassB;</code></span></a></li>
+                </ul>
+              </div>
+          </div>
+          <h3 class="section-tag">Extra Notes · beyond the PDF</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">Rules of friendship</h4>
+                <ul>
+                  <li><a href="#"><span>Friendship is granted, not taken — only the class itself can declare its friends.</span></a></li>
+                  <li><a href="#"><span>It isn't mutual: if A is a friend of B, B is not automatically a friend of A.</span></a></li>
+                  <li><a href="#"><span>It isn't inherited and isn't transitive — a friend of a friend is not a friend.</span></a></li>
+                  <li><a href="#"><span>The friend declaration can go in the <code>public</code> or <code>private</code> part; it means the same thing.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Friend classes</h4>
+                <ul>
+                  <li><a href="#"><span><code>friend class Auditor;</code> makes every member function of Auditor a friend.</span></a></li>
+                  <li><a href="#"><span>Useful when two classes are tightly linked, e.g. a list and its node class.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">When to use it</h4>
+                <ul>
+                  <li><a href="#"><span>Prefer member functions and getters first; every friend weakens encapsulation.</span></a></li>
+                  <li><a href="#"><span>Good uses: a function that needs private data from two classes, and operators like <code>&lt;&lt;</code> whose left operand isn't your class.</span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

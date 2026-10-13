@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Memory · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Dynamic Memory" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JHKFQBZ63"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4JHKFQBZ63');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="dma">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-revision.html">C++ Revision</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="dynamic-memory.html">Dynamic Memory</a> · <a href="this-pointer.html">this Pointer</a> · <a href="friend-functions.html">Friend Functions</a> · <a href="inheritance.html">Inheritance</a> · <a href="polymorphism.html">Polymorphism</a> · <a href="operator-overloading.html">Operator Overloading</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--dma" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 05</div>
+              <h2 class="pg-title" tabindex="-1">Dynamic Memory</h2>
+              <p class="pg-by">Memory created at runtime with new — and freed with delete</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-cpu"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Notes</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/file/d/1_QPJNxik_FjhKs0nZJ5Ux2e_B1FOlvqb/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> DMA.pdf</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=k9kYLYlW04Q" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Cascading &amp; Dynamic</a><a class="chip" href="https://www.youtube.com/watch?v=keo3Km8ps70" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Dynamic Memory 1</a><a class="chip" href="https://www.youtube.com/watch?v=kTMD8XaZrOU" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Enhanced Array</a><a class="chip" href="https://www.youtube.com/watch?v=919l_06xRUE" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Dynamic Memory 2</a><a class="chip" href="https://www.youtube.com/watch?v=ZeWVv0pQIEs" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Dynamic Memory 3</a><a class="chip" href="https://www.youtube.com/watch?v=JpAZZngxI8s" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> 2D Arrays &amp; Friend</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#dma"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> DynamicMemory.cpp</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">new, delete and delete[]</a></li>
+                  <li><a href="#">Memory leaks &amp; invalid pointers</a></li>
+                  <li><a href="#">Arrow operator (-&gt;) on object pointers</a></li>
+                  <li><a href="#">delete, then set to nullptr</a></li>
+                  <li><a href="#">Destructor frees dynamic members</a></li>
+                  <li><a href="#">Shallow vs deep copy</a></li>
+                  <li><a href="#">Expanding a dynamic array</a></li>
+                </ul>
+              </div>
+              <div class="pull">This page is a short summary. The full notes are in <a
+                  href="https://drive.google.com/file/d/1_QPJNxik_FjhKs0nZJ5Ux2e_B1FOlvqb/view"
+                  target="_blank" rel="noopener noreferrer">DMA.pdf</a> on Google Drive.</div>
+            </div>
+          </div>
+          <h3 class="section-tag">Summary</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">01 · Runtime memory</h4>
+                <ul>
+                  <li><a href="#"><span>Memory is created while the program runs, not at compile time — use it when you don't know the size in advance or need a flexible structure.</span></a></li>
+                  <li><a href="#"><span><code>new</code> allocates, <code>delete</code> frees a single element, <code>delete[]</code> frees an array.</span></a></li>
+                  <li><a href="#"><span><code>int* p = new int(10);</code> … <code>delete p;</code> and <code>int* arr = new int[5];</code> … <code>delete[] arr;</code></span></a></li>
+                  <li><a href="#"><span>Forgetting to free what you allocated causes a memory leak.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">02 · Pointers to objects</h4>
+                <ul>
+                  <li><a href="#"><span><code>Student s1;</code> lives on the stack and is used with the dot operator: <code>s1.print();</code></span></a></li>
+                  <li><a href="#"><span><code>Student* p = new Student();</code> creates the object on the heap; <code>p</code> stores its address.</span></a></li>
+                  <li><a href="#"><span>Reach members through the pointer with <code>p-&gt;print();</code> or <code>(*p).print();</code></span></a></li>
+                  <li><a href="#"><span>An object made with <code>new</code> must be freed with <code>delete p;</code></span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">03 · After delete</h4>
+                <ul>
+                  <li><a href="#"><span>The pointer keeps the old address, but the memory is no longer valid — using it is undefined behaviour and may crash.</span></a></li>
+                  <li><a href="#"><span>Never delete the same pointer twice (double delete).</span></a></li>
+                  <li><a href="#"><span>Best practice: <code>delete p; p = nullptr;</code> — deleting a <code>nullptr</code> does nothing, and <code>if (p != nullptr)</code> tells you it is safe to use.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">04 · Dynamic members in a class</h4>
+                <ul>
+                  <li><a href="#"><span>When the data size varies per object, allocate it in the constructor: <code>grades = new int[size];</code></span></a></li>
+                  <li><a href="#"><span>A default constructor can start with <code>grades = nullptr;</code> and <code>size = 0;</code></span></a></li>
+                  <li><a href="#"><span>A setter that replaces the array must <code>delete[]</code> the old one before allocating a new one.</span></a></li>
+                  <li><a href="#"><span>Always write a destructor that frees it: <code>~Student() { delete[] grades; }</code></span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">05 · Copy constructor — deep copy</h4>
+                <ul>
+                  <li><a href="#"><span>The default copy constructor makes a shallow copy: it copies the pointer, not the data.</span></a></li>
+                  <li><a href="#"><span><code>Student s2 = s1;</code> then leaves both objects pointing at the same array, and both destructors free it (double delete / crash).</span></a></li>
+                  <li><a href="#"><span>Fix it with a custom copy constructor <code>Student(const Student&amp; other)</code> that allocates new memory and copies each value.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">06 · Expanding a dynamic array</h4>
+                <ul>
+                  <li><a href="#"><span>A dynamic array can't be resized directly — create a larger one, copy the old data, then delete the old array.</span></a></li>
+                  <li><a href="#"><span>Efficient version (pointer reassignment): <code>int* temp = new int[newSize];</code> copy the elements, then <code>delete[] grades; grades = temp; size = newSize;</code></span></a></li>
+                  <li><a href="#"><span>Always copy before deleting, and never leave a temporary array allocated.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">07 · Arrays of objects</h4>
+                <ul>
+                  <li><a href="#"><span><code>Course* courses = new Course[5];</code> — the number of objects is decided at runtime.</span></a></li>
+                  <li><a href="#"><span>Use them like a normal array: <code>courses[0].setName("Math");</code></span></a></li>
+                  <li><a href="#"><span><code>delete[] courses;</code> calls the destructor of every object in the array.</span></a></li>
+                  <li><a href="#"><span>Handy for composition: a class holding a dynamic array of another class, freed in its destructor.</span></a></li>
+                </ul>
+              </div>
+          </div>
+          <h3 class="section-tag">Extra Notes · beyond the PDF</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">Rule of three</h4>
+                <ul>
+                  <li><a href="#"><span>If a class needs a destructor because it owns dynamic memory, it almost always needs a copy constructor and a copy assignment operator (<code>operator=</code>) too.</span></a></li>
+                  <li><a href="#"><span>Without your own <code>operator=</code>, <code>s2 = s1;</code> copies the pointer — the same shallow-copy bug as a missing copy constructor.</span></a></li>
+                  <li><a href="#"><span>Inside <code>operator=</code>, check <code>if (this != &amp;other)</code> before deleting, so <code>s1 = s1;</code> doesn't destroy its own data.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Common mistakes</h4>
+                <ul>
+                  <li><a href="#"><span>Mixing up the forms: memory from <code>new[]</code> must be freed with <code>delete[]</code>, memory from <code>new</code> with <code>delete</code>.</span></a></li>
+                  <li><a href="#"><span>Overwriting the only pointer — <code>p = new int[10];</code> twice leaks the first block.</span></a></li>
+                  <li><a href="#"><span>Returning a pointer to a local variable: it is destroyed when the function ends.</span></a></li>
+                  <li><a href="#"><span>Calling <code>delete</code> on memory that didn't come from <code>new</code> (e.g. <code>int x; delete &amp;x;</code>).</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Stack vs heap</h4>
+                <ul>
+                  <li><a href="#"><span>Local variables live on the stack and are freed automatically at the end of their scope.</span></a></li>
+                  <li><a href="#"><span>Heap memory lives until you <code>delete</code> it — even after the pointer variable itself is gone.</span></a></li>
+                  <li><a href="#"><span>A heap object's destructor runs only when you <code>delete</code> it.</span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

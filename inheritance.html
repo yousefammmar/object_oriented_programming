@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inheritance · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Inheritance" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JHKFQBZ63"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4JHKFQBZ63');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="inheritance">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-revision.html">C++ Revision</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="dynamic-memory.html">Dynamic Memory</a> · <a href="this-pointer.html">this Pointer</a> · <a href="friend-functions.html">Friend Functions</a> · <a href="inheritance.html">Inheritance</a> · <a href="polymorphism.html">Polymorphism</a> · <a href="operator-overloading.html">Operator Overloading</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--inheritance" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Study Guide · 08</div>
+              <h2 class="pg-title" tabindex="-1">Inheritance</h2>
+              <p class="pg-by">The &quot;is-a&quot; relationship — building specialised classes from a base</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-branch"/></svg> </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="study-step">
+                <div class="sn">1</div>
+                <div>
+                  <h3 class="st-title">Notes</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/file/d/1UbLjBoMP7MoX7jRaYEGOWlhOALkyV1Pg/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Inheritance.pdf</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">2</div>
+                <div>
+                  <h3 class="st-title">Videos by Dr. Ibrahim Albluwi</h3>
+                  <div class="chips"><a class="chip" href="https://www.youtube.com/watch?v=eniwNVGZvCw" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Inheritance Intro</a><a class="chip" href="https://www.youtube.com/watch?v=l68U8BDaoSs" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Function Overriding</a><a class="chip" href="https://www.youtube.com/watch?v=2nvqzEvCp8Y" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Homework 3</a><a class="chip" href="https://www.youtube.com/watch?v=bLFKe_7SJCw" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-play"/></svg> Multi-level Inheritance</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">3</div>
+                <div>
+                  <h3 class="st-title">Code examples</h3>
+                  <div class="chips"><a class="chip" href="code-files.html#inherit"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Inheritance.cpp</a></div>
+                </div>
+              </div>
+              <div class="study-step">
+                <div class="sn">4</div>
+                <div>
+                  <h3 class="st-title">Lab walkthroughs</h3>
+                  <div class="chips"><a class="chip" href="https://drive.google.com/drive/folders/1KZ6vWbFT3wncDwH_vuQD4c1HfeVrgB-_" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 08 video</a><a class="chip" href="https://drive.google.com/drive/folders/16vOiaY7AEVwSHufk8RYAn452awbIyLEq" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 08 solution</a><a class="chip" href="https://drive.google.com/drive/folders/1w70x994MrTH0mLJ_Di1JMt493Ikr4wOa" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 09 video</a><a class="chip" href="https://drive.google.com/drive/folders/1jya4Q5vqQlCk4gH-7ECoroBprAP2URz4" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-flask"/></svg> Lab 09 solution</a></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sbox">
+                <h3 class="sbox-title">Key Concepts</h3>
+                <ul>
+                  <li><a href="#">Base and derived classes (is-a)</a></li>
+                  <li><a href="#">Single, multiple and multilevel</a></li>
+                  <li><a href="#">protected: the class plus its children</a></li>
+                  <li><a href="#">Constructors run base → derived</a></li>
+                  <li><a href="#">Destructors run derived → base</a></li>
+                  <li><a href="#">Overriding and Base::function()</a></li>
+                  <li><a href="#">Multiple-inheritance ambiguity</a></li>
+                </ul>
+              </div>
+              <div class="pull">This page is a short summary. The full notes are in <a
+                  href="https://drive.google.com/file/d/1UbLjBoMP7MoX7jRaYEGOWlhOALkyV1Pg/view"
+                  target="_blank" rel="noopener noreferrer">Inheritance.pdf</a> on Google Drive.</div>
+            </div>
+          </div>
+          <h3 class="section-tag">Summary</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">01 · What is inheritance?</h4>
+                <ul>
+                  <li><a href="#"><span>Software reuse: a derived (child) class absorbs a base (parent) class's data members and functions, then adds its own.</span></a></li>
+                  <li><a href="#"><span>It models IS-A — every Student is also a Person. HAS-A (a Car has an Engine) is composition, not inheritance.</span></a></li>
+                  <li><a href="#"><span>Single (Dog → Animal), multiple (SmartBoat → Boat, ComputerSystem) and multilevel (BabyDog → Dog → Animal).</span></a></li>
+                  <li><a href="#"><span>Syntax: <code>class Student : public Person { … };</code></span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">02 · Access control</h4>
+                <ul>
+                  <li><a href="#"><span>Private: only the class. Protected: the class and its derived classes. Public: everyone.</span></a></li>
+                  <li><a href="#"><span>Base private members are never directly accessible in a derived class — go through public/protected setters and getters.</span></a></li>
+                  <li><a href="#"><span>Public inheritance keeps public and protected as they are; protected inheritance makes both protected; private inheritance makes both private.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">03 · Constructors &amp; destructors</h4>
+                <ul>
+                  <li><a href="#"><span>Neither is inherited.</span></a></li>
+                  <li><a href="#"><span>Constructors run base → derived. Call a parameterised base constructor in the initialiser list: <code>Student() : Person("Ali") { }</code></span></a></li>
+                  <li><a href="#"><span>If you don't, the base default constructor is called — a compile error if the base only has parameterised ones.</span></a></li>
+                  <li><a href="#"><span>Destructors run the other way: <code>~Derived</code> first, then <code>~Base</code>.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">04 · Function overriding</h4>
+                <ul>
+                  <li><a href="#"><span>A derived class can provide its own version of a base function: <code>s.print()</code> then calls <code>Student::print()</code>.</span></a></li>
+                  <li><a href="#"><span>Functions it doesn't redefine are inherited and used as they are.</span></a></li>
+                  <li><a href="#"><span>Call the base version from inside the override with <code>Person::print();</code></span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">05 · Multiple inheritance</h4>
+                <ul>
+                  <li><a href="#"><span><code>class Student : public Person, public Citizen { … };</code> inherits the members of both.</span></a></li>
+                  <li><a href="#"><span>If both bases have a <code>print()</code>, <code>s.print();</code> is an ambiguity error.</span></a></li>
+                  <li><a href="#"><span>Fix it with <code>s.Person::print();</code>, by overriding <code>print()</code> in Student, with <code>using Citizen::print;</code>, or by renaming the base functions.</span></a></li>
+                </ul>
+              </div>
+          </div>
+          <h3 class="section-tag">Extra Notes · beyond the PDF</h3>
+          <div class="qgrid">
+              <div class="sbox">
+                <h4 class="sbox-title">Good to know</h4>
+                <ul>
+                  <li><a href="#"><span>Not inherited: constructors, the destructor, the assignment operator and friend functions.</span></a></li>
+                  <li><a href="#"><span>A derived object contains a full base-class part — that's why the base constructor must run first.</span></a></li>
+                  <li><a href="#"><span><code>protected</code> members are usable in derived classes but still hidden from <code>main</code>.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Common mistakes</h4>
+                <ul>
+                  <li><a href="#"><span>Not calling a parameterised base constructor when the base has no default constructor — compile error.</span></a></li>
+                  <li><a href="#"><span>Initialising base members in the derived initialiser list (<code>Student() : name_("Ali")</code>) — call the base constructor instead.</span></a></li>
+                  <li><a href="#"><span>Using inheritance for HAS-A relationships — that's composition.</span></a></li>
+                  <li><a href="#"><span>Redefining a function with a different parameter list hides every base version with that name.</span></a></li>
+                </ul>
+              </div>
+              <div class="sbox">
+                <h4 class="sbox-title">Exam tip: tracing output</h4>
+                <ul>
+                  <li><a href="#"><span>Constructors run base → member objects → derived constructor body.</span></a></li>
+                  <li><a href="#"><span>Destructors run in exactly the reverse order.</span></a></li>
+                  <li><a href="#"><span>Objects are destroyed in reverse order of creation, so the last object created is destroyed first.</span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

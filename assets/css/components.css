@@ -648,6 +648,7 @@ html.dark .dash-card--hero {
 }
 
 .sb-card small {
+  display: block;
   color: var(--text-2);
   font-size: 0.8rem;
 }

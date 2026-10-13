@@ -15,9 +15,16 @@ This repository backs the OOP study hub — a modern, multi-page static website 
 | Section | What you'll find |
 |---|---|
 | **C++ Revision** | Functions, loops, arrays, pointers, dynamic memory |
-| **Class Revision** | Constructors, destructors, copy constructor, file separation |
+| **Class Basics** | Constructors, destructors, copy constructor, file separation |
 | **Const & Static** | Constant members, static members, initialiser lists |
 | **Composition** | Has-a relationships, member object construction |
+| **Dynamic Memory** | `new` / `delete`, dynamic arrays, dynamic members |
+| **this Pointer** | The implicit object pointer, cascading calls |
+| **Friend Functions** | Non-member access to private data |
+| **Inheritance** | Base/derived classes, overriding, multi-level inheritance |
+| **Polymorphism** | Virtual functions, base-class pointers, abstract classes |
+| **Operator Overloading** | Giving operators meaning for your own classes |
+| **Achievements** | Optional badges for completing topics, labs and exploring the site |
 | **Labs (1–10)** | Video walkthroughs + written solutions for every lab |
 | **Examination Hall** | Past quizzes with written & video solutions, mid/final exams |
 | **Code Examples** | All `.cpp` files with syntax highlighting, embedded in the site |
@@ -44,7 +51,7 @@ Functions, loops, arrays, pointers, references, dynamic memory (`new`/`delete`),
  
 **Key concepts:** Variables & data types · For/while/do-while · 1D & 2D arrays · Pointers & references · Dynamic memory
  
-### 02 · Class Revision
+### 02 · Class Basics
 Class definition, access modifiers, setters/getters, constructors, destructors, copy constructor, `.h`/`.cpp` file separation, arrays of objects.
  
 **Key concepts:** `public`/`private` access · Default & parameterised constructors · Initialiser list syntax · Copy constructor · Destructor · Header-source separation
@@ -139,10 +146,16 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 ```
 .
 ├── index.html               Home (dashboard, topic cards, study-order roadmap, quick links)
-├── cpp-revision.html          C++ Revision
-├── class-revision.html        Class Revision
+├── cpp-revision.html        C++ Revision
+├── class-basics.html        Class Basics
 ├── const-static.html        Const & Static
 ├── composition.html         Composition
+├── dynamic-memory.html      Dynamic Memory
+├── this-pointer.html        this Pointer
+├── friend-functions.html    Friend Functions
+├── inheritance.html         Inheritance
+├── polymorphism.html        Polymorphism
+├── operator-overloading.html Operator Overloading
 ├── labs.html                Labs 1–10
 ├── code-files.html          Code viewer (tabs, copy, wrap, full screen)
 ├── examination-hall.html    Quizzes, exams, solution recordings
@@ -159,7 +172,7 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 │       ├── storage.js       Safe localStorage wrapper (falls back to memory)
 │       ├── theme.js         Light/dark switch
 │       ├── layout.js        Builds the shared shell around each page; DOM/toast helpers
-│       ├── progress.js      Manual completion tracking + sidebar progress card
+│       ├── progress.js      Manual completion tracking, achievements + sidebar progress card
 │       ├── library.js       Last visited, recent pages, bookmarks
 │       ├── page-features.js Per-page enhancements (dashboard, completion buttons, link filter, pager)
 │       ├── search.js        Ctrl/⌘+K search dialog
@@ -188,8 +201,8 @@ Script order (each page): `config → storage → theme → layout → progress 
 | `storage.js` | `OOP.store.get / set / remove / getJSON / setJSON` — never throws, falls back to memory |
 | `theme.js` | `toggle()`, `sync()`; global `toggleTheme()` kept from the original site |
 | `layout.js` | `render()`, `setDrawer(open)`, `currentPage()`; helpers `OOP.dom.el()`, `OOP.dom.icon()`, `OOP.ui.toast()` |
-| `progress.js` | `isDone / setDone / toggle`, `isLabDone / toggleLab`, `percent()`, `reset()`, `ring()`, `init()` |
-| `library.js` | `visit()`, `last()`, `recent()`, `bookmarks()`, `toggleBookmark()`, `isBookmarked()` |
+| `progress.js` | `isDone / setDone / toggle`, `isLabDone / toggleLab`, `percent()`, `reset()`, `ring()`, `achievements()`, `init()` |
+| `library.js` | `visit()`, `last()`, `recent()`, `seen()`, `bookmarks()`, `toggleBookmark()`, `isBookmarked()` |
 | `page-features.js` | `tagResourceKinds`, `addPageActions`, `addLabToggles`, `renderDashboard`, `addPager`, `addLinksFilter` |
 | `search.js` | `open()`, `close()`; internals `loadIndex`, `score`, `run`, `highlight`, `go`, `jumpTo` |
 | `code-viewer.js` | `hlCpp(code)`, `ct(id, line)`, `copyCode()`; wiring for tabs, wrap, full screen, bookmarks |
