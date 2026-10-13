@@ -14,8 +14,8 @@ This repository backs the OOP study hub — a modern, multi-page static website 
  
 | Section | What you'll find |
 |---|---|
-| **C++ Basics** | Functions, loops, arrays, pointers, dynamic memory |
-| **Class Basics** | Constructors, destructors, copy constructor, file separation |
+| **C++ Revision** | Functions, loops, arrays, pointers, dynamic memory |
+| **Class Revision** | Constructors, destructors, copy constructor, file separation |
 | **Const & Static** | Constant members, static members, initialiser lists |
 | **Composition** | Has-a relationships, member object construction |
 | **Labs (1–10)** | Video walkthroughs + written solutions for every lab |
@@ -39,12 +39,12 @@ The site recommends this order for each topic:
  
 ## Topics Covered
  
-### 01 · C++ Basics
+### 01 · C++ Revision
 Functions, loops, arrays, pointers, references, dynamic memory (`new`/`delete`), strings.
  
 **Key concepts:** Variables & data types · For/while/do-while · 1D & 2D arrays · Pointers & references · Dynamic memory
  
-### 02 · Class Basics
+### 02 · Class Revision
 Class definition, access modifiers, setters/getters, constructors, destructors, copy constructor, `.h`/`.cpp` file separation, arrays of objects.
  
 **Key concepts:** `public`/`private` access · Default & parameterised constructors · Initialiser list syntax · Copy constructor · Destructor · Header-source separation
@@ -139,8 +139,8 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 ```
 .
 ├── index.html               Home (dashboard, topic cards, study-order roadmap, quick links)
-├── cpp-basics.html          C++ Basics
-├── class-basics.html        Class Basics
+├── cpp-revision.html          C++ Revision
+├── class-revision.html        Class Revision
 ├── const-static.html        Const & Static
 ├── composition.html         Composition
 ├── labs.html                Labs 1–10

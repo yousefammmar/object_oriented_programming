@@ -12,7 +12,7 @@ Run it again whenever you edit page content or add a page. It uses only the Pyth
 library, plus `node` (to read code-data.js).
 
 Each entry looks like:
-    {"p": "cpp", "f": "cpp-basics.html", "ty": "resource", "ti": "Intro",
+    {"p": "cpp", "f": "cpp-revision.html", "ty": "resource", "ti": "Intro",
      "cx": "Videos by Dr. Ibrahim Albluwi", "s": ".chip", "n": 3}
   p/f  page id and file          ty  type (topic, section, lab, exam, text, resource, code-file, code)
   ti   title shown in results    cx  context (the card/step the text belongs to)
@@ -28,8 +28,8 @@ from html.parser import HTMLParser
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGES = [  # (id, file, label) — keep in sync with assets/js/config.js
-    ('home', 'index.html', 'Home'), ('cpp', 'cpp-basics.html', 'C++ Basics'),
-    ('classes', 'class-basics.html', 'Class Basics'), ('const', 'const-static.html', 'Const & Static'),
+    ('home', 'index.html', 'Home'), ('cpp', 'cpp-revision.html', 'C++ Revision'),
+    ('classes', 'class-revision.html', 'Class Revision'), ('const', 'const-static.html', 'Const & Static'),
     ('composition', 'composition.html', 'Composition'), ('labs', 'labs.html', 'Labs'),
     ('code', 'code-files.html', 'Code Files'), ('quizzes', 'examination-hall.html', 'Examination Hall'),
     ('links', 'all-links.html', 'All Links'),

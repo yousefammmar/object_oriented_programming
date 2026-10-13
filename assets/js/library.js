@@ -3,7 +3,7 @@
  * and bookmarks. Everything is optional, stored locally (no login, no backend).
  *
  * An "entry" describes one place on the site:
- *   { key: "page:cpp" | "code:sep", label: "C++ Basics", href: "cpp-basics.html" }
+ *   { key: "page:cpp" | "code:sep", label: "C++ Revision", href: "cpp-revision.html" }
  *
  * Storage keys: "last" (entry + timestamp), "recent" (array, newest first, max 6), "bookmarks" (array).
  *

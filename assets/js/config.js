@@ -30,7 +30,7 @@
      */
     pages: [
       { id: 'home', file: 'index.html', label: 'Home', group: null, icon: 'home', topic: false },
-      { id: 'cpp', file: 'cpp-basics.html', label: 'C++ Basics', group: 'Learn', icon: 'zap', topic: true },
+      { id: 'cpp', file: 'cpp-revision.html', label: 'C++ Revision', group: 'Learn', icon: 'zap', topic: true },
       { id: 'classes', file: 'class-basics.html', label: 'Class Basics', group: 'Learn', icon: 'layers', topic: true },
       { id: 'const', file: 'const-static.html', label: 'Const & Static', group: 'Learn', icon: 'lock', topic: true },
       { id: 'composition', file: 'composition.html', label: 'Composition', group: 'Learn', icon: 'boxes', topic: true },

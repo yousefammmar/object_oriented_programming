@@ -32,7 +32,7 @@ const REPORT = arg('--report', null);
 
 /** original page id -> new file */
 const PAGES = {
-  home: 'index.html', cpp: 'cpp-basics.html', classes: 'class-basics.html', const: 'const-static.html',
+  home: 'index.html', cpp: 'cpp-revision.html', classes: 'class-revision.html', const: 'const-static.html',
   composition: 'composition.html', labs: 'labs.html', code: 'code-files.html',
   quizzes: 'examination-hall.html', links: 'all-links.html'
 };
