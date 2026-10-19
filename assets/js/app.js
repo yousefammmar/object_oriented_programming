@@ -83,6 +83,9 @@
     OOP.features.init();
     OOP.search.init();
     if (document.body.getAttribute('data-page') === 'code') OOP.codeViewer.init();
+    // The browser jumps to #id before the shell exists; redo the jump now that the layout is final.
+    const anchor = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (anchor) anchor.scrollIntoView({ behavior: 'instant' });
 
     document.getElementById('readingBtn').addEventListener('click', function () {
       setReading(!document.body.classList.contains('reading-mode'));

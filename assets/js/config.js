@@ -42,6 +42,7 @@
       { id: 'operators', file: 'operator-overloading.html', label: 'Operator Overloading', group: 'Learn', icon: 'operator', topic: true },
       { id: 'labs', file: 'labs.html', label: 'Labs', group: 'Practice', icon: 'flask', topic: true },
       { id: 'code', file: 'code-files.html', label: 'Code Files', group: 'Practice', icon: 'code', topic: false },
+      { id: 'revision', file: 'revision-hall.html', label: 'Revision Hall', group: 'Practice', icon: 'book', topic: false },
       { id: 'quizzes', file: 'examination-hall.html', label: 'Examination Hall', group: 'Practice', icon: 'clipboard', topic: false },
       { id: 'links', file: 'all-links.html', label: 'All Links', group: 'Resources', icon: 'link', topic: false }
     ],
