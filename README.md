@@ -26,6 +26,7 @@ This repository backs the OOP study hub — a modern, multi-page static website 
 | **Operator Overloading** | Giving operators meaning for your own classes |
 | **Achievements** | Optional badges for completing topics, labs and exploring the site |
 | **Labs (1–10)** | Video walkthroughs + written solutions for every lab |
+| **Revision Hall** | Summaries, revision notes, exam topics and per-topic notes in one place |
 | **Examination Hall** | Past quizzes with written & video solutions, mid/final exams |
 | **Code Examples** | All `.cpp` files with syntax highlighting, embedded in the site |
 | **All Links** | Every external resource — videos, slides, PDFs — in one place |
@@ -158,6 +159,7 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 ├── operator-overloading.html Operator Overloading
 ├── labs.html                Labs 1–10
 ├── code-files.html          Code viewer (tabs, copy, wrap, full screen)
+├── revision-hall.html       Summaries, revision notes, exam topics
 ├── examination-hall.html    Quizzes, exams, solution recordings
 ├── all-links.html           Link directory + video index (with live filter)
 ├── assets/

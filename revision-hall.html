@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Revision Hall · OOP — CS11253</title>
+  <meta name="description" content="OOP CS11253 study guide — Revision Hall" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JHKFQBZ63"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4JHKFQBZ63');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Design system: tokens -> base -> layout -> components -> page-specific rules -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <!-- Apply the saved theme before first paint (prevents a light/dark flash). Full logic: assets/js/theme.js -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('oop-theme');
+        if (t === 'dark' || (t === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="revision">
+  <!--
+    The site shell (sidebar, top bar, masthead, footer) is rendered by assets/js/layout.js from
+    assets/js/config.js, so it is defined once for all pages. Only this <main> element is page-specific.
+  -->
+  <noscript>
+    <p class="noscript-note">JavaScript is needed for the navigation shell. Pages:
+      <a href="index.html">Home</a> · <a href="cpp-revision.html">C++ Revision</a> · <a href="class-basics.html">Class Basics</a> · <a href="const-static.html">Const &amp; Static</a> · <a href="composition.html">Composition</a> · <a href="dynamic-memory.html">Dynamic Memory</a> · <a href="this-pointer.html">this Pointer</a> · <a href="friend-functions.html">Friend Functions</a> · <a href="inheritance.html">Inheritance</a> · <a href="polymorphism.html">Polymorphism</a> · <a href="operator-overloading.html">Operator Overloading</a> · <a href="labs.html">Labs</a> · <a href="code-files.html">Code Files</a> · <a href="revision-hall.html">Revision Hall</a> · <a href="examination-hall.html">Examination Hall</a> · <a href="all-links.html">All Links</a></p>
+  </noscript>
+
+  <main id="main" class="page page--revision" tabindex="-1">
+    <div class="inner">
+          <div class="pg-head">
+            <div>
+              <div class="pg-cat">Practice Material</div>
+              <h2 class="pg-title" tabindex="-1">Revision Hall</h2>
+              <p class="pg-by">Summaries, revision notes and exam topics — everything for a quick review</p>
+            </div>
+            <div class="pg-icon"><svg class="i" aria-hidden="true"><use href="#i-book"/></svg> </div>
+          </div>
+          <h3 class="section-tag">Full-Course Revision</h3>
+          <div class="qgrid">
+            <div class="qcard qcard--accent">
+              <div class="q-num">Whole Course ·</div>
+              <h4 class="q-title">Revision Notes</h4>
+              <ul>
+                <li><a href="https://docs.google.com/document/d/18u2ScB0OiCFmEoGvbHdovOQVdBllFFTU/edit?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> OOP — Revision</a></li>
+                <li><a href="https://api.psutarchive.com/assets/00c85957-4f7a-4853-817e-5efc3a2eae3e"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Dana's Handwritten Notebook</a></li>
+              </ul>
+            </div>
+            <div class="qcard qcard--soft">
+              <div class="q-num">Mid &amp; Final ·</div>
+              <h4 class="q-title">Exam Topics</h4>
+              <ul>
+                <li><a href="https://docs.google.com/document/d/1z-9vMUXbNCdQNuLhmyUZ6WTEltkTPrp-/edit?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Class 1 — Midterm Topics</a></li>
+                <li><a href="https://docs.google.com/document/d/112pX3hAWQDCiRRRYejpRJNWOiDe4lfYo/edit?usp=sharing"
+                    target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Final Exam Topics</a></li>
+              </ul>
+            </div>
+            <div class="qcard qcard--ink">
+              <div class="q-num">C++ ·</div>
+              <h4 class="q-title">Revision Code</h4>
+              <ul>
+                <li><a href="code-files.html#revision"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision1.cpp</a></li>
+                <li><a href="code-files.html#revision2"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision2.cpp</a></li>
+                <li><a href="code-files.html#revision3"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision3.cpp</a></li>
+                <li><a href="code-files.html#revision4"><svg class="i" aria-hidden="true"><use href="#i-code"/></svg> Revision4.cpp</a></li>
+              </ul>
+            </div>
+          </div>
+          <h3 class="section-tag">Topic Summaries</h3>
+          <div class="qgrid">
+            <div class="qcard">
+              <div class="q-num">Topic 01 ·</div>
+              <h4 class="q-title">C++ Revision</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/19LkVl2twmbSNKQoPlLkeCoH4NFtJTLKX/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> C++_Basics_Guide.pdf</a></li>
+                <li><a href="https://drive.google.com/file/d/1tZbABfU2OL1SBiDcQ583iBAo7L0MEvsI/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> C++_Basics_2.pdf</a></li>
+                <li><a href="cpp-revision.html"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Key concepts (study page)</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 02 ·</div>
+              <h4 class="q-title">Class Basics</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1YJM0vJrQ2nrrX8gB9k-369hgqSoey9CK/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> class.pdf</a></li>
+                <li><a href="https://drive.google.com/file/d/1J63kpscw1srtpzJDlulJLYyf2hNQqvOi/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Classes (Cont..).pdf</a></li>
+                <li><a href="class-basics.html"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Key concepts (study page)</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 03 ·</div>
+              <h4 class="q-title">Const &amp; Static</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1v0vsRAud84cvl7XSvJcKTdBzZVSpiHbx/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Const and Static.pdf</a></li>
+                <li><a href="const-static.html"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Key concepts (study page)</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 04 ·</div>
+              <h4 class="q-title">Composition</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1Vk-H8whET7pCVf4Up8gseXQNdKxgD76M/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Composition.pdf</a></li>
+                <li><a href="composition.html"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Key concepts (study page)</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 05 ·</div>
+              <h4 class="q-title">Dynamic Memory</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1_QPJNxik_FjhKs0nZJ5Ux2e_B1FOlvqb/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> DMA.pdf</a></li>
+                <li><a href="dynamic-memory.html#summary"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Summary on this site</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 06 ·</div>
+              <h4 class="q-title">this Pointer</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1BzaJME4SFMAgLB9sA78xjfZrWA1Dtmac/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> this pointer.pdf</a></li>
+                <li><a href="this-pointer.html#summary"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Summary on this site</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 07 ·</div>
+              <h4 class="q-title">Friend Functions</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1cxPEQ6beOjRHL1Ye_26dX4f_OUjFX549/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Friend Function.pdf</a></li>
+                <li><a href="friend-functions.html#summary"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Summary on this site</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 08 ·</div>
+              <h4 class="q-title">Inheritance</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1UbLjBoMP7MoX7jRaYEGOWlhOALkyV1Pg/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Inheritance.pdf</a></li>
+                <li><a href="inheritance.html#summary"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Summary on this site</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 09 ·</div>
+              <h4 class="q-title">Polymorphism</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1SKzF4uh2_o3dJRGniSBj0BjXqkNDFjNH/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Polymorphism.pdf</a></li>
+                <li><a href="polymorphism.html#summary"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Summary on this site</a></li>
+              </ul>
+            </div>
+            <div class="qcard">
+              <div class="q-num">Topic 10 ·</div>
+              <h4 class="q-title">Operator Overloading</h4>
+              <ul>
+                <li><a href="https://drive.google.com/file/d/1wT4qcgs3_MyIMwNFaGGyj5zBjqcq0AV9/view" target="_blank" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg> Operator overloading.pdf</a></li>
+                <li><a href="operator-overloading.html#summary"><svg class="i" aria-hidden="true"><use href="#i-text"/></svg> Summary on this site</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Scripts: classic (non-module) so the site also works when opened straight from disk. -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/progress.js"></script>
+  <script src="assets/js/library.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/page-features.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

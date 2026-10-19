@@ -35,7 +35,8 @@ PAGES = [  # (id, file, label) — keep in sync with assets/js/config.js
     ('friend', 'friend-functions.html', 'Friend Functions'), ('inheritance', 'inheritance.html', 'Inheritance'),
     ('polymorphism', 'polymorphism.html', 'Polymorphism'), ('operators', 'operator-overloading.html', 'Operator Overloading'),
     ('labs', 'labs.html', 'Labs'),
-    ('code', 'code-files.html', 'Code Files'), ('quizzes', 'examination-hall.html', 'Examination Hall'),
+    ('code', 'code-files.html', 'Code Files'), ('revision', 'revision-hall.html', 'Revision Hall'),
+    ('quizzes', 'examination-hall.html', 'Examination Hall'),
     ('links', 'all-links.html', 'All Links'),
 ]
 
