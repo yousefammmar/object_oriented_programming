@@ -232,6 +232,7 @@
   /** Initialise the viewer (called by app.js on code-files.html only). */
   function init() {
     wireTabs();
+    document.addEventListener('oop:library', syncBookmark); // bookmarks can change on another device
 
     document.getElementById('wrapBtn').addEventListener('click', function () {
       setWrap(!document.getElementById('editor').classList.contains('is-wrapped'));

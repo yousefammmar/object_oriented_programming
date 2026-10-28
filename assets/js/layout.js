@@ -93,7 +93,8 @@
     branch: '<path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
     shapes: '<path d="M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04l3.7 5.94a.7.7 0 0 1-.57 1.1z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/>',
     operator: '<path d="M12 3v14M5 10h14M5 21h14"/>',
-    award: '<circle cx="12" cy="8" r="6"/><path d="M15.48 12.89 17 22l-5-3-5 3 1.52-9.11"/>'
+    award: '<circle cx="12" cy="8" r="6"/><path d="M15.48 12.89 17 22l-5-3-5 3 1.52-9.11"/>',
+    cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>'
   };
 
   /** Inject the sprite once (hidden). Icons elsewhere use <svg class="i"><use href="#i-name"/></svg>. */
@@ -164,7 +165,7 @@
     return el('aside', { class: 'sidebar', id: 'sidebar', 'aria-label': 'Site navigation' }, [
       el('div', { class: 'sb-head' }, [brand, close]),
       nav,
-      el('div', { class: 'sb-foot', id: 'sbProgress' })
+      el('div', { class: 'sb-foot' }, [el('div', { id: 'sbProgress' }), el('div', { id: 'sbAccount' })])
     ]);
   }
 

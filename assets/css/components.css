@@ -653,6 +653,38 @@ html.dark .dash-card--hero {
   font-size: 0.8rem;
 }
 
+/* Optional sign-in under the progress card (only rendered when Firebase is configured) */
+.sb-account {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--s-2);
+}
+
+.sb-account small {
+  color: var(--text-2);
+  font-size: 0.75rem;
+}
+
+.sb-signin {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.sb-account-who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.sb-account-who .i { flex: none; color: var(--accent); }
+
 /* ───────────── 6. Dialogs (native <dialog>) ───────────── */
 dialog {
   padding: 0;

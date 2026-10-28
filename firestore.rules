@@ -1,0 +1,15 @@
+rules_version = '2';
+
+// Cross-device sync for the OOP study guide (assets/js/sync.js).
+// Each signed-in student can read and write ONLY their own document: users/{their uid}.
+// Everything else is denied, so the public web config cannot be used to read anyone's data.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['state', 'updatedAt'])
+        && request.resource.data.state is map;
+    }
+  }
+}

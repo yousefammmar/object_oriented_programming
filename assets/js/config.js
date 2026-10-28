@@ -20,6 +20,23 @@
     storagePrefix: 'oop-',
 
     /**
+     * Optional cross-device sync (assets/js/sync.js, setup in docs/FIREBASE-SETUP.md).
+     * null = guest-only site: progress stays in the browser and no Firebase code is loaded.
+     * Paste the Firebase web-app config object here to show "Sign in with Google" (always optional).
+     * These values are public by design; firestore.rules is what protects each student's data.
+     * Adding `emulators: true` points it at `npm run emulators` (localhost only) for local testing.
+     */
+    firebase: {
+      apiKey: 'AIzaSyDHk_RIx9x-2Su26LkEZXqHJTmY7DS-ReE',
+      authDomain: 'object-oriented-programm-95ff5.firebaseapp.com',
+      projectId: 'object-oriented-programm-95ff5',
+      storageBucket: 'object-oriented-programm-95ff5.firebasestorage.app',
+      messagingSenderId: '206706304496',
+      appId: '1:206706304496:web:493a18fb84219b88182935',
+      measurementId: 'G-Z0NZSWJNF7' // only used by Firebase Analytics, which this site does not load
+    },
+
+    /**
      * Pages, in navigation order.
      *   id     – short id, also the value of <body data-page="…">
      *   file   – HTML file name

@@ -5,6 +5,7 @@
  *   1. layout   – build sidebar / top bar / masthead / footer around <main>
  *   2. progress – sidebar progress card
  *   3. features – per-page enhancements (dashboard, completion buttons, link filter …)
+ *      sync     – optional sign-in / cross-device sync (does nothing until Firebase is configured)
  *   4. search   – wire the search buttons, honour #hit= links
  *   5. code viewer (code-files.html only)
  *   6. global behaviour – keyboard shortcuts, reading mode, shortcuts dialog
@@ -81,6 +82,7 @@
     OOP.layout.render();
     OOP.progress.init();
     OOP.features.init();
+    OOP.sync.init();
     OOP.search.init();
     if (document.body.getAttribute('data-page') === 'code') OOP.codeViewer.init();
     // The browser jumps to #id before the shell exists; redo the jump now that the layout is final.

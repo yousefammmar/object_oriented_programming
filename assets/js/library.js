@@ -1,6 +1,6 @@
 /**
  * library.js — the student's personal "library": last visited section, recently visited list
- * and bookmarks. Everything is optional, stored locally (no login, no backend).
+ * and bookmarks. Everything is optional and stored locally; sync.js can mirror it to an account.
  *
  * An "entry" describes one place on the site:
  *   { key: "page:cpp" | "code:sep", label: "C++ Revision", href: "cpp-revision.html" }
