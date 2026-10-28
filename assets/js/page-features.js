@@ -122,6 +122,8 @@
         btn.classList.add('just-done');
       }
     });
+    // Stay correct when progress changes elsewhere (another device via sync.js, a reset …).
+    document.addEventListener('oop:progress', function () { btn.setAttribute('aria-pressed', String(OOP.progress.isDone(p.id))); });
     return btn;
   }
 
@@ -137,6 +139,7 @@
       btn.setAttribute('aria-pressed', String(on));
       OOP.ui.toast(on ? 'Bookmarked ' + p.label : 'Bookmark removed', 'bookmark');
     });
+    document.addEventListener('oop:library', function () { btn.setAttribute('aria-pressed', String(OOP.library.isBookmarked(entry.key))); });
     return btn;
   }
 
@@ -166,7 +169,11 @@
         el('span', { text: 'Mark done' }),
         el('span', { class: 'sr-only', text: 'Lab ' + num })
       ]);
-      const sync = function () { card.classList.toggle('is-done', OOP.progress.isLabDone(num)); };
+      const sync = function () {
+        card.classList.toggle('is-done', OOP.progress.isLabDone(num));
+        btn.setAttribute('aria-pressed', String(OOP.progress.isLabDone(num)));
+      };
+      document.addEventListener('oop:progress', sync);
       btn.addEventListener('click', function () {
         const on = OOP.progress.toggleLab(num);
         btn.setAttribute('aria-pressed', String(on));
@@ -196,7 +203,7 @@
     const dlg = el('dialog', { 'aria-labelledby': 'resetTitle' }, [
       el('div', { class: 'dialog-body' }, [
         el('h2', { id: 'resetTitle', text: 'Reset your progress?' }),
-        el('p', { text: 'This clears every completed topic and lab on this device. Your bookmarks are kept. This cannot be undone.' }),
+        el('p', { text: 'This clears every completed topic and lab on this device (and on your account, if you are signed in). Your bookmarks are kept. This cannot be undone.' }),
         el('div', { class: 'dialog-actions' }, [
           el('button', { type: 'button', class: 'btn btn--ghost', 'data-act': 'cancel', text: 'Cancel' }),
           el('button', { type: 'button', class: 'btn btn--primary', 'data-act': 'ok', text: 'Reset progress' })

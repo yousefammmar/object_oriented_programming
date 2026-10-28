@@ -6,7 +6,9 @@
     "serve": "python3 -m http.server 8000",
     "build:search": "python3 tools/build_search_index.py",
     "verify": "node tools/verify_preservation.cjs --report docs/PRESERVATION-REPORT.md",
-    "verify:analytics": "node tools/verify_analytics.cjs"
+    "verify:analytics": "node tools/verify_analytics.cjs",
+    "test:sync": "node tools/test_sync.cjs",
+    "emulators": "firebase emulators:start --project demo-oop"
   },
   "devDependencies": {
     "playwright": "^1.56.1"

@@ -179,6 +179,7 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 │       ├── library.js       Last visited, recent pages, bookmarks
 │       ├── page-features.js Per-page enhancements (dashboard, completion buttons, link filter, pager)
 │       ├── search.js        Ctrl/⌘+K search dialog
+│       ├── sync.js          Optional Google sign-in + cross-device sync (Firebase; off until configured)
 │       ├── search-index.js  GENERATED search data (see tools/)
 │       ├── code-data.js     The C++ example files (course content — do not edit casually)
 │       ├── code-viewer.js   Highlighting, tabs, copy, wrap, full screen (code-files.html only)
@@ -186,17 +187,20 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 ├── tools/
 │   ├── build_search_index.py    Regenerates assets/js/search-index.js from the pages
 │   ├── verify_preservation.cjs  Compares original vs current content (text, links, code)
-│   └── verify_analytics.cjs     Browser test for the custom GA4 events (sends nothing to Google)
+│   ├── verify_analytics.cjs     Browser test for the custom GA4 events (sends nothing to Google)
+│   └── test_sync.cjs            Checks the sync merge logic (`npm run test:sync`)
 ├── docs/PRESERVATION-REPORT.md  Latest content-preservation report
 ├── docs/GA4-ENGAGEMENT-TRACKING.md  GA4 event dictionary, setup and analysis guide
-└── package.json             Convenience scripts (`npm run serve | build:search | verify | verify:analytics`)
+├── docs/FIREBASE-SETUP.md       How to turn on cross-device sync
+├── firestore.rules              Firestore security rules (each student reads/writes only their own data)
+└── package.json             Convenience scripts (`npm run serve | build:search | verify | verify:analytics | test:sync`)
 ```
 
 ### How a page is put together
 
 Each page file contains only its **own content** inside `<main id="main">`, plus `<link>` tags for the five stylesheets and `<script>` tags for the modules. When the scripts run, `layout.js` builds the shared shell (sidebar, top bar, masthead, footer) from `config.js` and moves `<main>` into it. This keeps navigation defined **once** instead of copied into nine files.
 
-Script order (each page): `config → analytics → storage → theme → layout → progress → library → search → page-features → [code-data → code-viewer on code-files.html] → app`. `app.js` runs last and calls each module's `init()` in the right order.
+Script order (each page): `config → analytics → storage → theme → layout → progress → library → search → page-features → sync → [code-data → code-viewer on code-files.html] → app`. `app.js` runs last and calls each module's `init()` in the right order.
 
 ### Module reference
 
@@ -267,7 +271,7 @@ It loads the original site and the current pages in a real browser and compares 
 
 - Tested automatically in Chromium only; Safari, Firefox and Edge are expected to work (standard APIs, native `<dialog>`) but have **not** been verified.
 - Fonts load from Google Fonts; offline, the system fonts are used instead.
-- Progress, bookmarks and "continue learning" are stored in the browser (`localStorage`) — they are per device and are lost if site data is cleared.
+- Progress, bookmarks and "continue learning" are stored in the browser (`localStorage`) — per device, and lost if site data is cleared — unless the student signs in. Sign-in is optional and only appears once Firebase is configured (see [docs/FIREBASE-SETUP.md](docs/FIREBASE-SETUP.md)).
 - Search results for code match source text, not meaning; the index must be regenerated after content edits.
 
 ---
