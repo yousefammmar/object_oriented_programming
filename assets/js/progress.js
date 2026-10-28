@@ -63,7 +63,7 @@
     const page = OOP.config.pages.filter(function (p) { return p.id === id; })[0];
     if (!page) return;
     // GA4: self-reported completion, sent only when the state actually changes
-    if (was !== !!done) {
+    if (was !== !!done && OOP.analytics) {
       OOP.analytics.track(done ? 'lesson_complete' : 'lesson_uncomplete', { lesson_id: id, lesson_name: page.label, completion_method: 'manual' });
     }
     if (done) {
@@ -83,7 +83,7 @@
     const s = read();
     if (s.labs[num]) delete s.labs[num]; else s.labs[num] = true;
     write(s);
-    OOP.analytics.track(s.labs[num] ? 'lab_complete' : 'lab_uncomplete', { lab_number: num, completion_method: 'manual' });
+    if (OOP.analytics) OOP.analytics.track(s.labs[num] ? 'lab_complete' : 'lab_uncomplete', { lab_number: num, completion_method: 'manual' });
     return !!s.labs[num];
   }
 

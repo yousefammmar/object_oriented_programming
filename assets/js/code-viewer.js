@@ -154,8 +154,8 @@
     const btn = document.getElementById('copyBtn');
 
     const done = function (ok) {
-      // GA4: successful copies only; the file name is sent, never the code
-      if (ok) OOP.analytics.track('code_copy', { code_file: file, page_path: location.pathname });
+      // GA4: successful copies only; the file name is sent, never the code. (Not "page_path": gtag.js reserves it.)
+      if (ok && OOP.analytics) OOP.analytics.track('code_copy', { code_file: file, code_page_path: location.pathname });
       if (!btn) return;
       const old = 'Copy';
       btn.textContent = ok ? 'Copied!' : 'Copy failed';
@@ -214,7 +214,7 @@
    * plus the GA4 code_file_view event when it is a different file. The first render calls ct() directly.
    */
   function select(id, line) {
-    if (cf[id] && id !== activeTab) OOP.analytics.track('code_file_view', { code_file: cf[id].name });
+    if (OOP.analytics && cf[id] && id !== activeTab) OOP.analytics.track('code_file_view', { code_file: cf[id].name });
     ct(id, line);
   }
 

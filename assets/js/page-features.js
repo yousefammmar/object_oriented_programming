@@ -65,17 +65,18 @@
   function trackResourceClicks() {
     const p = page();
     const onClick = function (e) {
-      if (e.type === 'auxclick' && e.button !== 1) return;
+      if (!OOP.analytics || (e.type === 'auxclick' && e.button !== 1)) return;
       const a = e.target.closest && e.target.closest('#main a[href]');
       if (!a || a.closest('[data-ui]')) return;
       const external = /^https?:$/.test(a.protocol) && a.host !== location.host;
       if (!external && !/code-files\.html$/.test(a.pathname)) return;
-      // Card links ("Video Walkthrough", "Written Solution") are only meaningful with their card title
+      // Card links ("Video Walkthrough") need their card title; a link in a note ("notebook") the note's sentence
       const card = a.closest('.qcard');
+      const note = a.closest('.pull');
       const head = card ? ['.q-num', '.q-title'].map(function (s) { return (card.querySelector(s) || {}).textContent || ''; }).join(' ') + ' — ' : '';
       OOP.analytics.track('learning_resource_click', {
         resource_type: resourceType(a),
-        resource_name: head + a.textContent,
+        resource_name: note ? note.textContent : head + a.textContent,
         lesson_id: p.topic ? p.id : undefined
       });
     };
