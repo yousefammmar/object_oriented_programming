@@ -26,7 +26,9 @@ The existing Google tag (`G-4JHKFQBZ63`, in every page's `<head>`) is unchanged 
 Design rules:
 
 - **Fails safe.** No `gtag` (tag removed), `gtag.js` blocked by an ad blocker, or `gtag` throwing → the
-  event is dropped silently and the site behaves exactly as before.
+  event is dropped silently and the site behaves exactly as before. Every caller checks `OOP.analytics`
+  first, so the site also works when `analytics.js` itself is blocked (ad blockers often block any file
+  with that name) or missing from a cached page.
 - **One event per real state change.** Events are sent from the functions that change state
   (`setDone`, `toggleLab`, `copyCode`, `select`), not from click listeners, so extra listeners can't
   multiply them. As a second guard, `track()` drops an *identical* event (same name and parameters)
@@ -91,7 +93,12 @@ nothing. The code itself is never sent.
 | Parameter | Type | Example | Meaning |
 |---|---|---|---|
 | `code_file` | string | `DynamicMemory.cpp` | File title shown in the editor |
-| `page_path` | string | `/object_oriented_programming/code-files.html` | Path of the page the copy happened on |
+| `code_page_path` | string | `/object_oriented_programming/code-files.html` | Path of the page the copy happened on |
+
+> The brief asked for `page_path`, but `gtag.js` reserves that name: it turns it into its own
+> document-path field (`dp`) and never sends it as a custom parameter, so a custom dimension on
+> `page_path` would always be empty (found by test TC90). The value is therefore sent as
+> `code_page_path`. GA4's built-in *Page path and screen class* dimension shows the same path.
 
 ### `code_file_view`
 The student switched the code viewer to a **different** file: tab click, arrow/Home/End keys,
@@ -118,7 +125,7 @@ because the destination's `page_view` already records them.
 | Parameter | Type | Example | Meaning |
 |---|---|---|---|
 | `resource_type` | string | `video` | Category (rules below) |
-| `resource_name` | string | `Lab 01 · C++ Revision — Video Walkthrough` | Link text. For links inside a card (Labs, Examination Hall, Revision Hall) the card number/title is prefixed, so "Video Walkthrough" is never ambiguous |
+| `resource_name` | string | `Lab 01 · C++ Revision — Video Walkthrough` | Link text. For links inside a card (Labs, Examination Hall, Revision Hall) the card number/title is prefixed, so "Video Walkthrough" is never ambiguous. A link inside a highlighted note is named by the note's sentence (e.g. `Pages 10–19 in Dana AL-taher's notebook cover this topic.` instead of just `notebook`) |
 | `lesson_id` | string | `cpp` | Topic id when the click happened on a topic page; absent on Home, Examination Hall, Revision Hall, All Links, Code Files |
 
 `resource_type` is derived from metadata already on the page, first match wins:
@@ -180,12 +187,12 @@ Event parameters only appear in reports and explorations after they are register
 | Completion method | Event | `completion_method` |
 | Lab number | Event | `lab_number` |
 | Code file | Event | `code_file` |
-| Code page path | Event | `page_path` |
+| Code page path | Event | `code_page_path` |
 | Resource type | Event | `resource_type` |
 | Resource name | Event | `resource_name` |
 
-(8 of the 50 event-scoped dimensions a standard property allows. "Code page path" must not be named
-"Page path" — that name is taken by a built-in dimension.)
+(8 of the 50 event-scoped dimensions a standard property allows. Don't name one "Page path" — a
+built-in dimension already uses that name.)
 
 **Custom metrics are not needed:** every parameter is categorical, and GA4's built-in *Event count*,
 *Total users* and *Sessions* are the measures.
@@ -224,25 +231,37 @@ analysis.
 ### 5.1 Automated (local; sends nothing to Google)
 
 ```bash
-npm install                      # once; installs Playwright (existing dev dependency)
-npm run verify:analytics         # CHROME=/path/to/chrome npm run verify:analytics to use your own Chromium
+npm install && npx playwright install chromium   # once
+npm run verify:analytics                         # all 90 cases (~4 min)
+node tools/verify_analytics.cjs 18 83            # only some cases
 ```
 
-It serves the site locally and drives Chromium with the real `gtag.js`. Every request to a Google
-collection endpoint is answered locally, so no test data reaches GA4. It checks:
+`CHROME=/path/to/chrome` uses an existing Chromium instead. The script serves the site locally (also
+under `/object_oriented_programming/`, like GitHub Pages) and drives Chromium with the real `gtag.js`.
+Every request to a Google collection endpoint is answered locally, so no test data reaches GA4.
+Each case sets up its own localStorage and fails on any uncaught JavaScript error.
 
-1. exactly one `page_view` per page load (also after switching code files);
-2. lesson complete → reverse → complete gives 1 + 1 + 1 events; repeating a state, opening or refreshing a page gives none; seeded progress is kept;
-3. lab complete/reverse for a new and an already-done lab; lab data kept;
-4. `code_file_view` on tab click, arrow key and in-page jump, none on first render or same tab; `code_copy` on success (clipboard verified), none on failure;
-5. `learning_resource_click` type/name/lesson for 14 representative links, plus middle-click; none for placeholders, pager, sidebar or internal page links;
-6. events really leave via `gtag.js` (`/g/collect` hit with `ep.lesson_id`, …);
-7. only the 8 documented parameters, no code/e-mail, no new localStorage keys;
-8. the site still works with `gtag.js` blocked, with the Google tag removed and with a `gtag` that throws;
-9. no uncaught JavaScript errors.
+| Cases | Group | What is covered |
+|---|---|---|
+| 1–17 | Page load | All 16 pages: `analytics.js` right after `config.js`, exactly one `page_view`, no custom event on load; both redirect stubs |
+| 18–34 | Lessons | Each of the 11 topics; un-ticking; 5 rapid clicks; Space/Enter keys; no event without a state change; reload; Home *Reset progress* (Cancel + confirm) |
+| 35–47 | Labs | Each of the 10 labs on and off; rapid clicks; Labs-page completion vs. individual labs; existing data keeps its keys and shape |
+| 48–63 | Code viewer | First render, deep links (`#sep:12`, unknown `#bogus`); all 19 tabs; same tab; arrow/Home/End keys; in-page jumps; copy via Clipboard API, via fallback, with one or both failing, double-click; other toolbar/global UI; `window.ct()` |
+| 64–79 | Resource links | 10 representative links (every `resource_type`); multi-line text and note links; icon click; middle/right click; Ctrl/Cmd-click and Enter; non-resource links; **sweep of all 251 resource links on all 16 pages** |
+| 80–87 | GA unavailable | `gtag.js` blocked; tag removed; `gtag` throwing; `analytics.js` blocked; no localStorage; corrupt progress; GA opt-out flag; click before `gtag.js` has loaded |
+| 88–90 | Privacy / GA4 data | All events use documented names/parameters with short primitive values; `track()` input validation and duplicate guard; real `/g/collect` hits under the GitHub Pages path with a UTM landing (campaign URL kept, one client/session id, `lab_number` sent as text) |
 
-Last run: **53/53 checks passed** (Chromium for Testing, Playwright 1.64). `npm run verify` (content
-preservation) produces identical output before and after this change.
+**Last run: 90/90 passed** (Chromium for Testing 151, Playwright 1.64). `npm run verify` (content
+preservation) produces identical output before and after this work.
+
+**Issues the suite found, now fixed:**
+
+| Case | Issue | Fix |
+|---|---|---|
+| TC83 | With `analytics.js` blocked (common: ad blockers match the file name), *Mark as completed*, lab toggles, code tabs and *Copy* threw errors | Every caller checks `OOP.analytics` first |
+| TC90 | `gtag.js` reserves `page_path`: it was sent as its own `dp` field, never as a custom parameter | Renamed to `code_page_path` |
+| TC74, TC79 | Three links were reported only as `notebook` | Links inside a note are named by the note's sentence |
+| TC89 | `track(null)` sent an event named "null"; NaN/Infinity, invalid keys and non-object parameters were passed on | Name must be a string; values must be finite; keys must follow the GA4 naming rule; non-objects are ignored |
 
 ### 5.2 Realtime (production)
 1. Open the live site in a normal browser window without an ad blocker (Brave Shields, uBlock, etc. block GA).
