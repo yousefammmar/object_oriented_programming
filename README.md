@@ -171,6 +171,7 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 │   │   └── pages.css        Page-specific styles (home, study pages, labs, code viewer, links)
 │   └── js/
 │       ├── config.js        Site structure (page list, masthead/footer text) + OOP namespace
+│       ├── analytics.js     Custom GA4 events (completion, code viewer, resource clicks); fails safe
 │       ├── storage.js       Safe localStorage wrapper (falls back to memory)
 │       ├── theme.js         Light/dark switch
 │       ├── layout.js        Builds the shared shell around each page; DOM/toast helpers
@@ -184,22 +185,25 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 │       └── app.js           Bootstraps everything; keyboard shortcuts; reading mode
 ├── tools/
 │   ├── build_search_index.py    Regenerates assets/js/search-index.js from the pages
-│   └── verify_preservation.cjs  Compares original vs current content (text, links, code)
+│   ├── verify_preservation.cjs  Compares original vs current content (text, links, code)
+│   └── verify_analytics.cjs     Browser test for the custom GA4 events (sends nothing to Google)
 ├── docs/PRESERVATION-REPORT.md  Latest content-preservation report
-└── package.json             Convenience scripts (`npm run serve | build:search | verify`)
+├── docs/GA4-ENGAGEMENT-TRACKING.md  GA4 event dictionary, setup and analysis guide
+└── package.json             Convenience scripts (`npm run serve | build:search | verify | verify:analytics`)
 ```
 
 ### How a page is put together
 
 Each page file contains only its **own content** inside `<main id="main">`, plus `<link>` tags for the five stylesheets and `<script>` tags for the modules. When the scripts run, `layout.js` builds the shared shell (sidebar, top bar, masthead, footer) from `config.js` and moves `<main>` into it. This keeps navigation defined **once** instead of copied into nine files.
 
-Script order (each page): `config → storage → theme → layout → progress → library → search → page-features → [code-data → code-viewer on code-files.html] → app`. `app.js` runs last and calls each module's `init()` in the right order.
+Script order (each page): `config → analytics → storage → theme → layout → progress → library → search → page-features → [code-data → code-viewer on code-files.html] → app`. `app.js` runs last and calls each module's `init()` in the right order.
 
 ### Module reference
 
 | File | Main functions |
 |---|---|
 | `config.js` | `OOP.config.pages` (navigation order), `OOP.config.site` (masthead/footer text) |
+| `analytics.js` | `OOP.analytics.track(name, params)` — no-op when GA is missing/blocked |
 | `storage.js` | `OOP.store.get / set / remove / getJSON / setJSON` — never throws, falls back to memory |
 | `theme.js` | `toggle()`, `sync()`; global `toggleTheme()` kept from the original site |
 | `layout.js` | `render()`, `setDrawer(open)`, `currentPage()`; helpers `OOP.dom.el()`, `OOP.dom.icon()`, `OOP.ui.toast()` |
@@ -224,6 +228,8 @@ Script order (each page): `config → storage → theme → layout → progress 
 ### Analytics
 
 Every page's `<head>` contains the Google tag (`G-4JHKFQBZ63`). To remove it, delete the "Google tag (gtag.js)" block from each page.
+
+`assets/js/analytics.js` adds custom events for learning interactions (lesson/lab completion, code copy and file switches, resource clicks). It sends nothing personal and does nothing when the tag is removed or blocked. Event dictionary, GA4 setup and analysis notes: [docs/GA4-ENGAGEMENT-TRACKING.md](docs/GA4-ENGAGEMENT-TRACKING.md).
 
 ### Run locally
 
