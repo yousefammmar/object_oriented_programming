@@ -7,7 +7,7 @@
  *   - builds the Home dashboard and the All Links filter.
  *
  * Sections:
- *   1. Markup enhancements   (chips, placeholder links, stagger animation)
+ *   1. Markup enhancements   (chips, placeholder links, stagger animation, GA4 resource clicks)
  *   2. Topic completion      (page actions, lab toggles, Home badges)
  *   3. Home dashboard        (continue learning, progress, bookmarks / recent, achievements)
  *   4. Previous / next pager
@@ -39,6 +39,48 @@
     document.querySelectorAll('.chip, .qcard li a').forEach(function (a) {
       a.setAttribute('data-kind', kindOf(a));
     });
+  }
+
+  /**
+   * GA4 resource_type of a link: the site's own icon cue first (kindOf), then its URL / text.
+   * @returns {string} video | code_example | quiz | lab | pdf | slides | folder | document | external_website
+   */
+  function resourceType(a) {
+    const kind = kindOf(a);
+    if (kind === 'video' || kind === 'quiz' || kind === 'lab') return kind;
+    if (kind === 'code' || /code-files\.html$/.test(a.pathname)) return 'code_example';
+    if (/(^|\.)(youtube\.com|youtu\.be)$/.test(a.hostname)) return 'video';
+    if (/\.pdf\b|\(pdf\)/i.test(a.textContent)) return 'pdf';
+    if (/\bslides\b/i.test(a.textContent)) return 'slides';
+    if (/\/drive\/folders\//.test(a.pathname)) return 'folder';
+    if (/^(docs|drive)\.google\.com$|^api\.psutarchive\.com$/.test(a.hostname)) return 'document';
+    return 'external_website';
+  }
+
+  /**
+   * GA4 learning_resource_click for links in the page content that open a resource: any external
+   * link, plus links to code examples. Plain page-to-page links are already counted as page_views.
+   * Middle-click counts too; right-click → "Open in new tab" is invisible to the page.
+   */
+  function trackResourceClicks() {
+    const p = page();
+    const onClick = function (e) {
+      if (e.type === 'auxclick' && e.button !== 1) return;
+      const a = e.target.closest && e.target.closest('#main a[href]');
+      if (!a || a.closest('[data-ui]')) return;
+      const external = /^https?:$/.test(a.protocol) && a.host !== location.host;
+      if (!external && !/code-files\.html$/.test(a.pathname)) return;
+      // Card links ("Video Walkthrough", "Written Solution") are only meaningful with their card title
+      const card = a.closest('.qcard');
+      const head = card ? ['.q-num', '.q-title'].map(function (s) { return (card.querySelector(s) || {}).textContent || ''; }).join(' ') + ' — ' : '';
+      OOP.analytics.track('learning_resource_click', {
+        resource_type: resourceType(a),
+        resource_name: head + a.textContent,
+        lesson_id: p.topic ? p.id : undefined
+      });
+    };
+    document.addEventListener('click', onClick);
+    document.addEventListener('auxclick', onClick);
   }
 
   /**
@@ -312,6 +354,7 @@
 
   function init() {
     tagResourceKinds();
+    trackResourceClicks();
     neutralisePlaceholderLinks();
     staggerGrids();
     addPageActions();

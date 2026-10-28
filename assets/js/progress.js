@@ -23,7 +23,8 @@
  *   OOP.progress.reset()           (callers must confirm first — see confirmReset in page-features.js)
  *   OOP.progress.ring(pct)         → a progress-ring element
  *   OOP.progress.achievements()    → [{ id, name, desc, unlocked }]
- * Fires the DOM event "oop:progress" on every change.
+ * Fires the DOM event "oop:progress" on every change, and the GA4 events lesson_complete /
+ * lesson_uncomplete / lab_complete / lab_uncomplete through OOP.analytics (reset() sends none).
  */
 (function () {
   'use strict';
@@ -56,10 +57,15 @@
   /** Mark/unmark a topic and (only when completing) show a brief positive notification. */
   function setDone(id, done) {
     const s = read();
+    const was = !!s.topics[id];
     if (done) s.topics[id] = true; else delete s.topics[id];
     write(s);
     const page = OOP.config.pages.filter(function (p) { return p.id === id; })[0];
     if (!page) return;
+    // GA4: self-reported completion, sent only when the state actually changes
+    if (was !== !!done) {
+      OOP.analytics.track(done ? 'lesson_complete' : 'lesson_uncomplete', { lesson_id: id, lesson_name: page.label, completion_method: 'manual' });
+    }
     if (done) {
       const all = count() === total();
       OOP.ui.toast(all ? 'All topics complete — great work!' : page.label + ' marked as complete', 'check');
@@ -77,6 +83,7 @@
     const s = read();
     if (s.labs[num]) delete s.labs[num]; else s.labs[num] = true;
     write(s);
+    OOP.analytics.track(s.labs[num] ? 'lab_complete' : 'lab_uncomplete', { lab_number: num, completion_method: 'manual' });
     return !!s.labs[num];
   }
 

@@ -150,9 +150,12 @@
    */
   function copyCode() {
     const code = (cf[activeTab] && cf[activeTab].code) || '';
+    const file = cf[activeTab] && cf[activeTab].name;
     const btn = document.getElementById('copyBtn');
 
     const done = function (ok) {
+      // GA4: successful copies only; the file name is sent, never the code
+      if (ok) OOP.analytics.track('code_copy', { code_file: file, page_path: location.pathname });
       if (!btn) return;
       const old = 'Copy';
       btn.textContent = ok ? 'Copied!' : 'Copy failed';
@@ -206,12 +209,21 @@
 
   /* ───────────── 5. Wiring ───────────── */
 
+  /**
+   * A file chosen by the student (tab click/keys, back/forward, in-page search jump). Same as ct(),
+   * plus the GA4 code_file_view event when it is a different file. The first render calls ct() directly.
+   */
+  function select(id, line) {
+    if (cf[id] && id !== activeTab) OOP.analytics.track('code_file_view', { code_file: cf[id].name });
+    ct(id, line);
+  }
+
   /** Tabs: click + Left/Right/Home/End keyboard support (WAI-ARIA tabs pattern). */
   function wireTabs() {
     const list = document.getElementById('ftabs');
     list.addEventListener('click', function (e) {
       const t = e.target.closest('.ftab');
-      if (t) ct(t.getAttribute('data-tab'));
+      if (t) select(t.getAttribute('data-tab'));
     });
     list.addEventListener('keydown', function (e) {
       const all = tabs();
@@ -225,7 +237,7 @@
       if (n === null) return;
       e.preventDefault();
       all[n].focus();
-      ct(all[n].getAttribute('data-tab'));
+      select(all[n].getAttribute('data-tab'));
     });
   }
 
@@ -258,7 +270,7 @@
     // Back/forward or search jumping within the page
     window.addEventListener('hashchange', function () {
       const h = parseHash();
-      ct(h.id, h.line);
+      select(h.id, h.line);
     });
 
     setWrap(OOP.store.get('code-wrap', '0') === '1');
