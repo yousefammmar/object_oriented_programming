@@ -476,7 +476,8 @@
           why: 'Student inherits a print from both bases, so s.print() is ambiguous. Fix it with s.Person::print(), by overriding print in Student, or with a using declaration.'
         },
         {
-          q: 'With class B : protected A { ... };, what do the public members of A become in B?',
+          q: 'With this declaration, what do the public members of A become in B?',
+          code: 'class B : protected A { ... };',
           options: ['Public', 'Private', 'Inaccessible', 'Protected'],
           answer: 3,
           why: 'Protected inheritance makes the public and protected members of the base protected in the derived class. Public inheritance keeps them as they are; private inheritance makes both private.'
@@ -494,7 +495,8 @@
       version: 1,
       questions: [
         {
-          q: 'Circle inherits publicly from Shape. Given Shape sh; and Circle ci;, which line compiles?',
+          q: 'Circle inherits publicly from Shape. Which line compiles?',
+          code: 'Shape sh;\nCircle ci;',
           options: ['Circle* p = &sh;', 'Shape* p = &ci;', 'Circle& r = sh;', 'Circle c = sh;'],
           answer: 1,
           why: 'A base-class pointer can point to a derived object, because every Circle is a Shape. The reverse is not allowed: a Shape is not necessarily a Circle.'
