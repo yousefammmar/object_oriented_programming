@@ -1,15 +1,89 @@
 rules_version = '2';
 
-// Cross-device sync for the OOP study guide (assets/js/sync.js).
-// Each signed-in student can read and write ONLY their own document: users/{their uid}.
-// Everything else is denied, so the public web config cannot be used to read anyone's data.
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Cross-device sync (assets/js/sync.js).
+    // Each signed-in student can read and write ONLY their own document: users/{their uid}.
     match /users/{uid} {
       allow read, delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['state', 'updatedAt'])
         && request.resource.data.state is map;
+    }
+
+    // Research study (assets/js/research.js, docs/RESEARCH.md).
+    // The research ID is the uid of an ANONYMOUS Firebase account, so a participant can only ever
+    // reach their own records, and a Google account (sync.js) can never write research data.
+    // Nothing here is readable by anyone else; the research team exports with admin credentials,
+    // which bypass these rules (tools/export_research.cjs).
+    match /researchParticipants/{rid} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == rid
+          && request.auth.token.firebase.sign_in_provider == 'anonymous';
+      }
+
+      allow read, delete: if isOwner();
+
+      // Consent record: created as 'granted'. Later it may only be re-confirmed (same or newer
+      // information-sheet version) or changed to 'withdrawn' — never back from 'withdrawn'.
+      allow create: if isOwner()
+        && request.resource.data.keys().hasOnly(['researchId', 'consentStatus', 'consentVersion', 'consentedAt', 'updatedAt'])
+        && request.resource.data.researchId == rid
+        && request.resource.data.consentStatus == 'granted'
+        && request.resource.data.consentVersion is int
+        && request.resource.data.consentedAt is timestamp
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['consentStatus', 'consentVersion', 'consentedAt', 'withdrawnAt', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && ((resource.data.consentStatus == 'granted' && request.resource.data.consentStatus == 'granted'
+              && request.resource.data.consentVersion is int
+              && request.resource.data.consentVersion >= resource.data.consentVersion
+              && request.resource.data.consentedAt is timestamp)
+          || (request.resource.data.consentStatus == 'withdrawn' && request.resource.data.withdrawnAt is timestamp));
+
+      // One document per study session. Counters only grow, identity fields never change,
+      // and recorded quiz attempts can be added but never altered or removed.
+      match /sessions/{sid} {
+        function validSession() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['researchId', 'sessionId', 'topicId', 'startedAt', 'lastActiveAt', 'endedAt',
+                'engagementTimeSeconds', 'pageViews', 'maxScrollDepth', 'quizStatus', 'quizStartedAt', 'quizCompletedAt',
+                'quizScore', 'quizLastScore', 'quizAttemptCount', 'quizPriorAttempts', 'quizAttempts',
+                'interactions', 'interactionsTracked', 'consentVersion', 'schemaVersion', 'updatedAt'])
+            && d.researchId == rid && d.sessionId == sid
+            && d.topicId is string && d.topicId.size() <= 40
+            && d.startedAt is timestamp && d.lastActiveAt is timestamp
+            && (d.endedAt == null || d.endedAt is timestamp)
+            && d.engagementTimeSeconds is int && d.engagementTimeSeconds >= 0 && d.engagementTimeSeconds <= 86400
+            && d.pageViews is int && d.pageViews >= 1 && d.pageViews <= 10000
+            && d.maxScrollDepth is int && d.maxScrollDepth >= 0 && d.maxScrollDepth <= 100
+            && d.quizStatus in ['not_started', 'started', 'completed']
+            && (d.quizScore == null || (d.quizScore is int && d.quizScore >= 0 && d.quizScore <= 100))
+            && (d.quizLastScore == null || (d.quizLastScore is int && d.quizLastScore >= 0 && d.quizLastScore <= 100))
+            && d.quizAttemptCount is int && d.quizAttemptCount >= 0 && d.quizAttemptCount <= 200
+            && d.quizPriorAttempts is int && d.quizPriorAttempts >= 0
+            && d.quizAttempts is map && d.quizAttempts.size() == d.quizAttemptCount
+            && (d.quizStatus == 'completed') == (d.quizAttemptCount > 0)
+            && d.interactions is map && d.interactions.size() <= 20
+            && d.interactionsTracked is bool
+            && d.consentVersion is int && d.schemaVersion is int
+            && d.updatedAt == request.time;
+        }
+
+        allow read, delete: if isOwner();
+        allow create: if isOwner() && validSession();
+        allow update: if isOwner() && validSession()
+          && request.resource.data.diff(resource.data).unchangedKeys()
+               .hasAll(['researchId', 'sessionId', 'topicId', 'startedAt', 'quizPriorAttempts', 'consentVersion'])
+          && request.resource.data.engagementTimeSeconds >= resource.data.engagementTimeSeconds
+          && request.resource.data.pageViews >= resource.data.pageViews
+          && request.resource.data.maxScrollDepth >= resource.data.maxScrollDepth
+          && request.resource.data.quizAttempts.diff(resource.data.quizAttempts).changedKeys().size() == 0
+          && request.resource.data.quizAttempts.diff(resource.data.quizAttempts).removedKeys().size() == 0;
+      }
     }
   }
 }

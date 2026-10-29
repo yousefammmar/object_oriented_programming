@@ -36,6 +36,8 @@
   --success: #0b7a4b;
   --success-soft: #e0f5ea;
   --warn: #8a5a00;
+  --danger: #b42318;         /* wrong quiz answers (≥ 4.5:1 on --card) */
+  --danger-soft: #fdecea;
 
   /* Chip "kinds" (resource type colours; always paired with an emoji, never colour alone) */
   --kind-doc: #315ceb;
@@ -93,6 +95,8 @@ html.dark {
   --success: #5ee9a4;
   --success-soft: #10352a;
   --warn: #ffcb6b;
+  --danger: #ff9b9b;
+  --danger-soft: #3b1a22;
 
   --kind-doc: #7fb0ff;
   --kind-video: #ff8fb6;
@@ -151,4 +155,5 @@ html.dark {
   --z-drawer: 60;
   --z-fab: 30;
   --z-toast: 90;
+  --z-prompt: 50;
 }

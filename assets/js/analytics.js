@@ -9,6 +9,8 @@
  *   lab_complete / lab_uncomplete         progress.js  toggleLab()
  *   code_copy / code_file_view            code-viewer.js
  *   learning_resource_click               page-features.js  trackResourceClicks()
+ *   quiz_started / quiz_completed         quiz.js     (score only — never the answers)
+ *   study_session_started / _completed    research.js (consenting research participants only)
  *
  * Safety rules:
  *   - no gtag (tag removed) or gtag.js blocked → nothing is sent and the site works exactly as before
@@ -57,12 +59,15 @@
    */
   function track(name, params) {
     try {
-      if (typeof window.gtag !== 'function' || typeof name !== 'string' || !NAME.test(name)) return false;
+      if (typeof name !== 'string' || !NAME.test(name)) return false;
       const data = clean(params);
       const key = name + JSON.stringify(data);
       const now = Date.now();
       if (key === last.key && now - last.at < DEDUPE_MS) return false;
       last = { key: key, at: now };
+      // research.js counts learning interactions from this (event name only), with or without GA.
+      document.dispatchEvent(new CustomEvent('oop:track', { detail: { name: name } }));
+      if (typeof window.gtag !== 'function') return false;
       window.gtag('event', name, data);
       return true;
     } catch (e) {

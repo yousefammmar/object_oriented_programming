@@ -165,7 +165,7 @@
     return el('aside', { class: 'sidebar', id: 'sidebar', 'aria-label': 'Site navigation' }, [
       el('div', { class: 'sb-head' }, [brand, close]),
       nav,
-      el('div', { class: 'sb-foot' }, [el('div', { id: 'sbProgress' }), el('div', { id: 'sbAccount' })])
+      el('div', { class: 'sb-foot' }, [el('div', { id: 'sbProgress' }), el('div', { id: 'sbAccount' }), el('div', { id: 'sbResearch' })])
     ]);
   }
 

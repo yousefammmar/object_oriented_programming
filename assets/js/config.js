@@ -37,6 +37,18 @@
     },
 
     /**
+     * Optional research study (assets/js/research.js, docs/RESEARCH.md). Needs `firebase` above.
+     * null = no consent prompt and no research data; the topic quizzes work either way.
+     * Nothing is recorded until a student agrees in the consent dialog.
+     *   consentVersion – bump when the participant information changes; everyone is asked again
+     *   idleSeconds    – active time stops counting after this long without any input
+     *   sessionMinutes – a study session ends after this long without activity (GA4 also uses 30)
+     *   saveSeconds    – how often an open study session is saved to Firestore while it changes
+     *   contact/ethics – plain text shown in the participant information when filled in
+     */
+    research: { consentVersion: 1, idleSeconds: 60, sessionMinutes: 30, saveSeconds: 60, contact: '', ethics: '' },
+
+    /**
      * Pages, in navigation order.
      *   id     – short id, also the value of <body data-page="…">
      *   file   – HTML file name

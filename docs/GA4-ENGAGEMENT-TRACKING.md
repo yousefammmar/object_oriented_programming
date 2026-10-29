@@ -147,11 +147,33 @@ The icons are the same cue the site already uses to colour resource chips (`kind
 `page-features.js`). A Drive file without `.pdf` in its text is `document`, not `pdf`, because the
 format cannot be known reliably.
 
+### `quiz_started` / `quiz_completed`
+The optional end-of-topic quiz (`quiz.js`, questions in `quiz-data.js`), for every visitor.
+`quiz_started` on **Take quiz** / **Retake quiz**; `quiz_completed` once per submitted attempt.
+The answers themselves are never sent.
+
+| Parameter | Type | Example | Meaning |
+|---|---|---|---|
+| `lesson_id` | string | `dma` | Topic id |
+| `quiz_score` | number | `75` | `quiz_completed` only: correct / total × 100, rounded (8 questions) |
+
+### `study_session_started` / `study_session_completed`
+Research participants only (opt-in, `research.js`; definitions in [RESEARCH.md](RESEARCH.md)).
+A *study session* is one topic in one browser, ending after 30 min without activity — it is **not**
+a GA4 session. `study_session_completed` is usually sent on a later page load, after the timeout.
+No research or session ids are sent.
+
+| Parameter | Type | Example | Meaning |
+|---|---|---|---|
+| `lesson_id` | string | `this` | Topic id |
+| `study_active_sec` | number | `412` | `_completed` only: active engagement time of the session, seconds |
+| `study_quiz_status` | string | `completed` | `_completed` only: `not_started` / `started` / `completed` |
+
 ### Not tracked (on purpose)
 
 | What | Why |
 |---|---|
-| Quiz scores | The site has no interactive quiz; Examination Hall only links to papers and solution videos |
+| Quiz answers, research IDs | Answers are research data (Firestore, consenting students only); ids would link GA4 to the research record |
 | Video watching | No embedded players — every video opens on YouTube/Drive, so only the click is observable |
 | Progress reset, bookmarks, theme, reading mode, search queries | Not requested; search queries could contain personal text |
 | Page views, scroll, engagement time, outbound clicks | Already collected by the Google tag / Enhanced Measurement |
@@ -167,6 +189,8 @@ format cannot be known reliably.
 | `code_copy` | `code-viewer.js` → `copyCode()` → `done(ok)` when `ok` | **Copy** button (`onclick="copyCode()"`) |
 | `code_file_view` | `code-viewer.js` → `select()` when the file differs | Tab click/keys, `hashchange` |
 | `learning_resource_click` | `page-features.js` → `trackResourceClicks()` | One `click` + `auxclick` listener on `document` |
+| `quiz_started` / `quiz_completed` | `quiz.js` → `begin()` / form `submit` (once per attempt) | **Take quiz**, **Retake quiz**, **Submit answers** |
+| `study_session_started` / `study_session_completed` | `research.js` → `begin()` / `close()` | First page view of a session / the next page load or activity after the timeout |
 
 ---
 
@@ -190,12 +214,19 @@ Event parameters only appear in reports and explorations after they are register
 | Code page path | Event | `code_page_path` |
 | Resource type | Event | `resource_type` |
 | Resource name | Event | `resource_name` |
+| Study quiz status | Event | `study_quiz_status` |
 
-(8 of the 50 event-scoped dimensions a standard property allows. Don't name one "Page path" — a
+(9 of the 50 event-scoped dimensions a standard property allows. Don't name one "Page path" — a
 built-in dimension already uses that name.)
 
-**Custom metrics are not needed:** every parameter is categorical, and GA4's built-in *Event count*,
-*Total users* and *Sessions* are the measures.
+**Custom metrics** (*Custom definitions → Custom metrics*), only for the quiz and study-session events:
+
+| Metric name | Scope | Event parameter | Unit |
+|---|---|---|---|
+| Quiz score | Event | `quiz_score` | Standard |
+| Study active seconds | Event | `study_active_sec` | Time → seconds |
+
+The other events are categorical; GA4's built-in *Event count*, *Total users* and *Sessions* are their measures.
 
 ### 4.2 Data retention (strongly recommended)
 *Admin → Data collection and modification → Data retention → Event data retention: 14 months.*
