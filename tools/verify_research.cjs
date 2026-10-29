@@ -15,6 +15,10 @@
  *   F  admin CSV export of the emulator data
  *   G  withdrawal deletes everything and stops recording; sync data untouched
  *   H  askConsent: false — recorded by default with no prompt, opt-out deletes, earlier "no" respected
+ *   J  offline: the attempt is kept on the device and reaches Firestore after reconnecting, once
+ *   K  no research account for Home-only visitors, crawlers, or browsers that block storage
+ *   I  existing features still work: completion, bookmarks, dashboard, achievements, pager, theme,
+ *      search, code viewer
  * Groups B–G run with askConsent: true (ask first); H with askConsent: false (the config default).
  *
  * Usage:
@@ -100,8 +104,9 @@ let base = '';
 const errors = [];
 let firestoreTraffic = 0;
 
-async function context(browser, timings, consent) {
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+async function context(browser, timings, consent, extra = {}) {
+  const ctx = await browser.newContext(Object.assign({ viewport: { width: 1280, height: 800 } }, extra.userAgent ? { userAgent: extra.userAgent } : {}));
+  if (extra.noStorage) await ctx.addInitScript(() => Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } }));
   const cfg = config(timings);
   await ctx.route('**/*', (route) => {
     const url = route.request().url();
@@ -149,6 +154,8 @@ async function wiggle(page, ms) {
   while (Date.now() < end) { x = x === 300 ? 320 : 300; await page.mouse.move(x, 400); await sleep(400); }
 }
 const local = async (page, topic) => ((await ls(page, 'research-open')) || {})[topic];
+/** This page's own research ID (its anonymous uid) once its consent record is saved — other open browsers can't interfere. */
+const ridOf = (page) => poll(async () => { const c = await ls(page, 'research-consent'); return c && c.registered && c.registered.split(':')[0]; });
 
 /* ───────────── Cases ───────────── */
 
@@ -230,10 +237,10 @@ async function participant(browser) {
   check('C "Learn more" opens the information dialog with an explicit agree button', await page.isVisible('#researchDlg') &&
     (await page.textContent('#researchDlg')).includes('Never in the research data') && (await page.isVisible('#researchDlg >> text=I agree to take part')));
   await page.click('#researchDlg >> text=I agree to take part');
-  const parts = await poll(async () => { const p = await list('researchParticipants'); return p.length === 1 && p; });
-  const rid = parts && parts[0].id;
-  check('C consent record created (granted, version 1, timestamps)', parts && parts[0].consentStatus === 'granted' && parts[0].consentVersion === 1 &&
-    parts[0].consentedAt instanceof Date && parts[0].researchId === rid, parts);
+  const rid = await ridOf(page);
+  const part = rid && await get('researchParticipants/' + rid);
+  check('C consent record created (granted, version 1, timestamps)', part && part.consentStatus === 'granted' && part.consentVersion === 1 &&
+    part.consentedAt instanceof Date && part.researchId === rid, part);
   const user = rid && await authUser(rid);
   check('C research ID is an anonymous account with no email or name', user && !user.email && !user.displayName && !(user.providerUserInfo || []).length, user);
   let s = await poll(async () => { const x = await sessions(rid); return x.length === 1 && x[0]; });
@@ -302,7 +309,8 @@ async function participant(browser) {
   await page.click('.complete-btn');
   await visibility(page, 'hidden');
   s = await poll(async () => { const x = (await sessions(rid))[0]; return x.interactions.lesson_complete === 1 && x; });
-  check('C marking the topic complete is counted as an interaction', !!s && s.interactionsTracked === true, (await sessions(rid))[0]);
+  check('C marking the topic complete: counted as an interaction and topicCompleted = true', !!s && s.interactionsTracked === true &&
+    s.topicCompleted === true, (await sessions(rid))[0]);
   await visibility(page, 'visible');
 
   // Second tab, same topic → same session
@@ -317,20 +325,34 @@ async function participant(browser) {
   check('C another topic gets its own session', both && both.some((x) => x.topicId === 'friend' && x.pageViews === 1), both);
   await other.close();
 
+  // GA4: every event this page sent during the run (the page was reloaded once, after consent)
+  const evs = await page.evaluate(() => (window.dataLayer || []).filter((a) => a[0] === 'event').map((a) => [a[1], a[2] || {}]));
+  const NAME = /^[a-z][a-z0-9_]{0,39}$/;
+  const badGa = evs.filter(([n, p]) => !NAME.test(n) || Object.keys(p).length > 25 || Object.entries(p).some(([k, v]) =>
+    !NAME.test(k) || !(Number.isFinite(v) || typeof v === 'boolean' || (typeof v === 'string' && v.length <= 100 &&
+      !/[0-9a-f]{8}-[0-9a-f]{4}-|@/i.test(v) && !v.includes(rid)))));
+  check('C GA4: valid names, ≤ 25 primitive params, no ids, answers or emails', evs.length > 0 && !badGa.length, badGa);
+  const n = (name) => evs.filter(([x]) => x === name).length;
+  const qc = evs.filter(([x]) => x === 'quiz_completed').map(([, p]) => Object.keys(p).sort().join());
+  check('C GA4: no duplicates — refresh sends no new study_session_started; 2 quiz_started, 2 quiz_completed, 1 lesson_complete',
+    n('study_session_started') === 0 && n('quiz_started') === 2 && n('quiz_completed') === 2 && n('lesson_complete') === 1 &&
+    qc.every((k) => k === 'lesson_id,quiz_score'), evs.map(([x]) => x));
+
   // Google sign-in for sync stays separate from research
   await page.evaluate(() => firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(
     JSON.stringify({ sub: 'google-student', email: 'student@example.com', email_verified: true }))));
-  const synced = await poll(async () => { const u = await list('users'); return u.length === 1 && u[0]; });
+  const syncId = await page.evaluate(() => firebase.auth().currentUser.uid);
+  const synced = await poll(async () => { const u = await get('users/' + syncId); return u && u.state && Object.assign({ id: syncId }, u); });
   check('C Google sync still works next to research (users/{uid} saved)', synced && synced.state && synced.state.progress.topics.dma, synced);
-  const dump = JSON.stringify([await list('researchParticipants'), await sessions(rid)]);
+  const dump = JSON.stringify([await get('researchParticipants/' + rid), await sessions(rid)]);
   check('C research records contain no email, name or Google uid', !/student@example\.com|google-student|@/.test(dump) && !dump.includes(synced && synced.id));
-  return { ctx, page, rid };
+  return { ctx, page, rid, syncId };
 }
 
 async function timeout(browser) {
   const ctx = await context(browser, { idle: 3, session: 0.1 }, true); // a session ends after 6 s idle
   const page = await open(ctx, 'this-pointer.html');
-  const rid = await poll(async () => { const p = await list('researchParticipants'); const mine = p.filter((x) => x.id !== globalThis.mainRid); return mine.length === 1 && mine[0].id; });
+  const rid = await ridOf(page);
   const first = await poll(async () => { const x = await sessions(rid); return x.length === 1 && x[0]; });
   await visibility(page, 'hidden');
   await sleep(8000);
@@ -370,7 +392,7 @@ async function rules(page, rid) {
       researchId: me, sessionId: id, topicId: 'dma', startedAt: T, lastActiveAt: T, endedAt: null, engagementTimeSeconds: 100,
       pageViews: 1, maxScrollDepth: 50, quizStatus: 'not_started', quizStartedAt: null, quizCompletedAt: null, quizScore: null,
       quizLastScore: null, quizAttemptCount: 0, quizPriorAttempts: 0, quizAttempts: {}, interactions: {}, interactionsTracked: true,
-      consentVersion: 1, schemaVersion: 1, updatedAt: ST()
+      topicCompleted: false, consentVersion: 1, schemaVersion: 1, updatedAt: ST()
     }, over);
     const one = { a1: { attemptNumber: 1, quizVersion: 1, score: 50, correctCount: 4, questionCount: 8, answers: [0, 0, 0, 0, 0, 0, 0, 0], startedAt: T, submittedAt: T } };
     const done = { quizStatus: 'completed', quizScore: 50, quizLastScore: 50, quizAttemptCount: 1, quizAttempts: one };
@@ -402,6 +424,7 @@ async function rules(page, rid) {
     await attempt('withdraw', consent.update({ consentStatus: 'withdrawn', withdrawnAt: T, updatedAt: ST() }));
     await attempt('unwithdraw', consent.update({ consentStatus: 'granted', updatedAt: ST() }));
     await attempt('readOwn', mine('s1').get());
+    await attempt('topicCompletedNotBool', mine('s8').set(session(me, 's8', { topicCompleted: 'yes' })));
 
     const g = make('google');
     await g.auth.signInWithCredential(fb.auth.GoogleAuthProvider.credential(JSON.stringify({ sub: 'g2', email: 'g2@example.com', email_verified: true })));
@@ -420,7 +443,8 @@ async function rules(page, rid) {
     clientTimeAsUpdatedAt: 'permission-denied', lowerEngagement: 'permission-denied', changeTopic: 'permission-denied',
     alterAttempt: 'permission-denied', dropAttempt: 'permission-denied', addAttempt: 'allowed', createWithdrawnConsent: 'permission-denied',
     createConsent: 'allowed', withdraw: 'allowed', unwithdraw: 'permission-denied', readOwn: 'allowed',
-    googleAccountConsent: 'permission-denied', googleAccountSession: 'permission-denied', googleReadsOtherSync: 'permission-denied'
+    googleAccountConsent: 'permission-denied', googleAccountSession: 'permission-denied', googleReadsOtherSync: 'permission-denied',
+    topicCompletedNotBool: 'permission-denied'
   };
   Object.keys(expect).forEach((k) => check('E rules: ' + k + ' → ' + expect[k], r[k] === expect[k], r[k]));
   const anon = await fetch(DOCS + '/researchParticipants/' + rid);
@@ -454,11 +478,20 @@ async function exporting(rid) {
   check('F export: 2 attempt rows, both re-scored and verified, answers + item correctness listed', att.length === 2 &&
     att.every((a) => a.score_verified === '1' && a.answers.split(';').length === 8 && a.item_correct.split(';').length === 8), att);
   check('F export: sessions without a "granted" consent record are left out', !out.sessions.some((r) => r.session_id === 's1' || r.session_id === 'evil'));
+  const ids = out.sessions.map((r) => r.session_id);
+  check('F export: session IDs are unique', ids.length > 0 && new Set(ids).size === ids.length);
+  const num = (v, lo, hi) => /^\d+$/.test(v) && +v >= lo && +v <= hi;
+  check('F export: engagement in whole seconds, scroll 0–100, scores 0–100 or empty, end source identifies open sessions',
+    out.sessions.every((r) => num(r.engagement_time_seconds, 0, 86400) && num(r.max_scroll_depth, 0, 100) &&
+      (r.quiz_score === '' || num(r.quiz_score, 0, 100)) && ['recorded', 'inferred', 'open'].includes(r.session_end_source)), out.sessions);
+  check('F export: topic completion column (dma = 1)', dma && dma.topic_completed === '1', dma && dma.topic_completed);
+  const files = fs.readFileSync(path.join(tmp, 'research_sessions.csv'), 'utf8') + fs.readFileSync(path.join(tmp, 'research_quiz_attempts.csv'), 'utf8');
+  check('F export: no names, emails or Google ids in the CSV files', !/@|student|google-student/i.test(files));
   check('F export: timestamps are UTC "YYYY-MM-DD HH:MM:SS"', /^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(dma && dma.session_started_at), dma && dma.session_started_at);
   return tmp;
 }
 
-async function withdrawal(ctx, page, rid, tmp) {
+async function withdrawal(ctx, page, rid, tmp, syncId) {
   await visibility(page, 'visible');
   await page.click('#sbResearch button');
   check('G sidebar dialog offers withdrawal and shows the research ID', (await page.textContent('#researchDlg')).includes(rid) &&
@@ -478,22 +511,22 @@ async function withdrawal(ctx, page, rid, tmp) {
   await answer(page, 'dma', [1, 1, 1, 1, 1, 1, 1, 1]);
   await visibility(page, 'hidden');
   await sleep(4000);
-  check('G after withdrawing nothing is recorded or saved', !(await ls(page, 'research-open')) && (await list('researchParticipants')).every((p) => p.id !== rid));
-  check('G withdrawal does not touch the Google sync data', (await list('users')).length === 1);
+  check('G after withdrawing nothing is recorded or saved', !(await ls(page, 'research-open')) && !(await get('researchParticipants/' + rid)) &&
+    (await sessions(rid)).length === 0);
+  check('G withdrawal does not touch the Google sync data', !!(await get('users/' + syncId)));
   const after = exportCsv(tmp);
   check('G export no longer contains the withdrawn participant', !after.sessions.some((r) => r.research_id === rid) && !after.attempts.some((r) => r.research_id === rid));
 }
 
 async function optOutMode(browser) {
-  const known = new Set((await list('researchParticipants')).map((p) => p.id));
-  const fresh = async () => (await list('researchParticipants')).filter((p) => !known.has(p.id));
+  firestoreTraffic = 0;
   const ctx = await context(browser, { idle: 3, session: 5, ask: false }, false);
   const page = await open(ctx, 'polymorphism.html');
   check('H no invitation or dialog; sidebar says "taking part"', !(await page.$('#researchPrompt')) && !(await page.$('#researchDlg')) &&
     (await page.textContent('#sbResearch')).includes('taking part') && !(await page.textContent('#sbResearch')).includes('not taking part'));
   check('H recorded by default as "implied" (no click needed)', (await ls(page, 'research-consent')).status === 'implied');
-  const p = await poll(async () => { const f = await fresh(); return f.length === 1 && f[0]; });
-  const rid = p && p.id;
+  const rid = await ridOf(page);
+  const p = rid && await get('researchParticipants/' + rid);
   check('H consent record saved with consentStatus "implied"', p && p.consentStatus === 'implied', p);
   const s = rid && await poll(async () => { const x = await sessions(rid); return x.length === 1 && x[0]; });
   check('H study session saved straight away (topic polymorphism, 1 page view)', s && s.topicId === 'polymorphism' && s.pageViews === 1, s);
@@ -504,25 +537,112 @@ async function optOutMode(browser) {
   check('H sidebar dialog explains the recording and offers opt-out', (await page.textContent('#researchDlg')).includes('While you take part') &&
     await page.isVisible('#researchDlg >> text=Withdraw and delete my data'));
   await page.click('#researchDlg >> text=Withdraw and delete my data');
-  const gone = await poll(async () => (await fresh()).length === 0 && (await sessions(rid)).length === 0);
-  check('H opting out deletes the data', gone, await fresh());
+  const gone = await poll(async () => !(await get('researchParticipants/' + rid)) && (await sessions(rid)).length === 0);
+  check('H opting out deletes the data', gone, await sessions(rid));
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.getElementById('sbResearch'));
   await wiggle(page, 1500);
   await visibility(page, 'hidden');
   await sleep(3000);
   check('H after opting out: not re-enrolled on reload, nothing recorded', (await ls(page, 'research-consent')).status === 'withdrawn' &&
-    !(await ls(page, 'research-open')) && (await fresh()).length === 0 && (await page.textContent('#sbResearch')).includes('not taking part'));
+    !(await ls(page, 'research-open')) && !(await get('researchParticipants/' + rid)) && (await page.textContent('#sbResearch')).includes('not taking part'));
   await ctx.close();
 
+  firestoreTraffic = 0;
   const ctx2 = await context(browser, { idle: 3, session: 5, ask: false }, 'declined');
   const page2 = await open(ctx2, 'polymorphism.html');
   await wiggle(page2, 1500);
   await visibility(page2, 'hidden');
   await sleep(3000);
   check('H a browser that already said "No thanks" is not enrolled', (await ls(page2, 'research-consent')).status === 'declined' &&
-    !(await ls(page2, 'research-open')) && (await fresh()).length === 0);
+    !(await ls(page2, 'research-open')) && firestoreTraffic === 0, { firestoreTraffic });
   await ctx2.close();
+}
+
+async function offline(browser) {
+  const ctx = await context(browser, { idle: 3, session: 5, ask: false }, false);
+  const page = await open(ctx, 'operator-overloading.html');
+  const rid = await ridOf(page);
+  await poll(async () => (await sessions(rid)).length === 1);
+  await ctx.setOffline(true);
+  await page.click('#topic-quiz .quiz-intro button');
+  await answer(page, 'operators', [1, 1, 1, 1, 1, 1, 1, 1]);
+  await visibility(page, 'hidden');
+  await sleep(4000);
+  const during = (await sessions(rid))[0];
+  check('J offline: quiz still works, attempt kept on the device, nothing reaches Firestore yet', (await page.textContent('.quiz-score')).startsWith('100%') &&
+    (await local(page, 'operators')).quizAttemptCount === 1 && during.quizAttemptCount === 0, during);
+  await ctx.setOffline(false);
+  await visibility(page, 'visible');
+  await visibility(page, 'hidden');
+  const after = await poll(async () => { const x = (await sessions(rid))[0]; return x.quizAttemptCount === 1 && x; }, 90000);
+  check('J back online: the attempt reaches Firestore in the same session (score 100)', after && after.quizScore === 100 &&
+    after.topicId === 'operators' && after.id === during.id, after || (await sessions(rid))[0]);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.getElementById('sbResearch'));
+  await visibility(page, 'hidden');
+  await sleep(3000);
+  const again = await sessions(rid);
+  check('J no duplicate attempt or session after reconnect + reload', again.length === 1 && again[0].quizAttemptCount === 1 && again[0].pageViews === 2, again);
+  await ctx.close();
+}
+
+async function guards(browser) {
+  const idle = async (page) => { await wiggle(page, 1500); await visibility(page, 'hidden'); await sleep(3000); };
+
+  firestoreTraffic = 0;
+  let ctx = await context(browser, { idle: 3, session: 5, ask: false }, false);
+  const home = await open(ctx, 'index.html');
+  await idle(home);
+  check('K a visitor who only opens Home gets no research account and no Firestore traffic', !(await ls(home, 'research-consent')).registered && firestoreTraffic === 0 &&
+    await home.evaluate(() => !(window.firebase && window.firebase.firestore)), { firestoreTraffic });
+  await ctx.close();
+
+  firestoreTraffic = 0;
+  ctx = await context(browser, { idle: 3, session: 5, ask: false }, false,
+    { userAgent: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' });
+  const bot = await open(ctx, 'polymorphism.html');
+  await idle(bot);
+  check('K a search-engine crawler is never enrolled or recorded', firestoreTraffic === 0 && !(await ls(bot, 'research-consent')) && !(await ls(bot, 'research-open')), { firestoreTraffic });
+  await ctx.close();
+
+  firestoreTraffic = 0;
+  ctx = await context(browser, { idle: 3, session: 5, ask: false }, false, { noStorage: true });
+  const blocked = await open(ctx, 'polymorphism.html');
+  await blocked.click('#topic-quiz .quiz-intro button');
+  await answer(blocked, 'polymorphism', [1, 1, 1, 1, 1, 1, 1, 1]);
+  await idle(blocked);
+  check('K storage blocked: the quiz still works, nothing is recorded or sent', (await blocked.textContent('.quiz-score')).startsWith('100%') && firestoreTraffic === 0, { firestoreTraffic });
+  await ctx.close();
+}
+
+async function features(browser) {
+  const ctx = await context(browser, { idle: 60, session: 30, ask: false }, false);
+  const page = await open(ctx, 'class-basics.html');
+  const btns = page.locator('.pg-actions .complete-btn');
+  await btns.nth(0).click();
+  await btns.nth(1).click();
+  check('I "Mark as completed" and "Bookmark this page" still toggle', (await btns.nth(0).getAttribute('aria-pressed')) === 'true' &&
+    (await btns.nth(1).getAttribute('aria-pressed')) === 'true');
+  await page.click('.pager .next');
+  await page.waitForURL(/const-static\.html$/);
+  check('I previous/next pager navigates', page.url().endsWith('const-static.html'));
+  const home = await open(ctx, 'index.html');
+  const dash = await home.evaluate(() => [...document.querySelectorAll('.dash-card')].map((c) => c.textContent).join(' | '));
+  check('I Home dashboard: 1 topic completed, the bookmark listed, "First Step" achievement unlocked', /1 of \d+ topics completed/.test(dash) &&
+    dash.includes('Bookmarks') && dash.includes('Class Basics') &&
+    await home.evaluate(() => OOP.progress.achievements().some((a) => a.id === 'first-topic' && a.unlocked)), dash.slice(0, 300));
+  const dark = await home.evaluate(() => document.documentElement.classList.contains('dark'));
+  await home.keyboard.press('t');
+  check('I theme switch (T) still works', (await home.evaluate(() => document.documentElement.classList.contains('dark'))) === !dark);
+  await home.keyboard.press('Control+k');
+  await home.keyboard.type('friend');
+  await sleep(500);
+  check('I search (Ctrl+K) still finds topics', await home.evaluate(() => document.querySelector('.search-dialog').open &&
+    document.getElementById('searchList').textContent.toLowerCase().includes('friend')));
+  const code = await open(ctx, 'code-files.html');
+  check('I code viewer still renders the C++ examples', await code.evaluate(() => (document.getElementById('cv') || {}).textContent.length > 100));
+  await ctx.close();
 }
 
 (async function main() {
@@ -536,13 +656,15 @@ async function optOutMode(browser) {
     await quizzes(browser);
     await undecided(browser);
     const p = await participant(browser);
-    globalThis.mainRid = p.rid;
     await timeout(browser);
     await rules(p.page, p.rid);
     const tmp = await exporting(p.rid);
-    await withdrawal(p.ctx, p.page, p.rid, tmp);
+    await withdrawal(p.ctx, p.page, p.rid, tmp, p.syncId);
     await p.ctx.close();
     await optOutMode(browser);
+    await offline(browser);
+    await guards(browser);
+    await features(browser);
   } catch (e) {
     failed++;
     console.log('FAIL crashed: ' + (e && e.stack));

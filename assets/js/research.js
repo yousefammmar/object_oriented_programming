@@ -172,12 +172,13 @@
         quizStatus: 'not_started', quizStartedAt: null, quizCompletedAt: null, quizScore: null, quizLastScore: null,
         quizAttemptCount: 0, quizPriorAttempts: past()[topic] || 0, quizAttempts: {},
         interactions: {}, interactionsTracked: !!OOP.analytics, consentVersion: cfg.consentVersion,
-        rev: 0, syncedRev: -1
+        topicCompleted: false, rev: 0, syncedRev: -1
       };
       ga('study_session_started', { lesson_id: topic });
     }
     r.pageViews++;
     r.lastActiveAt = Math.max(r.lastActiveAt, t);
+    r.topicCompleted = OOP.progress.isDone(topic);
     depthMax = depth();
     r.maxScrollDepth = Math.max(r.maxScrollDepth, depthMax);
     r.rev++;
@@ -192,6 +193,7 @@
     if (!cur || cur.sessionId !== sid || t - cur.lastActiveAt > GAP) begin(t);
     const map = readOpen();
     fn(map[topic]);
+    map[topic].topicCompleted = OOP.progress.isDone(topic); // "Mark as completed" state at the latest activity
     map[topic].rev++;
     writeOpen(map);
   }
@@ -362,7 +364,7 @@
       quizStatus: r.quizStatus, quizStartedAt: ts(r.quizStartedAt), quizCompletedAt: ts(r.quizCompletedAt),
       quizScore: r.quizScore, quizLastScore: r.quizLastScore, quizAttemptCount: r.quizAttemptCount,
       quizPriorAttempts: r.quizPriorAttempts, quizAttempts: attempts,
-      interactions: r.interactions, interactionsTracked: r.interactionsTracked,
+      interactions: r.interactions, interactionsTracked: r.interactionsTracked, topicCompleted: !!r.topicCompleted,
       consentVersion: r.consentVersion, schemaVersion: 1, updatedAt: serverTime()
     };
   }
@@ -375,9 +377,18 @@
     writeOutbox(readOutbox().filter(function (r) { return !(r.sessionId === id && rev >= r.rev); }));
   }
 
-  /** Write the consent record and every session that changed since it was last saved. */
+  function unsaved() {
+    const map = readOpen();
+    return Object.keys(map).map(function (k) { return map[k]; }).concat(readOutbox())
+      .filter(function (r) { return r.rev > r.syncedRev; });
+  }
+
+  /**
+   * Write every session that changed since it was last saved, plus the consent record with the first one.
+   * Nothing to save → no Firebase at all, so visitors who never open a topic get no research account.
+   */
   function save() {
-    if (!participating() || saving) return;
+    if (!participating() || saving || !unsaved().length) return;
     saving = true;
     connect().then(function (u) {
       if (!u || !participating()) return null;
@@ -388,15 +399,12 @@
         jobs.push(ref.set({ researchId: u.uid, consentStatus: c.status === 'implied' ? 'implied' : 'granted', consentVersion: c.version, consentedAt: ts(c.at), updatedAt: serverTime() })
           .then(function () {
             const c2 = consent();
-            if (c2 && c2.status === 'granted') { c2.registered = u.uid + ':' + c.version; setConsent(c2); }
+            if (c2 && participating()) { c2.registered = u.uid + ':' + c.version; setConsent(c2); }
           }));
       }
-      const map = readOpen();
-      Object.keys(map).map(function (k) { return map[k]; }).concat(readOutbox())
-        .filter(function (r) { return r.rev > r.syncedRev; })
-        .forEach(function (r) {
-          jobs.push(ref.collection('sessions').doc(r.sessionId).set(toDoc(r, u.uid)).then(function () { markSaved(r.sessionId, r.rev); }));
-        });
+      unsaved().forEach(function (r) {
+        jobs.push(ref.collection('sessions').doc(r.sessionId).set(toDoc(r, u.uid)).then(function () { markSaved(r.sessionId, r.rev); }));
+      });
       return Promise.all(jobs);
     }).catch(function (e) { console.warn('[research] not saved yet — kept on this device and retried later', e); })
       .then(function () { saving = false; });
@@ -476,7 +484,7 @@
         'Which of the ten topic pages you study, when, and how long you are active on them',
         'Page views and how far down each topic page you scroll',
         'Whether you take a topic quiz, your answers and your score',
-        'How often you mark a topic complete, open a learning resource or copy code'
+        'Whether you mark the topic complete, and how often you open a learning resource or copy code'
       ]),
       el('h3', { text: 'Never in the research data' }),
       list([
@@ -536,7 +544,9 @@
   }
 
   function init() {
-    if (location.protocol === 'file:') return;
+    // Off when opened from disk, when the browser keeps no storage (every page would start a new
+    // participant and session) and for search-engine crawlers, which run scripts too.
+    if (location.protocol === 'file:' || !OOP.store.persistent || /bot|crawl|spider|slurp|lighthouse/i.test(navigator.userAgent)) return;
     // askConsent off: everyone takes part by default until they opt out from the sidebar.
     if (!cfg.askConsent && !consent()) setConsent({ status: 'implied', version: cfg.consentVersion, at: now() });
     render();

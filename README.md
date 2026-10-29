@@ -199,6 +199,7 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 ├── docs/GA4-ENGAGEMENT-TRACKING.md  GA4 event dictionary, setup and analysis guide
 ├── docs/FIREBASE-SETUP.md       How to turn on cross-device sync
 ├── docs/RESEARCH.md             Research study: consent, metrics, data dictionary, export, limitations
+├── docs/RESEARCH-PRODUCTION.md  Research: Firebase console steps, production smoke test, GA4 DebugView
 ├── firestore.rules              Firestore security rules (each student reads/writes only their own data)
 └── package.json             Convenience scripts (`npm run serve | build:search | verify | verify:analytics | test:sync | test:research | verify:research | export:research`)
 ```

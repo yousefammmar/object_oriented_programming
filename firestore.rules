@@ -53,7 +53,7 @@ service cloud.firestore {
           return d.keys().hasOnly(['researchId', 'sessionId', 'topicId', 'startedAt', 'lastActiveAt', 'endedAt',
                 'engagementTimeSeconds', 'pageViews', 'maxScrollDepth', 'quizStatus', 'quizStartedAt', 'quizCompletedAt',
                 'quizScore', 'quizLastScore', 'quizAttemptCount', 'quizPriorAttempts', 'quizAttempts',
-                'interactions', 'interactionsTracked', 'consentVersion', 'schemaVersion', 'updatedAt'])
+                'interactions', 'interactionsTracked', 'topicCompleted', 'consentVersion', 'schemaVersion', 'updatedAt'])
             && d.researchId == rid && d.sessionId == sid
             && d.topicId is string && d.topicId.size() <= 40
             && d.startedAt is timestamp && d.lastActiveAt is timestamp
@@ -69,7 +69,7 @@ service cloud.firestore {
             && d.quizAttempts is map && d.quizAttempts.size() == d.quizAttemptCount
             && (d.quizStatus == 'completed') == (d.quizAttemptCount > 0)
             && d.interactions is map && d.interactions.size() <= 20
-            && d.interactionsTracked is bool
+            && d.interactionsTracked is bool && d.topicCompleted is bool
             && d.consentVersion is int && d.schemaVersion is int
             && d.updatedAt == request.time;
         }

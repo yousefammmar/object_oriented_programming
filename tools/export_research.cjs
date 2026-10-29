@@ -106,7 +106,7 @@ const INTERACTIONS = ['lesson_complete', 'lesson_uncomplete', 'learning_resource
 const SESSION_COLUMNS = ['research_id', 'session_id', 'topic_id', 'session_started_at', 'session_last_active_at', 'session_ended_at',
   'session_end_source', 'engagement_time_seconds', 'page_views', 'max_scroll_depth', 'quiz_status', 'quiz_score', 'quiz_score_verified',
   'quiz_last_score', 'quiz_best_score', 'quiz_attempt_count', 'quiz_prior_attempts', 'quiz_started_at', 'quiz_completed_at',
-  'interactions_tracked'].concat(INTERACTIONS.map((n) => n + '_count'), ['consent_status', 'consent_version', 'schema_version', 'updated_at']);
+  'topic_completed', 'interactions_tracked'].concat(INTERACTIONS.map((n) => n + '_count'), ['consent_status', 'consent_version', 'schema_version', 'updated_at']);
 
 const ATTEMPT_COLUMNS = ['research_id', 'session_id', 'topic_id', 'attempt_id', 'attempt_number', 'quiz_prior_attempts', 'quiz_version',
   'question_count', 'correct_count', 'score_reported', 'score_recomputed', 'score_verified', 'started_at', 'submitted_at',
@@ -167,7 +167,7 @@ function build(data, quiz, timeoutMs, now) {
       quiz_score_verified: first ? (first.r ? flag(first.r.score === s.quizScore) : null) : null,
       quiz_last_score: s.quizLastScore, quiz_best_score: scores.length ? Math.max.apply(null, scores) : null,
       quiz_attempt_count: s.quizAttemptCount, quiz_prior_attempts: s.quizPriorAttempts,
-      quiz_started_at: time(s.quizStartedAt), quiz_completed_at: time(s.quizCompletedAt),
+      quiz_started_at: time(s.quizStartedAt), quiz_completed_at: time(s.quizCompletedAt), topic_completed: flag(s.topicCompleted),
       interactions_tracked: flag(s.interactionsTracked), consent_status: p.consentStatus, consent_version: s.consentVersion,
       schema_version: s.schemaVersion, updated_at: time(s.updatedAt)
     };

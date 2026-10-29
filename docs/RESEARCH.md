@@ -31,7 +31,7 @@ show associations between engagement and quiz performance, **not** learning gain
 
    Collecting research data **without asking** normally needs either explicit consent or a formal
    waiver of consent from your ethics board, and may fall under Jordan's Personal Data Protection
-   Law. Confirm which mode your approval covers before using real students' data; switching to
+   Law. **Implied participation is not formal consent, and this code is not an ethics approval.** Confirm which mode your approval covers before using real students' data; switching to
    `true` later makes default (`implied`) participants stop being recorded until they agree.
 1. **Ethics approval.** Get approval from your institution's ethics board for this design, and
    check the participant information text in `research.js` (`open()`) against your protocol.
@@ -39,18 +39,9 @@ show associations between engagement and quiz performance, **not** learning gain
    `contact: 'Your Name, you@psut.edu.jo'`, `ethics: 'Approved by … (ref. …)'`). They are shown in
    the consent dialog only when filled in. If the approved wording differs, edit the text and bump
    `consentVersion` — everyone is then asked again, and nothing is recorded until they answer.
-2. **Firebase console** (project `object-oriented-programm-95ff5`):
-   - *Authentication → Sign-in method → Add new provider → **Anonymous** → Enable.* Without it,
-     consenting students' data stays in their browser and is never saved.
-   - *Firestore Database → Rules:* paste the whole of [`firestore.rules`](../firestore.rules) and
-     **Publish** (it contains both the sync rules and the research rules).
-   - Optional: *Authentication → Settings → User account cleanup* (needs Identity Platform) to
-     delete old anonymous accounts automatically.
-3. **GA4** (optional, for reports on the new events): register the custom dimensions/metrics in
-   [GA4-ENGAGEMENT-TRACKING.md](GA4-ENGAGEMENT-TRACKING.md#41-register-custom-dimensions-required).
-4. **Export credentials:** *Project settings → Service accounts → Generate new private key.* Store the
-   JSON file **outside this repository** (e.g. `~/secure/oop-research-sa.json`), readable only by
-   you. It grants full database access — never commit it, email it or put it in the website.
+2. **Firebase console, GA4 and export key** — every step outside the code, plus a production
+   smoke test and the GA4 DebugView checklist, is in
+   [RESEARCH-PRODUCTION.md](RESEARCH-PRODUCTION.md). None of it is done yet.
 
 Turning research off: set `research: null` in `config.js`. The quizzes keep working.
 
@@ -84,7 +75,7 @@ never re-enrolled automatically. Signing in with Google for progress sync is unr
   no name, email, Google uid, IP address or free text. Security rules reject research writes from
   Google-signed-in accounts.
 - **One ID per browser.** A student who takes part on two devices appears as two participants
-  (documented limitation, §9). Linking devices would need an identifier tied to the account, which
+  (documented limitation, §10). Linking devices would need an identifier tied to the account, which
   the design deliberately avoids.
 - **Consent record** `researchParticipants/{researchId}`: `consentStatus` (`granted` = agreed in the
   dialog, `implied` = taking part by default, `withdrawn`), `consentVersion`, `consentedAt` (agreement
@@ -95,6 +86,10 @@ never re-enrolled automatically. Signing in with Google for progress sync is unr
   record are deleted, and the anonymous account is deleted. If the browser is offline, deletion is
   retried on the next visit; until then the record is excluded from the export (not `granted`).
   Align this "delete on withdrawal" behaviour with your ethics protocol.
+- **Never recorded:** visitors who never open a topic page (no research account is created until a
+  study session needs saving), browsers that keep no storage (every page would otherwise start a new
+  participant), search-engine crawlers (user agent containing bot/crawl/spider/slurp/lighthouse),
+  and anyone who opted out or withdrew — they are not re-enrolled.
 - **GA4** receives no answers, research IDs, session IDs, names or emails (§6).
 
 ---
@@ -134,6 +129,9 @@ So a refresh never creates a new session, and sessions of different topics may o
   that reached the bottom of the window, where content = from the top of `<main>` to the top of the
   quiz block. Measured continuously (on scroll and at load), not GA4's single 90% event; a page
   shorter than the window scores 100 at load; scrolling back up never lowers it.
+- **Topic completion** (`topicCompleted`): whether the topic was marked with *Mark as completed* at the
+  session's latest recorded activity (self-reported, independent of the quiz). Toggles during the
+  session are also counted (`lesson_complete` / `lesson_uncomplete` interactions).
 - **Last activity** (`lastActiveAt`): end of the last credited active moment, or the last page view.
 
 **Saving.** Every change is written to `localStorage` first (at most 5 s of data at risk), then to
@@ -160,6 +158,9 @@ finished sessions wait locally if Firestore is unreachable (offline, Anonymous s
     `quiz_prior_attempts = 0` for a first-ever exposure.
 - Duplicate submissions: the form ignores repeat submits of the same attempt, and research.js
   records one entry per started attempt.
+- An attempt belongs to the session that is open when it is **submitted**. If a student opens the
+  quiz, leaves it idle past the 30-minute timeout and then submits, it is recorded in the new
+  session (its `started_at` is then earlier than `session_started_at`).
 - **Integrity.** Scores are computed in the browser, so they are not tamper-proof. Mitigations: the
   stored answers are re-scored against `quiz-data.js` at export (`score_verified`); rules bound
   every value, keep counters monotonic and make attempts append-only. True server-side scoring would
@@ -207,7 +208,7 @@ researchParticipants/{researchId}/sessions/{sessionId}
   quizAttemptCount, quizPriorAttempts,
   quizAttempts: { <attemptId>: { attemptNumber, quizVersion, score, correctCount,
                                  questionCount, answers[], startedAt, submittedAt } },
-  interactions: { lesson_complete: n, learning_resource_click: n, … }, interactionsTracked,
+  interactions: { lesson_complete: n, learning_resource_click: n, … }, interactionsTracked, topicCompleted,
   consentVersion, schemaVersion, updatedAt
 ```
 
@@ -283,6 +284,7 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 | `quiz_prior_attempts` | integer ≥ 0 | attempts on this topic in earlier sessions (same browser) |
 | `quiz_started_at` | datetime / empty | first time the quiz was opened in the session |
 | `quiz_completed_at` | datetime / empty | submission time of the first attempt |
+| `topic_completed` | 1 / 0 / empty | topic marked "completed" at the session's latest activity (self-reported); empty for records saved before this field existed |
 | `interactions_tracked` | 1 / 0 | 0 = interaction counting was unavailable (analytics.js blocked) → the `*_count` columns are empty |
 | `lesson_complete_count`, `lesson_uncomplete_count` | integer / empty | "Mark as completed" turned on / off during the session |
 | `learning_resource_click_count` | integer / empty | notes, videos, code examples, past quizzes/labs opened from the page |
@@ -312,7 +314,39 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 
 ---
 
-## 10. Limitations (report these)
+## 10. Methodology and limitations (report these)
+
+**Design statements**
+
+- The study is **observational**. Nothing is assigned or manipulated.
+- **Quiz participation is optional**, so the quiz-score sample is self-selected (**self-selection
+  bias**).
+- **Quiz performance is not learning improvement.** There is no pre-test, so a score is a one-time
+  outcome, not a gain.
+- **Engagement does not establish causation.** Associations between engagement metrics and scores
+  can reflect prior knowledge, motivation or other confounders.
+- **Predictive validity needs validation.** If a model is used to *predict* quiz performance from
+  engagement metrics, report its performance on held-out data (k-fold cross-validation or a
+  held-out participant set), not only in-sample R².
+- **Implied participation** (`askConsent: false`) is not formal consent and does not replace ethics
+  approval.
+
+**Analysis notes for the supported analyses**
+
+- *Unit of analysis* is the study session. Sessions are **nested in participants** (and topics), so
+  observations are not independent: use cluster-robust standard errors by `research_id`, or mixed
+  models with participant and topic effects.
+- *Descriptive statistics:* report per topic and overall; include the share of sessions with
+  `quiz_status = completed` and compare engagement between quiz-takers and non-takers (selection).
+- *Correlation:* engagement time, page views and scroll depth are skewed — prefer Spearman, or
+  log-transform time (`log1p`).
+- *Multiple regression* (traditional metrics → quiz score): restrict to first exposure
+  (`quiz_prior_attempts = 0`, verified scores), check collinearity between the engagement metrics
+  (VIF), and keep topic as a factor because topics differ in difficulty.
+- *Comparing traditional vs learning-specific indicators:* `topic_completed` (self-reported) and the
+  interaction counts are the learning-specific behaviour indicators; the quiz score is the outcome.
+
+**Measurement limitations**
 
 - **No pre-test**: the data cannot measure learning gain; quiz score is an outcome measured once.
 - **Self-selection**: quiz-taking is optional (and so is consent in opt-in mode); quiz-takers may be
@@ -340,7 +374,7 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 | Command | What it checks |
 |---|---|
 | `npm run test:research` | timer (idle, hidden, no double counting), question bank shape, scoring, export logic (consent filter, missing values, re-scoring, CSV) |
-| `npm run emulators` then `npm run verify:research` | 107 browser checks against the Firebase emulators: quizzes on all 10 topics, both consent modes (opt-in: consent / decline; default: no prompt, opt-out deletes, earlier "no" respected), sessions, page views, active time, idle, hidden tab, scroll depth, quiz attempts, interactions, second tab, session timeout, 25 security-rule cases, CSV export, withdrawal, sync still working and kept separate |
+| `npm run emulators` then `npm run verify:research` | 126 browser checks against the Firebase emulators: quizzes on all 10 topics; both consent modes (opt-in: consent / decline; default: no prompt, opt-out deletes, earlier "no" respected); sessions, page views, active time, idle, hidden tab, scroll depth, topic completion, quiz attempts, interactions, second tab, session timeout; offline save and resync; no research account for Home-only visitors, crawlers or blocked storage; 26 security-rule cases; GA4 payloads (valid, no ids/answers/emails, no duplicates); CSV export (unique ids, ranges, no personal data); withdrawal; Google sync still working and separate; existing features (completion, bookmarks, dashboard, achievements, pager, theme, search, code viewer) |
 | `npm run verify:analytics`, `npm run test:sync`, `npm run verify` | existing GA4, sync and content-preservation suites |
 
 The browser suite rewrites `config.js` on the fly (emulators, project `demo-oop`, short timings) and

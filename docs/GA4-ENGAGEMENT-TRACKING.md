@@ -309,10 +309,13 @@ preservation) produces identical output before and after this work.
    parameters. Expected sequence for one topic: `page_view` → `lesson_complete` (`lesson_id`,
    `lesson_name`, `completion_method = manual`).
 4. Debug traffic is flagged as developer traffic, so the Developer-traffic filter (4.4) can remove it.
+5. Full checklist including the research events: [RESEARCH-PRODUCTION.md §3](RESEARCH-PRODUCTION.md#3-ga4-debugview).
 
 | Action on the site | Expected in DebugView |
 |---|---|
-| Open any page | `page_view` only — no custom event |
+| Open a non-topic page | `page_view` only — no custom event |
+| Open a topic page (new study session) | `page_view` + `study_session_started` (`lesson_id`); a refresh within 30 min sends `page_view` only |
+| *Take quiz* / *Submit answers* | `quiz_started` / `quiz_completed` (`lesson_id`, `quiz_score`) |
 | *Mark as completed* (off → on) | `lesson_complete` |
 | *Mark as completed* (on → off) | `lesson_uncomplete` |
 | Labs → *Mark done* | `lab_complete` / `lab_uncomplete` with `lab_number` |

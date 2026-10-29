@@ -112,7 +112,7 @@ function session(over) {
     researchId: 'r1', sessionId: 's1', topicId: 'dma', startedAt: d('10:00:00'), lastActiveAt: d('10:20:00'), endedAt: null,
     engagementTimeSeconds: 900, pageViews: 2, maxScrollDepth: 87, quizStatus: 'not_started', quizStartedAt: null,
     quizCompletedAt: null, quizScore: null, quizLastScore: null, quizAttemptCount: 0, quizPriorAttempts: 0, quizAttempts: {},
-    interactions: { lesson_complete: 1 }, interactionsTracked: true, consentVersion: 1, schemaVersion: 1, updatedAt: d('10:20:05')
+    interactions: { lesson_complete: 1 }, interactionsTracked: true, topicCompleted: true, consentVersion: 1, schemaVersion: 1, updatedAt: d('10:20:05')
   }, over);
 }
 const data = {
@@ -161,6 +161,11 @@ test('open sessions: inferred end after the timeout, recorded end kept', () => {
   assert.strictEqual(byId('s2').session_end_source, 'recorded');
   const fresh = ex.build(data, quiz, 30 * 60000, d('10:30:00')).sessionRows.find((r) => r.session_id === 's1');
   assert.deepStrictEqual([fresh.session_ended_at, fresh.session_end_source], [null, 'open']);
+});
+test('topic completion exported as 1/0, empty for records without it', () => {
+  assert.strictEqual(byId('s1').topic_completed, 1);
+  const r = ex.build({ participants: { r1: { consentStatus: 'granted' } }, sessions: [session({ topicCompleted: false }), session({ sessionId: 'old', topicCompleted: undefined })] }, quiz, 30 * 60000, d('12:00:00'));
+  assert.deepStrictEqual(r.sessionRows.map((x) => x.topic_completed).sort(), [0, null].sort());
 });
 test('interaction counts: 0 when tracked but none, empty when not tracked', () => {
   assert.strictEqual(byId('s1').lesson_complete_count, 1);
