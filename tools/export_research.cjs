@@ -5,8 +5,8 @@
  *   research_sessions.csv       one row per study session
  *   research_quiz_attempts.csv  one row per submitted quiz attempt
  *
- * Only participants whose consent record says "granted" are exported (withdrawn, deleted or unknown
- * participants are left out). Missing values are empty cells, never 0, so pandas reads them as NaN and
+ * Only participants whose consent record says "granted" (agreed) or "implied" (taking part by default,
+ * never opted out) are exported; withdrawn, deleted or unknown participants are left out. Missing values are empty cells, never 0, so pandas reads them as NaN and
  * SPSS as system-missing. Times are UTC, "YYYY-MM-DD HH:MM:SS". Column meanings: docs/RESEARCH.md.
  * Quiz scores are recomputed from the stored answers and the answer key in assets/js/quiz-data.js
  * (`*_verified` columns), because the browser that submitted them cannot be trusted.
@@ -99,12 +99,14 @@ async function fetchAll(project, auth) {
 
 /* ───────────── Rows ───────────── */
 
+/** Consent states that are exported (see docs/RESEARCH.md §3). */
+const ENROLLED = ['granted', 'implied'];
 const INTERACTIONS = ['lesson_complete', 'lesson_uncomplete', 'learning_resource_click', 'code_copy', 'code_file_view', 'lab_complete', 'lab_uncomplete'];
 
 const SESSION_COLUMNS = ['research_id', 'session_id', 'topic_id', 'session_started_at', 'session_last_active_at', 'session_ended_at',
   'session_end_source', 'engagement_time_seconds', 'page_views', 'max_scroll_depth', 'quiz_status', 'quiz_score', 'quiz_score_verified',
   'quiz_last_score', 'quiz_best_score', 'quiz_attempt_count', 'quiz_prior_attempts', 'quiz_started_at', 'quiz_completed_at',
-  'interactions_tracked'].concat(INTERACTIONS.map((n) => n + '_count'), ['consent_version', 'schema_version', 'updated_at']);
+  'interactions_tracked'].concat(INTERACTIONS.map((n) => n + '_count'), ['consent_status', 'consent_version', 'schema_version', 'updated_at']);
 
 const ATTEMPT_COLUMNS = ['research_id', 'session_id', 'topic_id', 'attempt_id', 'attempt_number', 'quiz_prior_attempts', 'quiz_version',
   'question_count', 'correct_count', 'score_reported', 'score_recomputed', 'score_verified', 'started_at', 'submitted_at',
@@ -131,11 +133,11 @@ function build(data, quiz, timeoutMs, now) {
   const attemptRows = [];
   const stats = { participants: 0, excludedParticipants: 0, sessions: 0, excludedSessions: 0, attempts: 0, unverified: 0 };
   Object.keys(data.participants).forEach((rid) => {
-    if (data.participants[rid].consentStatus === 'granted') stats.participants++; else stats.excludedParticipants++;
+    if (ENROLLED.includes(data.participants[rid].consentStatus)) stats.participants++; else stats.excludedParticipants++;
   });
   data.sessions.forEach((s) => {
     const p = data.participants[s.researchId];
-    if (!p || p.consentStatus !== 'granted') { stats.excludedSessions++; return; }
+    if (!p || !ENROLLED.includes(p.consentStatus)) { stats.excludedSessions++; return; }
     stats.sessions++;
     const attempts = Object.keys(s.quizAttempts || {}).map((id) => Object.assign({ id }, s.quizAttempts[id]))
       .sort((a, b) => a.attemptNumber - b.attemptNumber);
@@ -166,7 +168,7 @@ function build(data, quiz, timeoutMs, now) {
       quiz_last_score: s.quizLastScore, quiz_best_score: scores.length ? Math.max.apply(null, scores) : null,
       quiz_attempt_count: s.quizAttemptCount, quiz_prior_attempts: s.quizPriorAttempts,
       quiz_started_at: time(s.quizStartedAt), quiz_completed_at: time(s.quizCompletedAt),
-      interactions_tracked: flag(s.interactionsTracked), consent_version: s.consentVersion,
+      interactions_tracked: flag(s.interactionsTracked), consent_status: p.consentStatus, consent_version: s.consentVersion,
       schema_version: s.schemaVersion, updated_at: time(s.updatedAt)
     };
     INTERACTIONS.forEach((n) => { row[n + '_count'] = s.interactionsTracked ? (s.interactions || {})[n] || 0 : null; });
@@ -208,7 +210,7 @@ async function main() {
   fs.writeFileSync(path.join(out, 'research_quiz_attempts.csv'), csv(ATTEMPT_COLUMNS, result.attemptRows));
   const s = result.stats;
   console.log('Project ' + project + (process.env.FIRESTORE_EMULATOR_HOST ? ' (emulator)' : ''));
-  console.log('Participants exported: ' + s.participants + '   left out (not consenting): ' + s.excludedParticipants);
+  console.log('Participants exported: ' + s.participants + '   left out (withdrawn): ' + s.excludedParticipants);
   console.log('Sessions exported:     ' + s.sessions + '   left out: ' + s.excludedSessions);
   console.log('Quiz attempts:         ' + s.attempts + '   score not verified: ' + s.unverified);
   console.log('Wrote ' + path.join(out, 'research_sessions.csv') + ' and research_quiz_attempts.csv');

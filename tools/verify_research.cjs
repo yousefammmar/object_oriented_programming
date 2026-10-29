@@ -14,6 +14,8 @@
  *   E  Firestore security rules (other participants, Google accounts, tampering, consent)
  *   F  admin CSV export of the emulator data
  *   G  withdrawal deletes everything and stops recording; sync data untouched
+ *   H  askConsent: false — recorded by default with no prompt, opt-out deletes, earlier "no" respected
+ * Groups B–G run with askConsent: true (ask first); H with askConsent: false (the config default).
  *
  * Usage:
  *   npm run emulators                      # terminal 1 (auth :9099, firestore :8080, project demo-oop)
@@ -70,7 +72,7 @@ function config(t) {
   const src = fs.readFileSync(path.join(ROOT, 'assets/js/config.js'), 'utf8')
     .replace(/projectId: '[^']+'/, "projectId: 'demo-oop'")
     .replace('firebase: {', 'firebase: {\n      emulators: true,')
-    .replace(/research: \{[^}]*\}/, 'research: { consentVersion: 1, idleSeconds: ' + t.idle + ', sessionMinutes: ' + t.session +
+    .replace(/research: \{[^}]*\}/, 'research: { askConsent: ' + (t.ask !== false) + ', consentVersion: 1, idleSeconds: ' + t.idle + ', sessionMinutes: ' + t.session +
       ', saveSeconds: 5, contact: \'\', ethics: \'\' }');
   if (!/emulators: true/.test(src) || !/sessionMinutes: [\d.]+, saveSeconds: 5/.test(src)) throw new Error('could not rewrite config.js');
   return src;
@@ -111,7 +113,7 @@ async function context(browser, timings, consent) {
   });
   if (consent) {
     await ctx.addInitScript((c) => { if (!localStorage.getItem('oop-research-consent')) localStorage.setItem('oop-research-consent', c); },
-      JSON.stringify({ status: 'granted', version: 1, at: Date.now() }));
+      JSON.stringify({ status: consent === true ? 'granted' : consent, version: 1, at: Date.now() }));
   }
   return ctx;
 }
@@ -482,6 +484,47 @@ async function withdrawal(ctx, page, rid, tmp) {
   check('G export no longer contains the withdrawn participant', !after.sessions.some((r) => r.research_id === rid) && !after.attempts.some((r) => r.research_id === rid));
 }
 
+async function optOutMode(browser) {
+  const known = new Set((await list('researchParticipants')).map((p) => p.id));
+  const fresh = async () => (await list('researchParticipants')).filter((p) => !known.has(p.id));
+  const ctx = await context(browser, { idle: 3, session: 5, ask: false }, false);
+  const page = await open(ctx, 'polymorphism.html');
+  check('H no invitation or dialog; sidebar says "taking part"', !(await page.$('#researchPrompt')) && !(await page.$('#researchDlg')) &&
+    (await page.textContent('#sbResearch')).includes('taking part') && !(await page.textContent('#sbResearch')).includes('not taking part'));
+  check('H recorded by default as "implied" (no click needed)', (await ls(page, 'research-consent')).status === 'implied');
+  const p = await poll(async () => { const f = await fresh(); return f.length === 1 && f[0]; });
+  const rid = p && p.id;
+  check('H consent record saved with consentStatus "implied"', p && p.consentStatus === 'implied', p);
+  const s = rid && await poll(async () => { const x = await sessions(rid); return x.length === 1 && x[0]; });
+  check('H study session saved straight away (topic polymorphism, 1 page view)', s && s.topicId === 'polymorphism' && s.pageViews === 1, s);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oop-export-'));
+  const row = exportCsv(tmp).sessions.find((r) => r.research_id === rid);
+  check('H export includes default participants, marked consent_status "implied"', row && row.consent_status === 'implied', row);
+  await page.click('#sbResearch button');
+  check('H sidebar dialog explains the recording and offers opt-out', (await page.textContent('#researchDlg')).includes('While you take part') &&
+    await page.isVisible('#researchDlg >> text=Withdraw and delete my data'));
+  await page.click('#researchDlg >> text=Withdraw and delete my data');
+  const gone = await poll(async () => (await fresh()).length === 0 && (await sessions(rid)).length === 0);
+  check('H opting out deletes the data', gone, await fresh());
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.getElementById('sbResearch'));
+  await wiggle(page, 1500);
+  await visibility(page, 'hidden');
+  await sleep(3000);
+  check('H after opting out: not re-enrolled on reload, nothing recorded', (await ls(page, 'research-consent')).status === 'withdrawn' &&
+    !(await ls(page, 'research-open')) && (await fresh()).length === 0 && (await page.textContent('#sbResearch')).includes('not taking part'));
+  await ctx.close();
+
+  const ctx2 = await context(browser, { idle: 3, session: 5, ask: false }, 'declined');
+  const page2 = await open(ctx2, 'polymorphism.html');
+  await wiggle(page2, 1500);
+  await visibility(page2, 'hidden');
+  await sleep(3000);
+  check('H a browser that already said "No thanks" is not enrolled', (await ls(page2, 'research-consent')).status === 'declined' &&
+    !(await ls(page2, 'research-open')) && (await fresh()).length === 0);
+  await ctx2.close();
+}
+
 (async function main() {
   try { await fetch(FS); } catch (e) { console.error('Firestore emulator not running on :8080 — start it with: npm run emulators'); process.exit(1); }
   await fetch(FS + '/emulator/v1/projects/demo-oop/databases/(default)/documents', { method: 'DELETE' });
@@ -499,6 +542,7 @@ async function withdrawal(ctx, page, rid, tmp) {
     const tmp = await exporting(p.rid);
     await withdrawal(p.ctx, p.page, p.rid, tmp);
     await p.ctx.close();
+    await optOutMode(browser);
   } catch (e) {
     failed++;
     console.log('FAIL crashed: ' + (e && e.stack));

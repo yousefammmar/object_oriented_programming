@@ -116,7 +116,7 @@ function session(over) {
   }, over);
 }
 const data = {
-  participants: { r1: { consentStatus: 'granted' }, r2: { consentStatus: 'withdrawn' } },
+  participants: { r1: { consentStatus: 'granted' }, r2: { consentStatus: 'withdrawn' }, r3: { consentStatus: 'implied' } },
   sessions: [
     session(),
     session({ sessionId: 's2', endedAt: d('11:00:00'), quizStatus: 'completed', quizScore: 100, quizLastScore: 25, quizAttemptCount: 2,
@@ -127,15 +127,17 @@ const data = {
     session({ sessionId: 's3', quizStatus: 'completed', quizScore: 100, quizLastScore: 100, quizAttemptCount: 1, interactionsTracked: false,
       quizAttempts: { c: { attemptNumber: 1, quizVersion: 1, score: 100, correctCount: 8, questionCount: 8, answers: [0, 0, 0, 0, 0, 0, 0, 0], startedAt: d('10:00:00'), submittedAt: d('10:01:00') } } }),
     session({ researchId: 'r2', sessionId: 'x1' }),
+    session({ researchId: 'r3', sessionId: 'i1' }),
     session({ researchId: 'r9', sessionId: 'x2' })
   ]
 };
 const out = ex.build(data, quiz, 30 * 60000, d('12:00:00'));
 const byId = (id) => out.sessionRows.find((r) => r.session_id === id);
 
-test('only consenting participants are exported (withdrawn and unknown left out)', () => {
-  assert.deepStrictEqual(out.sessionRows.map((r) => r.session_id).sort(), ['s1', 's2', 's3']);
+test('granted and implied participants are exported; withdrawn and unknown are left out', () => {
+  assert.deepStrictEqual(out.sessionRows.map((r) => r.session_id).sort(), ['i1', 's1', 's2', 's3']);
   assert.strictEqual(out.stats.excludedSessions, 2);
+  assert.deepStrictEqual([byId('s1').consent_status, byId('i1').consent_status], ['granted', 'implied']);
 });
 test('no quiz → empty score cells (missing), not 0', () => {
   const r = byId('s1');

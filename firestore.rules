@@ -25,12 +25,13 @@ service cloud.firestore {
 
       allow read, delete: if isOwner();
 
-      // Consent record: created as 'granted'. Later it may only be re-confirmed (same or newer
-      // information-sheet version) or changed to 'withdrawn' — never back from 'withdrawn'.
+      // Consent record: created as 'granted' (agreed in the dialog) or 'implied' (taking part by default,
+      // config askConsent: false). Later it may only be re-confirmed (same or newer information-sheet
+      // version) or changed to 'withdrawn' — never back from 'withdrawn'.
       allow create: if isOwner()
         && request.resource.data.keys().hasOnly(['researchId', 'consentStatus', 'consentVersion', 'consentedAt', 'updatedAt'])
         && request.resource.data.researchId == rid
-        && request.resource.data.consentStatus == 'granted'
+        && request.resource.data.consentStatus in ['granted', 'implied']
         && request.resource.data.consentVersion is int
         && request.resource.data.consentedAt is timestamp
         && request.resource.data.updatedAt == request.time;
@@ -38,7 +39,7 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['consentStatus', 'consentVersion', 'consentedAt', 'withdrawnAt', 'updatedAt'])
         && request.resource.data.updatedAt == request.time
-        && ((resource.data.consentStatus == 'granted' && request.resource.data.consentStatus == 'granted'
+        && ((resource.data.consentStatus in ['granted', 'implied'] && request.resource.data.consentStatus in ['granted', 'implied']
               && request.resource.data.consentVersion is int
               && request.resource.data.consentVersion >= resource.data.consentVersion
               && request.resource.data.consentedAt is timestamp)

@@ -22,6 +22,17 @@ show associations between engagement and quiz performance, **not** learning gain
 
 ## 1. Before collecting real data
 
+0. **Consent mode** — `askConsent` in `config.js` → `research`:
+
+   | `askConsent` | Behaviour |
+   |---|---|
+   | `false` (current setting) | **No prompt.** Every visitor takes part by default (`consentStatus: implied`) from their first page load. The sidebar link "Research study: taking part" opens the information sheet, where they can opt out — which stops recording and deletes their data. |
+   | `true` | Opt-in. Nothing is recorded until the student clicks *I agree to take part* (invitation card on topic pages + the same dialog). |
+
+   Collecting research data **without asking** normally needs either explicit consent or a formal
+   waiver of consent from your ethics board, and may fall under Jordan's Personal Data Protection
+   Law. Confirm which mode your approval covers before using real students' data; switching to
+   `true` later makes default (`implied`) participants stop being recorded until they agree.
 1. **Ethics approval.** Get approval from your institution's ethics board for this design, and
    check the participant information text in `research.js` (`open()`) against your protocol.
    Fill in `contact` and `ethics` in `config.js` → `research` (plain text, e.g.
@@ -52,14 +63,16 @@ Turning research off: set `research: null` in `config.js`. The quizzes keep work
   (their answer, the correct one, a short explanation) → "Retake quiz". Optional for everyone,
   whether or not they take part in the study. It never marks a topic as completed; "Mark as
   completed" stays the only way to do that.
-- **Invitation** (bottom-right card) on topic pages until the student decides: *No thanks* or
-  *Learn more*. *Learn more* opens the participant information with *I agree to take part*.
-- **Sidebar link** on every page: "About the research study" / "Research study: taking part" /
-  "Research study: not taking part" → the same dialog, with *Withdraw and delete my data* for
-  participants (also shows their research ID, which they can quote to the research team).
+- **Sidebar link** on every page: "Research study: taking part" / "Research study: not taking part"
+  (or "About the research study" before an opt-in choice) → the participant information, with
+  *Withdraw and delete my data* for participants (also shows their research ID, which they can quote
+  to the research team).
+- Only with `askConsent: true`: an **invitation** (bottom-right card) on topic pages until the student
+  decides: *No thanks* or *Learn more* → the information with *I agree to take part*.
 
-Declining (or ignoring the card) changes nothing: no research code talks to Firebase, nothing is
-stored, and every feature works. Signing in with Google for progress sync is unrelated.
+Opting out (or, in opt-in mode, declining or ignoring the card) changes nothing else: no research
+code talks to Firebase, nothing is stored, and every feature works. A browser that opted out is
+never re-enrolled automatically. Signing in with Google for progress sync is unrelated.
 
 ---
 
@@ -73,8 +86,10 @@ stored, and every feature works. Signing in with Google for progress sync is unr
 - **One ID per browser.** A student who takes part on two devices appears as two participants
   (documented limitation, §9). Linking devices would need an identifier tied to the account, which
   the design deliberately avoids.
-- **Consent record** `researchParticipants/{researchId}`: `consentStatus` (`granted` / `withdrawn`),
-  `consentVersion`, `consentedAt`, `withdrawnAt`. The export includes only `granted` participants.
+- **Consent record** `researchParticipants/{researchId}`: `consentStatus` (`granted` = agreed in the
+  dialog, `implied` = taking part by default, `withdrawn`), `consentVersion`, `consentedAt` (agreement
+  or first page load), `withdrawnAt`. The export includes `granted` and `implied` participants and
+  says which in `consent_status`.
 - **Withdrawal** (sidebar → *Withdraw and delete my data*): recording stops at once, local research
   data is removed, the consent record is set to `withdrawn`, every session document and the consent
   record are deleted, and the anonymous account is deleted. If the browser is offline, deletion is
@@ -165,8 +180,8 @@ events are unchanged.
 |---|---|---|---|
 | `quiz_started` | "Take quiz" / "Retake quiz" | `lesson_id` | everyone |
 | `quiz_completed` | an attempt is submitted | `lesson_id`, `quiz_score` (0–100) | everyone |
-| `study_session_started` | a study session starts | `lesson_id` | participants only |
-| `study_session_completed` | a study session is closed (often on a later page load) | `lesson_id`, `study_active_sec`, `study_quiz_status` | participants only |
+| `study_session_started` | a study session starts | `lesson_id` | participants (everyone not opted out when `askConsent: false`) |
+| `study_session_completed` | a study session is closed (often on a later page load) | `lesson_id`, `study_active_sec`, `study_quiz_status` | participants |
 
 No answers, research IDs or session IDs are sent. `study_session_completed` is usually sent after
 the timeout, so GA4 attributes it to a later GA4 session.
@@ -204,7 +219,7 @@ sync data (`users/{uid}`), which is unchanged.
 
 - only the owning **anonymous** account can read, create, update or delete its records; nothing is
   readable by anyone else or without sign-in; Google accounts cannot write research data;
-- consent can be created only as `granted`, later re-confirmed or set to `withdrawn` — never back;
+- consent can be created only as `granted` or `implied`, later re-confirmed or set to `withdrawn` — never back;
 - session documents: fixed set of fields with types and ranges (score 0–100, scroll 0–100, page
   views ≥ 1, engagement ≤ 24 h …), `researchId`/`sessionId` must match the path, `updatedAt` must be
   the server time, `completed` ⇔ at least one attempt, attempt count = number of attempts;
@@ -272,7 +287,8 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 | `lesson_complete_count`, `lesson_uncomplete_count` | integer / empty | "Mark as completed" turned on / off during the session |
 | `learning_resource_click_count` | integer / empty | notes, videos, code examples, past quizzes/labs opened from the page |
 | `code_copy_count`, `code_file_view_count`, `lab_complete_count`, `lab_uncomplete_count` | integer / empty | other site interactions during the session (rare on topic pages) |
-| `consent_version` | integer | information-sheet version the participant agreed to |
+| `consent_status` | text | `granted` (agreed in the dialog) or `implied` (taking part by default, `askConsent: false`) |
+| `consent_version` | integer | information-sheet version shown when they agreed / were enrolled |
 | `schema_version` | integer | record format (currently 1) |
 | `updated_at` | datetime UTC | server time of the last save |
 
@@ -299,8 +315,9 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 ## 10. Limitations (report these)
 
 - **No pre-test**: the data cannot measure learning gain; quiz score is an outcome measured once.
-- **Self-selection**: consent and quiz-taking are both optional; participants and quiz-takers may be
+- **Self-selection**: quiz-taking is optional (and so is consent in opt-in mode); quiz-takers may be
   more motivated than other students. Compare `quiz_status` groups and report the proportions.
+  With `askConsent: false`, report that participation was by default with opt-out.
 - **Active time is an approximation**: a visible page with recent input is not proof of attention
   (an idle mouse over the page counts for up to `idleSeconds`); reading without touching anything
   for longer than `idleSeconds` is not counted; a visible-but-unfocused window still counts while
@@ -323,7 +340,7 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 | Command | What it checks |
 |---|---|
 | `npm run test:research` | timer (idle, hidden, no double counting), question bank shape, scoring, export logic (consent filter, missing values, re-scoring, CSV) |
-| `npm run emulators` then `npm run verify:research` | 98 browser checks against the Firebase emulators: quizzes on all 10 topics, consent / decline, sessions, page views, active time, idle, hidden tab, scroll depth, quiz attempts, interactions, second tab, session timeout, 25 security-rule cases, CSV export, withdrawal, sync still working and kept separate |
+| `npm run emulators` then `npm run verify:research` | 107 browser checks against the Firebase emulators: quizzes on all 10 topics, both consent modes (opt-in: consent / decline; default: no prompt, opt-out deletes, earlier "no" respected), sessions, page views, active time, idle, hidden tab, scroll depth, quiz attempts, interactions, second tab, session timeout, 25 security-rule cases, CSV export, withdrawal, sync still working and kept separate |
 | `npm run verify:analytics`, `npm run test:sync`, `npm run verify` | existing GA4, sync and content-preservation suites |
 
 The browser suite rewrites `config.js` on the fly (emulators, project `demo-oop`, short timings) and

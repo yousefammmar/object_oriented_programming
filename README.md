@@ -235,7 +235,7 @@ Script order (each page): `config → analytics → storage → theme → layout
 - **Continue learning, recently visited, bookmarks** on the Home dashboard.
 - **Code viewer**: line numbers, syntax highlighting, accessible tabs, copy with confirmation, wrap toggle, full screen, click a line to highlight it, deep links like `code-files.html#sep:12`. It is a viewer — it does **not** run code.
 - **Topic quizzes** (optional): 8 questions at the end of each Learn topic, score as a percentage, review of every answer with an explanation, unlimited retakes. Never marks a topic complete.
-- **Research study** (opt-in, off when `research: null` in `config.js`): consent dialog, anonymous study-session and quiz records in Firestore, withdrawal that deletes the data, admin CSV export. See [docs/RESEARCH.md](docs/RESEARCH.md).
+- **Research study** (off when `research: null` in `config.js`): anonymous study-session and quiz records in Firestore — everyone by default with opt-out from the sidebar (`askConsent: false`), or opt-in with a consent dialog (`askConsent: true`); withdrawal deletes the data; admin CSV export. See [docs/RESEARCH.md](docs/RESEARCH.md).
 - **All Links**: live filter that only hides rows while typing; clearing it shows everything.
 - **Themes**: light/dark (saved; follows the OS until you choose). **Reading mode** (`R`). **Shortcuts help** (`?`).
 - **Accessibility**: semantic headings, labelled controls, visible focus, focus-managed native `<dialog>`s, `aria-current`/`aria-pressed`/`aria-live` status, reduced-motion support, touch targets ≥ 44px on touch devices.

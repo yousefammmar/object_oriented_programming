@@ -1,8 +1,10 @@
 /**
  * research.js — OPT-IN research data collection (study sessions + quiz results). docs/RESEARCH.md
  *
- * Off unless OOP.config.research and OOP.config.firebase are set. Even then nothing is recorded and
- * no Firebase code is loaded until the student agrees in the consent dialog; declining changes nothing.
+ * Off unless OOP.config.research and OOP.config.firebase are set. Consent mode (`askConsent`):
+ *   true  – nothing is recorded and no Firebase code is loaded until the student agrees in the dialog
+ *   false – every visitor takes part by default (status 'implied'); no prompt is shown, and the sidebar
+ *           link "Research study" explains what is recorded and lets them opt out (which deletes it)
  *
  * Identity: a consenting browser signs in ANONYMOUSLY on a separate Firebase app named "research", so
  * the research ID is a random uid that is never linked to the Google sign-in used by sync.js.
@@ -93,18 +95,19 @@
     return [h.slice(0, 8), h.slice(8, 12), h.slice(12, 16), h.slice(16, 20), h.slice(20)].join('-');
   }
 
-  /** { status: 'granted' | 'declined' | 'withdrawn', version, at, registered?, purged? } or null */
+  /** { status: 'granted' | 'implied' | 'declined' | 'withdrawn', version, at, registered?, purged? } or null */
   function consent() { return OOP.store.getJSON(K.consent, null); }
   function setConsent(c) { OOP.store.setJSON(K.consent, c); }
-  /** Agreed to the CURRENT information sheet. After a change (new consentVersion) nothing is recorded until asked again. */
+  function optedOut(c) { return !!c && (c.status === 'declined' || c.status === 'withdrawn'); }
+  /**
+   * Recording this browser? 'implied' counts only while askConsent is off. 'granted' must be for the
+   * CURRENT information sheet: after a change (new consentVersion) nothing is recorded until asked again.
+   */
   function participating() {
     const c = consent();
-    return !!c && c.status === 'granted' && c.version === cfg.consentVersion;
+    return !!c && ((c.status === 'implied' && !cfg.askConsent) || (c.status === 'granted' && c.version === cfg.consentVersion));
   }
-  function decided() {
-    const c = consent();
-    return participating() || (!!c && c.status !== 'granted');
-  }
+  function decided() { return participating() || optedOut(consent()); }
 
   function readOpen() { return OOP.store.getJSON(K.open, {}); }
   function writeOpen(map) { OOP.store.setJSON(K.open, map); }
@@ -382,7 +385,7 @@
       const ref = db.collection('researchParticipants').doc(u.uid);
       const jobs = [];
       if (c.registered !== u.uid + ':' + c.version) {
-        jobs.push(ref.set({ researchId: u.uid, consentStatus: 'granted', consentVersion: c.version, consentedAt: ts(c.at), updatedAt: serverTime() })
+        jobs.push(ref.set({ researchId: u.uid, consentStatus: c.status === 'implied' ? 'implied' : 'granted', consentVersion: c.version, consentedAt: ts(c.at), updatedAt: serverTime() })
           .then(function () {
             const c2 = consent();
             if (c2 && c2.status === 'granted') { c2.registered = u.uid + ':' + c.version; setConsent(c2); }
@@ -464,8 +467,10 @@
     const body = [
       el('h2', { id: 'researchTitle', text: 'Research study: web analytics and learning' }),
       el('p', { text: 'This site is part of a study asking whether common website measures — time on a page, page views and how far you scroll — reflect meaningful learning, compared with scores on the optional topic quizzes. It is observational: it looks for relationships between these numbers. It does not grade you.' }),
-      el('p', { text: 'Taking part is voluntary. If you say no, nothing changes: every page, quiz and feature works the same.' }),
-      el('h3', { text: 'If you agree, this browser records' }),
+      el('p', { text: cfg.askConsent
+        ? 'Taking part is voluntary. If you say no, nothing changes: every page, quiz and feature works the same.'
+        : 'Taking part is voluntary. You can opt out below at any time, and every page, quiz and feature keeps working the same.' }),
+      el('h3', { text: cfg.askConsent ? 'If you agree, this browser records' : 'While you take part, this browser records' }),
       list([
         'A random research ID made for this browser — not your name, email or Google account',
         'Which of the ten topic pages you study, when, and how long you are active on them',
@@ -477,7 +482,7 @@
       list([
         'Your name, email address or Google account (signing in to sync progress is not linked to this)',
         'Anything you type, and your IP address',
-        'Anything before you agree or after you withdraw'
+        cfg.askConsent ? 'Anything before you agree or after you withdraw' : 'Anything after you opt out'
       ]),
       el('p', { text: 'The data is stored in this site\'s Google Firebase project and only the research team can export it. Each browser has its own research ID, so taking part on another device is a separate choice.' }),
       el('p', { text: 'You can withdraw at any time from "Research study" in the sidebar. Withdrawing stops recording and deletes the research data collected from this browser.' })
@@ -493,9 +498,10 @@
       b.addEventListener('click', function () { dlg.close(); fn(); });
       return b;
     };
-    const agreedBefore = !!c && c.status === 'granted'; // possibly to an older version of this sheet
+    // Has (or may have) data to delete: agreed, possibly to an older sheet, or enrolled by default.
+    const enrolled = !!c && (c.status === 'granted' || c.status === 'implied');
     body.push(el('div', { class: 'dialog-actions' }, [
-      agreedBefore ? btn('btn--ghost btn--danger', 'Withdraw and delete my data', withdraw) : btn('btn--ghost', 'No thanks', decline),
+      enrolled ? btn('btn--ghost btn--danger', 'Withdraw and delete my data', withdraw) : btn('btn--ghost', 'No thanks', decline),
       on ? btn('btn--primary', 'Keep taking part', function () {}) : btn('btn--primary', 'I agree to take part', grant)
     ]));
     dlg.appendChild(el('div', { class: 'dialog-body' }, body));
@@ -511,14 +517,14 @@
     if (host) {
       host.textContent = '';
       const c = consent();
-      const label = participating() ? 'Research study: taking part' : c && c.status !== 'granted' ? 'Research study: not taking part' : 'About the research study';
+      const label = participating() ? 'Research study: taking part' : optedOut(c) ? 'Research study: not taking part' : 'About the research study';
       const b = el('button', { type: 'button', class: 'link-btn sb-research' }, [icon('flask'), el('span', { text: label })]);
       b.addEventListener('click', open);
       host.appendChild(b);
     }
     const old = document.getElementById('researchPrompt');
     if (old) old.remove();
-    if (!topic || decided()) return;
+    if (!topic || !cfg.askConsent || decided()) return;
     const more = el('button', { type: 'button', class: 'btn btn--primary', text: 'Learn more' });
     const no = el('button', { type: 'button', class: 'btn btn--ghost', text: 'No thanks' });
     more.addEventListener('click', open);
@@ -531,6 +537,8 @@
 
   function init() {
     if (location.protocol === 'file:') return;
+    // askConsent off: everyone takes part by default until they opt out from the sidebar.
+    if (!cfg.askConsent && !consent()) setConsent({ status: 'implied', version: cfg.consentVersion, at: now() });
     render();
     const c = consent();
     if (c && c.status === 'withdrawn' && !c.purged) purge().catch(function (e) { console.warn('[research] withdrawal not finished yet', e); });

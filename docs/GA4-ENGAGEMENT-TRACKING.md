@@ -158,7 +158,7 @@ The answers themselves are never sent.
 | `quiz_score` | number | `75` | `quiz_completed` only: correct / total × 100, rounded (8 questions) |
 
 ### `study_session_started` / `study_session_completed`
-Research participants only (opt-in, `research.js`; definitions in [RESEARCH.md](RESEARCH.md)).
+Research participants only (`research.js`; everyone who has not opted out while `askConsent` is false — definitions in [RESEARCH.md](RESEARCH.md)).
 A *study session* is one topic in one browser, ending after 30 min without activity — it is **not**
 a GA4 session. `study_session_completed` is usually sent on a later page load, after the timeout.
 No research or session ids are sent.
