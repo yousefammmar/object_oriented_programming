@@ -131,6 +131,8 @@ async function open(ctx, file) {
 }
 const ls = (page, key) => page.evaluate((k) => JSON.parse(localStorage.getItem('oop-' + k) || 'null'), key);
 const ga = (page, name) => page.evaluate((n) => (window.dataLayer || []).filter((a) => a[0] === 'event' && a[1] === n).map((a) => a[2]), name);
+/** participant_id values given to GA4 on this page, in order (gtag 'set' user_properties). */
+const upIds = (page) => page.evaluate(() => (window.dataLayer || []).filter((a) => a[0] === 'set' && a[1] === 'user_properties').map((a) => a[2].participant_id));
 function visibility(page, state) {
   return page.evaluate((s) => {
     Object.defineProperty(document, 'visibilityState', { value: s, configurable: true });
@@ -226,6 +228,7 @@ async function undecided(browser) {
   check('B declined: no invitation after reload, nothing recorded, no Firestore requests at all',
     !(await page.$('#researchPrompt')) && !(await ls(page, 'research-open')) && firestoreTraffic === 0, { firestoreTraffic });
   check('B declined: no study_session events in GA4', (await ga(page, 'study_session_started')).length === 0);
+  check('B undecided / declined: no participant_id in GA4', !(await upIds(page)).length && !(await upIds(home)).length);
   await ctx.close();
 }
 
@@ -247,12 +250,17 @@ async function participant(browser) {
   check('C study session saved: topic dma, 1 page view, quiz not_started, no score', s && s.topicId === 'dma' && s.pageViews === 1 &&
     s.quizStatus === 'not_started' && s.quizScore === null && s.endedAt === null && s.sessionId === s.id && s.researchId === rid, s);
   check('C study_session_started sent to GA4 (lesson_id only)', JSON.stringify(await ga(page, 'study_session_started')) === '[{"lesson_id":"dma"}]');
+  check('C GA4 user property participant_id = research ID once it exists', await poll(async () => (await upIds(page)).slice(-1)[0] === rid), await upIds(page));
   check('C sync sign-in is separate: still offers "Sign in with Google"', (await page.textContent('#sbAccount')).includes('Sign in with Google') &&
     await page.evaluate(() => firebase.auth().currentUser === null));
   const sid = s.id;
 
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.getElementById('sbResearch'));
+  check('C next page load: participant_id set at the start from the saved ID (before any GA4 event)', await page.evaluate((r) => {
+    const i = dataLayer.findIndex((a) => a[0] === 'set' && a[1] === 'user_properties' && a[2].participant_id === r);
+    return i > -1 && !dataLayer.slice(0, i).some((a) => a[0] === 'event');
+  }, rid), await upIds(page));
   s = await poll(async () => { const x = await sessions(rid); return x.length === 1 && x[0].pageViews === 2 && x[0]; });
   check('C refresh resumes the same session and counts a page view', s && s.id === sid, await sessions(rid));
 
@@ -500,6 +508,7 @@ async function withdrawal(ctx, page, rid, tmp, syncId) {
   const gone = await poll(async () => !(await get('researchParticipants/' + rid)) && (await sessions(rid)).length === 0);
   check('G withdrawal deletes the consent record and every session', gone, await sessions(rid));
   check('G withdrawal deletes the anonymous research account', !(await authUser(rid)));
+  check('G withdrawal removes participant_id from later GA4 hits', (await upIds(page)).slice(-1)[0] === null, await upIds(page));
   const c = await ls(page, 'research-consent');
   check('G local research data removed; withdrawal recorded as finished', c.status === 'withdrawn' && c.purged === true &&
     !(await ls(page, 'research-open')) && !(await ls(page, 'research-outbox')) && !(await ls(page, 'research-attempts')), c);
@@ -514,6 +523,7 @@ async function withdrawal(ctx, page, rid, tmp, syncId) {
   check('G after withdrawing nothing is recorded or saved', !(await ls(page, 'research-open')) && !(await get('researchParticipants/' + rid)) &&
     (await sessions(rid)).length === 0);
   check('G withdrawal does not touch the Google sync data', !!(await get('users/' + syncId)));
+  check('G after withdrawing: participant_id never set again', !(await upIds(page)).length, await upIds(page));
   const after = exportCsv(tmp);
   check('G export no longer contains the withdrawn participant', !after.sessions.some((r) => r.research_id === rid) && !after.attempts.some((r) => r.research_id === rid));
 }
@@ -528,6 +538,7 @@ async function optOutMode(browser) {
   const rid = await ridOf(page);
   const p = rid && await get('researchParticipants/' + rid);
   check('H consent record saved with consentStatus "implied"', p && p.consentStatus === 'implied', p);
+  check('H default participants: participant_id = research ID in GA4', await poll(async () => (await upIds(page)).includes(rid)), await upIds(page));
   const s = rid && await poll(async () => { const x = await sessions(rid); return x.length === 1 && x[0]; });
   check('H study session saved straight away (topic polymorphism, 1 page view)', s && s.topicId === 'polymorphism' && s.pageViews === 1, s);
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oop-export-'));
@@ -544,6 +555,7 @@ async function optOutMode(browser) {
   await wiggle(page, 1500);
   await visibility(page, 'hidden');
   await sleep(3000);
+  check('H after opting out: participant_id not set on reload', !(await upIds(page)).length, await upIds(page));
   check('H after opting out: not re-enrolled on reload, nothing recorded', (await ls(page, 'research-consent')).status === 'withdrawn' &&
     !(await ls(page, 'research-open')) && !(await get('researchParticipants/' + rid)) && (await page.textContent('#sbResearch')).includes('not taking part'));
   await ctx.close();

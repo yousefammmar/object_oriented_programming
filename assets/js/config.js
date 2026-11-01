@@ -49,7 +49,7 @@
      *   saveSeconds    – how often an open study session is saved to Firestore while it changes
      *   contact/ethics – plain text shown in the participant information when filled in
      */
-    research: { askConsent: false, consentVersion: 1, idleSeconds: 60, sessionMinutes: 30, saveSeconds: 60, contact: '', ethics: '' },
+    research: { askConsent: false, consentVersion: 2, idleSeconds: 60, sessionMinutes: 30, saveSeconds: 60, contact: '', ethics: '' },
 
     /**
      * Pages, in navigation order.

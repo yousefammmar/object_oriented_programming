@@ -15,7 +15,7 @@ been done or tested yet; the code was verified only against the local Firebase e
 | 5 | Check the sign-up quota | Authentication → Settings → *Sign-up quota* (Identity Platform projects) | Firebase limits new accounts per IP address per hour (100 by default). A whole class signing up from one lab/campus IP within an hour can hit it; affected students' data waits in their browser and is retried on later visits. Raise it for the pilot hour if possible |
 | 6 | (Optional) Anonymous-account cleanup | Authentication → Settings → *User account cleanup* (needs Identity Platform) | Removes long-unused anonymous accounts. Their research documents stay until you delete them |
 | 7 | Service-account key for exports | Project settings → Service accounts → *Generate new private key* → save **outside the repo** (e.g. `~/secure/oop-research-sa.json`, `chmod 600`) | Full database access: never commit, email or upload it. `.gitignore` blocks common key names |
-| 8 | Register GA4 custom definitions | GA4 → Admin → Custom definitions ([GA4 doc §4.1](GA4-ENGAGEMENT-TRACKING.md#41-register-custom-dimensions-required)) | Not retroactive — do it before the pilot |
+| 8 | Register GA4 custom definitions, including the **user-scoped** `participant_id`; turn Google signals off | GA4 → Admin → Custom definitions ([GA4 doc §4.1](GA4-ENGAGEMENT-TRACKING.md#41-register-custom-dimensions-required)) | Not retroactive — do it before the pilot |
 | 9 | Merge `experiment` → `main` and push | git (only when you decide) | GitHub Pages serves `main` |
 
 No new Firebase project, API key or config value is needed: the site uses the existing web config.
@@ -62,9 +62,11 @@ or `auth/admin-restricted-operation`). If step 3 stays empty: rules not publishe
 | *Take quiz* / *Retake quiz* | `quiz_started` | `lesson_id` |
 | *Submit answers* (all answered) | `quiz_completed` (once per attempt) | `lesson_id`, `quiz_score` 0–100 — **no answers** |
 | Come back after > 30 min idle, or load a page after that | `study_session_completed` | `lesson_id`, `study_active_sec`, `study_quiz_status` |
-| Sidebar → withdraw | no further `study_session_*` events | — |
+| Any hit after your research ID exists (e.g. *Mark as completed* on a topic page after ≥ 60 s) | user property `participant_id` | equals your research ID (sidebar → *Research study*) |
+| Sidebar → withdraw | no further `study_session_*` events; `participant_id` cleared | — |
 
-No event may contain a name, email, research ID, session ID or quiz answer. Debug traffic is
+No event parameter may contain a name, email, research ID, session ID or quiz answer; the research ID
+appears only as the user property `participant_id`. Debug traffic is
 marked as developer traffic (filter it out of reports as in the GA4 doc §4.4).
 
 ## 4. Status

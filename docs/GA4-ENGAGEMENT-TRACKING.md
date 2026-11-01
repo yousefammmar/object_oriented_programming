@@ -34,7 +34,9 @@ Design rules:
   multiply them. As a second guard, `track()` drops an *identical* event (same name and parameters)
   repeated within 1 second.
 - **No personal data.** Only ids, labels from the site's own config/page text and file names are sent.
-  Never names, e-mails, account ids, C++ code, search queries or anything a student types.
+  Never names, e-mails, C++ code, search queries or anything a student types. The one per-person
+  value is the user property `participant_id` (research participants only): their random research ID,
+  never a name, e-mail or Google account ([RESEARCH.md §6](RESEARCH.md)).
   Strings are capped at GA4's 100-character limit.
 - **No changes** to the Measurement ID, page views, localStorage keys/structure, buttons, CSS, course
   content, links or achievements. No backend, login, cookies or dependencies were added.
@@ -173,7 +175,7 @@ No research or session ids are sent.
 
 | What | Why |
 |---|---|
-| Quiz answers, research IDs | Answers are research data (Firestore, consenting students only); ids would link GA4 to the research record |
+| Quiz answers, study session IDs | Answers are research data (Firestore, participants only). The research ID is sent only as the user property `participant_id` (§4.1), never as an event parameter |
 | Video watching | No embedded players — every video opens on YouTube/Drive, so only the click is observable |
 | Progress reset, bookmarks, theme, reading mode, search queries | Not requested; search queries could contain personal text |
 | Page views, scroll, engagement time, outbound clicks | Already collected by the Google tag / Enhanced Measurement |
@@ -227,6 +229,16 @@ built-in dimension already uses that name.)
 | Study active seconds | Event | `study_active_sec` | Time → seconds |
 
 The other events are categorical; GA4's built-in *Event count*, *Total users* and *Sessions* are their measures.
+
+**User-scoped dimension** (*Custom dimensions → Create custom dimension → Scope: User*), research
+participants only — lets Explorations break GA4's own metrics down per participant:
+
+| Dimension name | Scope | User property |
+|---|---|---|
+| Participant ID | User | `participant_id` |
+
+Turn **Google signals off** (*Admin → Data collection and modification → Data collection*): with it on,
+GA4 may hide rows for small groups (data thresholds), which a per-participant breakdown always is.
 
 ### 4.2 Data retention (strongly recommended)
 *Admin → Data collection and modification → Data retention → Event data retention: 14 months.*
@@ -394,6 +406,12 @@ question is about the students a campaign *acquired* (later visits included).
 9. **GA4 processing:** custom dimensions are not retroactive; explorations are limited by data
    retention (default 2 months) and may be sampled or thresholded; your own test visits are
    included unless filtered (4.4).
-10. **No consent notice is shown.** No personal data is sent by these events, but GA4 itself uses
-    cookies and IP-derived location. Check your institution's research-ethics requirements on
-    informing participants.
+10. **No consent notice is shown.** No names or e-mails are sent, but GA4 itself uses cookies and
+    IP-derived location, and `participant_id` links a participant's GA4 data to their research record
+    (the information sheet says so). Check your institution's research-ethics requirements.
+11. **`participant_id` coverage.** It is set on each page once the research ID is known, so GA4's
+    automatic `page_view` of that page never carries it, and nothing before a participant's research ID
+    exists (their first topic visit, until the first save) is linked. GA4 keeps the value on its side
+    for the user's later hits — check in the pilot that each participant's page views and engagement
+    time appear under their ID. Opting out sends an empty value; withdrawn IDs disappear from
+    Firestore, so an inner join drops their GA4 rows.

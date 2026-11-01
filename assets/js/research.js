@@ -118,6 +118,17 @@
 
   function ga(name, params) { if (OOP.analytics) OOP.analytics.track(name, params); }
 
+  let gaId; // research ID last given to GA4 on this page (null = removed)
+  /**
+   * GA4 user property participant_id, so GA4 data can be matched with this participant's sessions.
+   * Set as soon as the research ID is known on each page (GA4 forgets it between pages); null on withdrawal.
+   */
+  function gaParticipant(id) {
+    if (id === gaId || !OOP.analytics || !OOP.analytics.setParticipant) return;
+    gaId = id;
+    OOP.analytics.setParticipant(id);
+  }
+
   /** End a session at its last active moment and queue it for saving. */
   function close(r) {
     r.endedAt = r.lastActiveAt;
@@ -344,6 +355,10 @@
         .then(function (c) { return c.user; })
         .catch(function (e) { signing = null; throw e; });
       return signing;
+    }).then(function (u) {
+      // Restored or newly created identity (the first sign-in is not the only way to get here).
+      if (u && participating()) gaParticipant(u.uid);
+      return u;
     });
   }
 
@@ -453,6 +468,7 @@
 
   function withdraw() {
     stopTracking();
+    gaParticipant(null);
     setConsent({ status: 'withdrawn', version: cfg.consentVersion, at: now(), purged: false });
     [K.open, K.outbox, K.past].forEach(function (k) { OOP.store.remove(k); });
     render();
@@ -484,7 +500,8 @@
         'Which of the ten topic pages you study, when, and how long you are active on them',
         'Page views and how far down each topic page you scroll',
         'Whether you take a topic quiz, your answers and your score',
-        'Whether you mark the topic complete, and how often you open a learning resource or copy code'
+        'Whether you mark the topic complete, and how often you open a learning resource or copy code',
+        'The same research ID on this site\'s Google Analytics statistics (pages visited, active time, scroll, device type and how you reached the site), so they can be matched with your quiz scores'
       ]),
       el('h3', { text: 'Never in the research data' }),
       list([
@@ -492,8 +509,8 @@
         'Anything you type, and your IP address',
         cfg.askConsent ? 'Anything before you agree or after you withdraw' : 'Anything after you opt out'
       ]),
-      el('p', { text: 'The data is stored in this site\'s Google Firebase project and only the research team can export it. Each browser has its own research ID, so taking part on another device is a separate choice.' }),
-      el('p', { text: 'You can withdraw at any time from "Research study" in the sidebar. Withdrawing stops recording and deletes the research data collected from this browser.' })
+      el('p', { text: 'The data is stored in this site\'s Google Firebase project and Google Analytics property, and only the research team can export it. Each browser has its own research ID, so taking part on another device is a separate choice.' }),
+      el('p', { text: 'You can withdraw at any time from "Research study" in the sidebar. Withdrawing stops recording and deletes the research data collected from this browser. Google Analytics keeps its usual site statistics (up to 14 months), but those carrying your research ID are left out of the study.' })
     ];
     if (cfg.contact) body.push(el('p', { class: 'research-meta', text: 'Contact: ' + cfg.contact }));
     if (cfg.ethics) body.push(el('p', { class: 'research-meta', text: cfg.ethics }));
@@ -553,6 +570,9 @@
     const c = consent();
     if (c && c.status === 'withdrawn' && !c.purged) purge().catch(function (e) { console.warn('[research] withdrawal not finished yet', e); });
     if (!participating()) return;
+    // Research ID saved at registration: tag GA4 hits from the start of the page, before Firebase loads.
+    const known = String(c.registered || '').split(':')[0];
+    if (known) gaParticipant(known);
     sweep(now());
     startTracking();
     save();

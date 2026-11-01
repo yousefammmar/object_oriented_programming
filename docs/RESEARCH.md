@@ -90,7 +90,8 @@ never re-enrolled automatically. Signing in with Google for progress sync is unr
   study session needs saving), browsers that keep no storage (every page would otherwise start a new
   participant), search-engine crawlers (user agent containing bot/crawl/spider/slurp/lighthouse),
   and anyone who opted out or withdrew — they are not re-enrolled.
-- **GA4** receives no answers, research IDs, session IDs, names or emails (§6).
+- **GA4** receives the research ID only as the user property `participant_id`, so GA4's data can be
+  matched with the study (§6) — never answers, session IDs, names or emails.
 
 ---
 
@@ -184,15 +185,26 @@ events are unchanged.
 | `study_session_started` | a study session starts | `lesson_id` | participants (everyone not opted out when `askConsent: false`) |
 | `study_session_completed` | a study session is closed (often on a later page load) | `lesson_id`, `study_active_sec`, `study_quiz_status` | participants |
 
-No answers, research IDs or session IDs are sent. `study_session_completed` is usually sent after
-the timeout, so GA4 attributes it to a later GA4 session.
+No answers or session IDs are sent. `study_session_completed` is usually sent after the timeout, so
+GA4 attributes it to a later GA4 session.
 
-**GA4 ↔ Firestore linkage (not enabled).** The research dataset already contains its own
-GA-style metrics, so linkage is not needed for the core analysis. If it is ever required: add a
-random `study_session_id` parameter to the two `study_session_*` events, register it as an
-event-scoped custom dimension, enable the BigQuery export, and join on it. Never join on
-`ga_session_id` (only unique per GA client) or `client_id`, and cover the linkage in the consent text
-and ethics approval first, since it connects the research record to GA4's device-level data.
+**GA4 ↔ Firestore linkage: user property `participant_id`.** For participants only, `research.js`
+gives GA4 the research ID (`OOP.analytics.setParticipant`), so GA4's own metrics (engagement time,
+views, sessions, scroll, device, traffic source / UTM campaign) can be broken down per participant
+and joined with the export on `participant_id` = `research_id`.
+
+- **When it is set:** at the start of every page from the ID saved at registration, and when Firebase
+  restores or creates the identity. GA4 sends it once per page load and keeps it for the user's
+  later hits. Opting out sends an empty value and it is never set again.
+- **Not linked:** GA4's automatic `page_view` of each page (sent by the Google tag before any site
+  script runs; GA4's stored value should still apply from the second page on — verify in the pilot)
+  and everything before a participant's research ID exists (their first topic visit until the first
+  save, ≤ `saveSeconds`).
+- **Joining:** use an **inner join** with the Firestore export. Withdrawn participants are deleted
+  from Firestore, so their GA4 rows (which GA4 keeps until its retention ends) drop out. Never join
+  on `ga_session_id` or `client_id`.
+- **Consent:** information sheet version 2 (`consentVersion: 2`) tells participants about the link.
+  Make sure your ethics approval covers connecting the research record to GA4's device-level data.
 
 ---
 
@@ -364,8 +376,8 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 - **Interaction counts** depend on `analytics.js` loading (ad blockers can block it); flagged by
   `interactions_tracked`.
 - **Scores are client-side** and the answer key is public (§5).
-- **GA4 metrics are different**: GA4's engagement time and sessions use other rules, so compare
-  with this dataset's own metrics, not GA4 reports, unless you add the linkage in §6.
+- **GA4 metrics are different**: GA4's engagement time and sessions use other rules. Compare them
+  per participant through `participant_id` (§6), not GA4's totals against this dataset's.
 
 ---
 
@@ -374,7 +386,7 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 | Command | What it checks |
 |---|---|
 | `npm run test:research` | timer (idle, hidden, no double counting), question bank shape, scoring, export logic (consent filter, missing values, re-scoring, CSV) |
-| `npm run emulators` then `npm run verify:research` | 126 browser checks against the Firebase emulators: quizzes on all 10 topics; both consent modes (opt-in: consent / decline; default: no prompt, opt-out deletes, earlier "no" respected); sessions, page views, active time, idle, hidden tab, scroll depth, topic completion, quiz attempts, interactions, second tab, session timeout; offline save and resync; no research account for Home-only visitors, crawlers or blocked storage; 26 security-rule cases; GA4 payloads (valid, no ids/answers/emails, no duplicates); CSV export (unique ids, ranges, no personal data); withdrawal; Google sync still working and separate; existing features (completion, bookmarks, dashboard, achievements, pager, theme, search, code viewer) |
+| `npm run emulators` then `npm run verify:research` | 133 browser checks against the Firebase emulators: quizzes on all 10 topics; both consent modes (opt-in: consent / decline; default: no prompt, opt-out deletes, earlier "no" respected); sessions, page views, active time, idle, hidden tab, scroll depth, topic completion, quiz attempts, interactions, second tab, session timeout; offline save and resync; no research account for Home-only visitors, crawlers or blocked storage; 26 security-rule cases; GA4 payloads (valid, no ids/answers/emails, no duplicates); GA4 user property `participant_id` (set for participants only, from the start of each page, cleared on withdrawal, never set again after opting out); CSV export (unique ids, ranges, no personal data); withdrawal; Google sync still working and separate; existing features (completion, bookmarks, dashboard, achievements, pager, theme, search, code viewer) |
 | `npm run verify:analytics`, `npm run test:sync`, `npm run verify` | existing GA4, sync and content-preservation suites |
 
 The browser suite rewrites `config.js` on the fly (emulators, project `demo-oop`, short timings) and
