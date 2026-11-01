@@ -68,7 +68,7 @@ function firebase(srv) {
     }
   };
   const fb = {
-    apps: [1],
+    apps: [{ name: '[DEFAULT]' }],
     auth: () => ({ onAuthStateChanged: (cb) => setImmediate(() => cb({ uid: 'u1' })) }),
     firestore: Object.assign(() => ({ collection: () => ({ doc: () => ref }) }), { FieldValue: { serverTimestamp: () => 'ts' } }),
     kill: () => { dead = true; }

@@ -180,6 +180,9 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 │       ├── page-features.js Per-page enhancements (dashboard, completion buttons, link filter, pager)
 │       ├── search.js        Ctrl/⌘+K search dialog
 │       ├── sync.js          Optional Google sign-in + cross-device sync (Firebase; off until configured)
+│       ├── quiz-data.js     Questions for the optional end-of-topic quizzes (10 topics × 8)
+│       ├── quiz.js          Topic quiz UI: score, answer review, retake (topic pages only)
+│       ├── research.js      Opt-in research study: consent, study sessions, Firestore records
 │       ├── search-index.js  GENERATED search data (see tools/)
 │       ├── code-data.js     The C++ example files (course content — do not edit casually)
 │       ├── code-viewer.js   Highlighting, tabs, copy, wrap, full screen (code-files.html only)
@@ -188,19 +191,24 @@ The site is **plain HTML + CSS + vanilla JavaScript** — no framework, no build
 │   ├── build_search_index.py    Regenerates assets/js/search-index.js from the pages
 │   ├── verify_preservation.cjs  Compares original vs current content (text, links, code)
 │   ├── verify_analytics.cjs     Browser test for the custom GA4 events (sends nothing to Google)
-│   └── test_sync.cjs            Checks the sync merge logic (`npm run test:sync`)
+│   ├── test_sync.cjs            Checks the sync merge logic (`npm run test:sync`)
+│   ├── test_research.cjs        Checks the research timer, quiz scoring and export logic
+│   ├── verify_research.cjs      Browser test: quizzes, consent, sessions, rules, export (Firebase emulators)
+│   └── export_research.cjs      ADMIN: research data → CSV (needs a service-account key kept outside the repo)
 ├── docs/PRESERVATION-REPORT.md  Latest content-preservation report
 ├── docs/GA4-ENGAGEMENT-TRACKING.md  GA4 event dictionary, setup and analysis guide
 ├── docs/FIREBASE-SETUP.md       How to turn on cross-device sync
+├── docs/RESEARCH.md             Research study: consent, metrics, data dictionary, export, limitations
+├── docs/RESEARCH-PRODUCTION.md  Research: Firebase console steps, production smoke test, GA4 DebugView
 ├── firestore.rules              Firestore security rules (each student reads/writes only their own data)
-└── package.json             Convenience scripts (`npm run serve | build:search | verify | verify:analytics | test:sync`)
+└── package.json             Convenience scripts (`npm run serve | build:search | verify | verify:analytics | test:sync | test:research | verify:research | export:research`)
 ```
 
 ### How a page is put together
 
 Each page file contains only its **own content** inside `<main id="main">`, plus `<link>` tags for the five stylesheets and `<script>` tags for the modules. When the scripts run, `layout.js` builds the shared shell (sidebar, top bar, masthead, footer) from `config.js` and moves `<main>` into it. This keeps navigation defined **once** instead of copied into nine files.
 
-Script order (each page): `config → analytics → storage → theme → layout → progress → library → search → page-features → sync → [code-data → code-viewer on code-files.html] → app`. `app.js` runs last and calls each module's `init()` in the right order.
+Script order (each page): `config → analytics → storage → theme → layout → progress → library → search → page-features → sync → [quiz-data → quiz on the ten topic pages] → research → [code-data → code-viewer on code-files.html] → app`. `app.js` runs last and calls each module's `init()` in the right order.
 
 ### Module reference
 
@@ -216,6 +224,8 @@ Script order (each page): `config → analytics → storage → theme → layout
 | `page-features.js` | `tagResourceKinds`, `addPageActions`, `addLabToggles`, `renderDashboard`, `addPager`, `addLinksFilter` |
 | `search.js` | `open()`, `close()`; internals `loadIndex`, `score`, `run`, `highlight`, `go`, `jumpTo` |
 | `code-viewer.js` | `hlCpp(code)`, `ct(id, line)`, `copyCode()`; wiring for tabs, wrap, full screen, bookmarks |
+| `quiz.js` | `init()`, `grade(topicId, answers)`; emits `oop:quiz` events |
+| `research.js` | `init()`, `open()` (consent dialog), `Timer(idleMs)` (active-time clock) |
 | `app.js` | `start()`, `bindShortcuts()`, `setReading()`, `showShortcuts()` |
 
 ### Features
@@ -225,6 +235,8 @@ Script order (each page): `config → analytics → storage → theme → layout
 - **Progress** (optional, local only): mark topics and individual labs complete/incomplete, overall percentage, confirmed reset. Nothing is ever marked automatically.
 - **Continue learning, recently visited, bookmarks** on the Home dashboard.
 - **Code viewer**: line numbers, syntax highlighting, accessible tabs, copy with confirmation, wrap toggle, full screen, click a line to highlight it, deep links like `code-files.html#sep:12`. It is a viewer — it does **not** run code.
+- **Topic quizzes** (optional): 8 questions at the end of each Learn topic, score as a percentage, review of every answer with an explanation, unlimited retakes. Never marks a topic complete.
+- **Research study** (off when `research: null` in `config.js`): anonymous study-session and quiz records in Firestore — everyone by default with opt-out from the sidebar (`askConsent: false`), or opt-in with a consent dialog (`askConsent: true`); withdrawal deletes the data; admin CSV export. See [docs/RESEARCH.md](docs/RESEARCH.md).
 - **All Links**: live filter that only hides rows while typing; clearing it shows everything.
 - **Themes**: light/dark (saved; follows the OS until you choose). **Reading mode** (`R`). **Shortcuts help** (`?`).
 - **Accessibility**: semantic headings, labelled controls, visible focus, focus-managed native `<dialog>`s, `aria-current`/`aria-pressed`/`aria-live` status, reduced-motion support, touch targets ≥ 44px on touch devices.
@@ -272,6 +284,7 @@ It loads the original site and the current pages in a real browser and compares 
 - Tested automatically in Chromium only; Safari, Firefox and Edge are expected to work (standard APIs, native `<dialog>`) but have **not** been verified.
 - Fonts load from Google Fonts; offline, the system fonts are used instead.
 - Progress, bookmarks and "continue learning" are stored in the browser (`localStorage`) — per device, and lost if site data is cleared — unless the student signs in. Sign-in is optional and only appears once Firebase is configured (see [docs/FIREBASE-SETUP.md](docs/FIREBASE-SETUP.md)).
+- Quiz scores are computed in the browser and the answer key is public; the research export re-scores the stored answers, but scores are not tamper-proof (see [docs/RESEARCH.md](docs/RESEARCH.md#10-limitations-report-these)).
 - Search results for code match source text, not meaning; the index must be regenerated after content edits.
 
 ---

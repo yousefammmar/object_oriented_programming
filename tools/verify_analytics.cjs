@@ -43,7 +43,8 @@ const LABS = [['01', 'C++ Revision'], ['02', 'Pointers & Memory'], ['03', 'Class
 const EVENTS = ['lesson_complete', 'lesson_uncomplete', 'lab_complete', 'lab_uncomplete', 'code_copy', 'code_file_view', 'learning_resource_click'];
 const PARAMS = ['lesson_id', 'lesson_name', 'completion_method', 'lab_number', 'code_file', 'code_page_path', 'resource_type', 'resource_name'];
 const RESOURCE_TYPES = ['video', 'code_example', 'quiz', 'lab', 'pdf', 'slides', 'folder', 'document', 'external_website'];
-const STORAGE_KEYS = ['oop-progress', 'oop-bookmarks', 'oop-achievements', 'oop-last', 'oop-recent', 'oop-seen', 'oop-code-wrap', 'oop-reading', 'oop-theme'];
+const STORAGE_KEYS = ['oop-progress', 'oop-bookmarks', 'oop-achievements', 'oop-last', 'oop-recent', 'oop-seen', 'oop-code-wrap', 'oop-reading', 'oop-theme',
+  'oop-sync-base', 'oop-research-consent', 'oop-research-open', 'oop-research-outbox', 'oop-research-attempts']; // sync.js, research.js
 /** resource_name values that say nothing on their own. */
 const GENERIC = /^(notebook|notes|video|video walkthrough|solution drive|written solution|link|here|pdf|slides|download)$/i;
 /** Representative links: [page, selector, expected params]. */

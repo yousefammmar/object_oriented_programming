@@ -6,6 +6,8 @@
  *   2. progress – sidebar progress card
  *   3. features – per-page enhancements (dashboard, completion buttons, link filter …)
  *      sync     – optional sign-in / cross-device sync (does nothing until Firebase is configured)
+ *      quiz     – optional end-of-topic quiz (topic pages only, before research measures the page)
+ *      research – opt-in research study: consent link/prompt, study sessions (docs/RESEARCH.md)
  *   4. search   – wire the search buttons, honour #hit= links
  *   5. code viewer (code-files.html only)
  *   6. global behaviour – keyboard shortcuts, reading mode, shortcuts dialog
@@ -83,6 +85,8 @@
     OOP.progress.init();
     OOP.features.init();
     OOP.sync.init();
+    if (OOP.quiz) OOP.quiz.init();
+    OOP.research.init();
     OOP.search.init();
     if (document.body.getAttribute('data-page') === 'code') OOP.codeViewer.init();
     // The browser jumps to #id before the shell exists; redo the jump now that the layout is final.

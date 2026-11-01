@@ -1,5 +1,9 @@
 # Cross-device sync (Firebase) — setup
 
+> The opt-in **research study** uses the same Firebase project with its own anonymous accounts and
+> collection (`researchParticipants`). Its extra setup — enable the *Anonymous* sign-in provider and
+> publish the current `firestore.rules` — is in [RESEARCH.md](RESEARCH.md#1-before-collecting-real-data).
+
 The site works without any of this. Until `firebase` is set in `assets/js/config.js`, progress,
 bookmarks and history stay in the visitor's browser and no Firebase code is downloaded.
 

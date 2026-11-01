@@ -34,7 +34,9 @@ Design rules:
   multiply them. As a second guard, `track()` drops an *identical* event (same name and parameters)
   repeated within 1 second.
 - **No personal data.** Only ids, labels from the site's own config/page text and file names are sent.
-  Never names, e-mails, account ids, C++ code, search queries or anything a student types.
+  Never names, e-mails, C++ code, search queries or anything a student types. The one per-person
+  value is the user property `participant_id` (research participants only): their random research ID,
+  never a name, e-mail or Google account ([RESEARCH.md §6](RESEARCH.md)).
   Strings are capped at GA4's 100-character limit.
 - **No changes** to the Measurement ID, page views, localStorage keys/structure, buttons, CSS, course
   content, links or achievements. No backend, login, cookies or dependencies were added.
@@ -147,11 +149,33 @@ The icons are the same cue the site already uses to colour resource chips (`kind
 `page-features.js`). A Drive file without `.pdf` in its text is `document`, not `pdf`, because the
 format cannot be known reliably.
 
+### `quiz_started` / `quiz_completed`
+The optional end-of-topic quiz (`quiz.js`, questions in `quiz-data.js`), for every visitor.
+`quiz_started` on **Take quiz** / **Retake quiz**; `quiz_completed` once per submitted attempt.
+The answers themselves are never sent.
+
+| Parameter | Type | Example | Meaning |
+|---|---|---|---|
+| `lesson_id` | string | `dma` | Topic id |
+| `quiz_score` | number | `75` | `quiz_completed` only: correct / total × 100, rounded (8 questions) |
+
+### `study_session_started` / `study_session_completed`
+Research participants only (`research.js`; everyone who has not opted out while `askConsent` is false — definitions in [RESEARCH.md](RESEARCH.md)).
+A *study session* is one topic in one browser, ending after 30 min without activity — it is **not**
+a GA4 session. `study_session_completed` is usually sent on a later page load, after the timeout.
+No research or session ids are sent.
+
+| Parameter | Type | Example | Meaning |
+|---|---|---|---|
+| `lesson_id` | string | `this` | Topic id |
+| `study_active_sec` | number | `412` | `_completed` only: active engagement time of the session, seconds |
+| `study_quiz_status` | string | `completed` | `_completed` only: `not_started` / `started` / `completed` |
+
 ### Not tracked (on purpose)
 
 | What | Why |
 |---|---|
-| Quiz scores | The site has no interactive quiz; Examination Hall only links to papers and solution videos |
+| Quiz answers, study session IDs | Answers are research data (Firestore, participants only). The research ID is sent only as the user property `participant_id` (§4.1), never as an event parameter |
 | Video watching | No embedded players — every video opens on YouTube/Drive, so only the click is observable |
 | Progress reset, bookmarks, theme, reading mode, search queries | Not requested; search queries could contain personal text |
 | Page views, scroll, engagement time, outbound clicks | Already collected by the Google tag / Enhanced Measurement |
@@ -167,6 +191,8 @@ format cannot be known reliably.
 | `code_copy` | `code-viewer.js` → `copyCode()` → `done(ok)` when `ok` | **Copy** button (`onclick="copyCode()"`) |
 | `code_file_view` | `code-viewer.js` → `select()` when the file differs | Tab click/keys, `hashchange` |
 | `learning_resource_click` | `page-features.js` → `trackResourceClicks()` | One `click` + `auxclick` listener on `document` |
+| `quiz_started` / `quiz_completed` | `quiz.js` → `begin()` / form `submit` (once per attempt) | **Take quiz**, **Retake quiz**, **Submit answers** |
+| `study_session_started` / `study_session_completed` | `research.js` → `begin()` / `close()` | First page view of a session / the next page load or activity after the timeout |
 
 ---
 
@@ -190,12 +216,29 @@ Event parameters only appear in reports and explorations after they are register
 | Code page path | Event | `code_page_path` |
 | Resource type | Event | `resource_type` |
 | Resource name | Event | `resource_name` |
+| Study quiz status | Event | `study_quiz_status` |
 
-(8 of the 50 event-scoped dimensions a standard property allows. Don't name one "Page path" — a
+(9 of the 50 event-scoped dimensions a standard property allows. Don't name one "Page path" — a
 built-in dimension already uses that name.)
 
-**Custom metrics are not needed:** every parameter is categorical, and GA4's built-in *Event count*,
-*Total users* and *Sessions* are the measures.
+**Custom metrics** (*Custom definitions → Custom metrics*), only for the quiz and study-session events:
+
+| Metric name | Scope | Event parameter | Unit |
+|---|---|---|---|
+| Quiz score | Event | `quiz_score` | Standard |
+| Study active seconds | Event | `study_active_sec` | Time → seconds |
+
+The other events are categorical; GA4's built-in *Event count*, *Total users* and *Sessions* are their measures.
+
+**User-scoped dimension** (*Custom dimensions → Create custom dimension → Scope: User*), research
+participants only — lets Explorations break GA4's own metrics down per participant:
+
+| Dimension name | Scope | User property |
+|---|---|---|
+| Participant ID | User | `participant_id` |
+
+Turn **Google signals off** (*Admin → Data collection and modification → Data collection*): with it on,
+GA4 may hide rows for small groups (data thresholds), which a per-participant breakdown always is.
 
 ### 4.2 Data retention (strongly recommended)
 *Admin → Data collection and modification → Data retention → Event data retention: 14 months.*
@@ -278,10 +321,13 @@ preservation) produces identical output before and after this work.
    parameters. Expected sequence for one topic: `page_view` → `lesson_complete` (`lesson_id`,
    `lesson_name`, `completion_method = manual`).
 4. Debug traffic is flagged as developer traffic, so the Developer-traffic filter (4.4) can remove it.
+5. Full checklist including the research events: [RESEARCH-PRODUCTION.md §3](RESEARCH-PRODUCTION.md#3-ga4-debugview).
 
 | Action on the site | Expected in DebugView |
 |---|---|
-| Open any page | `page_view` only — no custom event |
+| Open a non-topic page | `page_view` only — no custom event |
+| Open a topic page (new study session) | `page_view` + `study_session_started` (`lesson_id`); a refresh within 30 min sends `page_view` only |
+| *Take quiz* / *Submit answers* | `quiz_started` / `quiz_completed` (`lesson_id`, `quiz_score`) |
 | *Mark as completed* (off → on) | `lesson_complete` |
 | *Mark as completed* (on → off) | `lesson_uncomplete` |
 | Labs → *Mark done* | `lab_complete` / `lab_uncomplete` with `lab_number` |
@@ -360,6 +406,12 @@ question is about the students a campaign *acquired* (later visits included).
 9. **GA4 processing:** custom dimensions are not retroactive; explorations are limited by data
    retention (default 2 months) and may be sampled or thresholded; your own test visits are
    included unless filtered (4.4).
-10. **No consent notice is shown.** No personal data is sent by these events, but GA4 itself uses
-    cookies and IP-derived location. Check your institution's research-ethics requirements on
-    informing participants.
+10. **No consent notice is shown.** No names or e-mails are sent, but GA4 itself uses cookies and
+    IP-derived location, and `participant_id` links a participant's GA4 data to their research record
+    (the information sheet says so). Check your institution's research-ethics requirements.
+11. **`participant_id` coverage.** It is set on each page once the research ID is known, so GA4's
+    automatic `page_view` of that page never carries it, and nothing before a participant's research ID
+    exists (their first topic visit, until the first save) is linked. GA4 keeps the value on its side
+    for the user's later hits — check in the pilot that each participant's page views and engagement
+    time appear under their ID. Opting out sends an empty value; withdrawn IDs disappear from
+    Firestore, so an inner join drops their GA4 rows.

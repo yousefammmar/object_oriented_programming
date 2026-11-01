@@ -8,6 +8,8 @@
  *   5. Dashboard widgets  (Home: continue learning, progress, bookmarks)
  *   6. Dialogs            (native <dialog>: search, shortcuts, confirm)
  *   7. Toasts, back-to-top, pager
+ *   8. Topic quiz          (quiz.js)
+ *   9. Research study      (research.js: sidebar link, invitation, information dialog)
  */
 
 /* ───────────── 1. Buttons ───────────── */
@@ -994,4 +996,331 @@ html.dark .toast .i {
 @media (max-width: 520px) {
   .pager { grid-template-columns: 1fr; }
   .pager .next { grid-column: auto; }
+}
+
+/* ───────────── 8. Topic quiz ───────────── */
+.quiz {
+  margin-top: var(--s-5);
+}
+
+.quiz [hidden] {
+  display: none;
+}
+
+.quiz-card {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-1);
+}
+
+.quiz-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+.quiz-intro p {
+  max-width: 60ch;
+  color: var(--text-2);
+}
+
+.quiz-intro strong {
+  color: var(--text);
+}
+
+.quiz-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* a long code line scrolls inside its block instead of widening the page */
+  gap: var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz-q fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.quiz-q legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--s-2);
+  padding: 0;
+  font-weight: 700;
+}
+
+.quiz-n {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.quiz-code {
+  margin-bottom: var(--s-2);
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid var(--code-border);
+  border-radius: var(--r-md);
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.quiz-code code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+.quiz-opts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.quiz-opt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px 10px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--card);
+  cursor: pointer;
+  transition: border-color var(--t-fast), background-color var(--t-fast);
+}
+
+.quiz-opt input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+
+.quiz-opt > span:not(.quiz-tag) {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.quiz-opt:hover,
+.quiz-opt:has(input:checked) {
+  border-color: var(--accent);
+}
+
+.quiz-opt:has(input:checked) {
+  background: var(--accent-soft);
+}
+
+.quiz-opt:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.quiz-opt:has(input:disabled) {
+  cursor: default;
+}
+
+.quiz-opt:has(input:disabled):not(.is-chosen):not(.is-answer) {
+  border-color: var(--border);
+  background: var(--card);
+}
+
+.quiz-opt.is-answer,
+.is-right .quiz-opt.is-chosen {
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+
+.is-wrong .quiz-opt.is-chosen {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.quiz-tag {
+  flex-basis: 100%;
+  padding-left: 28px;
+  color: var(--success);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.is-wrong .is-chosen .quiz-tag {
+  color: var(--danger);
+}
+
+.quiz-why {
+  margin-top: var(--s-2);
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: var(--accent-2-soft);
+  font-size: 0.9rem;
+}
+
+.quiz-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+
+.quiz-msg {
+  color: var(--warn);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.quiz-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  margin-bottom: var(--s-4);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.quiz-result:focus {
+  outline: none;
+}
+
+.quiz-score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.quiz-score strong {
+  color: var(--accent);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.quiz-score span {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.quiz-note {
+  flex-basis: 100%;
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 520px) {
+  .quiz-card { padding: var(--s-3); }
+}
+
+/* ───────────── 9. Research study ───────────── */
+.sb-research {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.sb-research .i {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.research-prompt {
+  position: fixed;
+  right: 20px;
+  bottom: 84px; /* above the back-to-top button */
+  z-index: var(--z-prompt);
+  max-width: 360px;
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-3);
+  animation: dialogIn 200ms var(--ease);
+}
+
+.research-prompt p {
+  margin-bottom: var(--s-2);
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+
+.research-prompt strong {
+  color: var(--text);
+}
+
+.research-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.research-prompt .btn {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .research-prompt { left: 16px; right: 16px; max-width: none; }
+}
+
+.research-dialog {
+  width: 640px;
+}
+
+.research-dialog .dialog-body {
+  max-height: min(80vh, 720px);
+  overflow-y: auto;
+}
+
+.research-dialog h3 {
+  margin: var(--s-3) 0 6px;
+  font-size: 0.95rem;
+}
+
+.research-dialog p,
+.research-dialog li {
+  color: var(--text-2);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.research-dialog p + p {
+  margin-top: 8px;
+}
+
+.research-dialog ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 1.2em;
+  list-style: disc;
+}
+
+.research-meta {
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
 }

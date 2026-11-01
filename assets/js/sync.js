@@ -22,6 +22,8 @@
  *   OOP.sync.init()                   load Firebase and start (called once by app.js)
  *   OOP.sync.start(firebase)          start with an already-loaded Firebase compat namespace
  *   OOP.sync.merge(local, cloud, base) → merged state (pure; tested by tools/test_sync.cjs)
+ *   OOP.sync.load(name)               load a Firebase compat script once ('app' | 'auth' | 'firestore')
+ *   OOP.sync.emulated()               true when config `emulators: true` applies (localhost only)
  */
 (function () {
   'use strict';
@@ -152,14 +154,16 @@
     timer = setTimeout(reconcile, DELAY);
   }
 
-  function load(src) {
-    return new Promise(function (resolve, reject) {
+  /** Load one Firebase compat script ('app', 'auth', 'firestore') once; research.js shares this. */
+  const scripts = {};
+  function load(name) {
+    return scripts[name] || (scripts[name] = new Promise(function (resolve, reject) {
       const s = document.createElement('script');
-      s.src = src;
+      s.src = SDK + name + '-compat.js';
       s.onload = resolve;
-      s.onerror = reject;
+      s.onerror = function (e) { delete scripts[name]; reject(e); };
       document.head.appendChild(s);
-    });
+    }));
   }
 
   /** Local testing against `npm run emulators` (config `emulators: true`, honoured on localhost only). */
@@ -178,7 +182,7 @@
 
   /** Firestore is only downloaded once someone signs in — guests never need it. */
   function listen(u) {
-    (fb.firestore ? Promise.resolve() : load(SDK + 'firestore-compat.js')).then(function () {
+    (fb.firestore ? Promise.resolve() : load('firestore')).then(function () {
       if (user !== u) return; // signed out meanwhile
       ref = firestore().collection('users').doc(u.uid);
       unlisten = ref.onSnapshot(function (snap) {
@@ -233,7 +237,8 @@
 
   function start(firebase) {
     fb = firebase;
-    if (!fb.apps.length) fb.initializeApp(OOP.config.firebase);
+    // research.js may already have created its own named app, so look for the default one.
+    if (!fb.apps.some(function (a) { return a.name === '[DEFAULT]'; })) fb.initializeApp(OOP.config.firebase);
     if (emulated()) fb.auth().useEmulator('http://127.0.0.1:9099');
     document.addEventListener('oop:progress', onLocalChange);
     document.addEventListener('oop:library', onLocalChange);
@@ -251,11 +256,11 @@
   function init() {
     // Guest-only site, or opened from disk (Google sign-in needs a real web address).
     if (!OOP.config.firebase || location.protocol === 'file:') return;
-    load(SDK + 'app-compat.js')
-      .then(function () { return load(SDK + 'auth-compat.js'); })
+    load('app')
+      .then(function () { return load('auth'); })
       .then(function () { start(window.firebase); })
       .catch(function () { /* offline or blocked: the site simply stays local */ });
   }
 
-  OOP.sync = { init, start, merge };
+  OOP.sync = { init, start, merge, load, emulated };
 })();

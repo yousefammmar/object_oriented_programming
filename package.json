@@ -8,7 +8,10 @@
     "verify": "node tools/verify_preservation.cjs --report docs/PRESERVATION-REPORT.md",
     "verify:analytics": "node tools/verify_analytics.cjs",
     "test:sync": "node tools/test_sync.cjs",
-    "emulators": "firebase emulators:start --project demo-oop"
+    "emulators": "firebase emulators:start --project demo-oop",
+    "test:research": "node tools/test_research.cjs",
+    "verify:research": "node tools/verify_research.cjs",
+    "export:research": "node tools/export_research.cjs"
   },
   "devDependencies": {
     "playwright": "^1.56.1"
