@@ -249,11 +249,26 @@ The export uses admin credentials, which bypass rules by design.
 GOOGLE_APPLICATION_CREDENTIALS=~/secure/oop-research-sa.json node tools/export_research.cjs
 ```
 
-(`npm run export:research` does the same when the variable is set.) It writes
-`research-export/research_sessions.csv` and `research-export/research_quiz_attempts.csv`
-(the folder is git-ignored) and prints how many participants/sessions were left out. No npm
-packages: it signs a token with the service-account key and reads the Firestore REST API.
-Against the emulator: `FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node tools/export_research.cjs --project demo-oop`.
+(`npm run export:research` does the same when the variable is set.) It writes three files to
+`research-export/` (git-ignored) and prints how many participants/sessions were left out, how many
+participants have a first quiz attempt and how many have GA4 data:
+
+- `research_sessions.csv` and `research_quiz_attempts.csv` — from Firestore;
+- `research_participants.csv` — **one row per participant, ready for SPSS/JASP**: their Firestore
+  totals joined with their GA4 metrics (GA4 Data API, user property `participant_id` = `research_id`,
+  from the day of the first exported session until today). Withdrawn participants' GA4 rows drop out.
+
+No npm packages: it signs a token with the service-account key and calls the Firestore and GA4 Data
+REST APIs. Against the emulator: `FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node tools/export_research.cjs --project demo-oop`
+(GA4 skipped).
+
+**One-time GA4 setup** (otherwise the export still runs, warns, and leaves the GA4 columns empty):
+1. Google Cloud console → project `object-oriented-programm-95ff5` → *APIs & Services → Library* →
+   **Google Analytics Data API** → *Enable*.
+2. GA4 → *Admin → Property access management* (property "Object Oriented", `G-FEC09FLLMC`,
+   id `558651328`) → *+ Add users* → the service account's `client_email` from the key file →
+   role **Viewer**.
+3. Another property: `--ga4-property <numeric property id>`.
 
 CSV conventions: UTF-8, comma-separated, header row, RFC 4180 quoting; **missing = empty cell**
 (pandas → `NaN`, SPSS → system-missing), never 0; times in UTC as `YYYY-MM-DD HH:MM:SS`; one row
@@ -272,6 +287,29 @@ SPSS: *File → Import Data → CSV*, first row = variable names; set the `*_at`
 ---
 
 ## 9. Data dictionary
+
+**`research_participants.csv`** — one row per participant with at least one exported session.
+
+| Column | Type | Meaning |
+|---|---|---|
+| `research_id` | text | as in the sessions file; equals GA4's `participant_id` |
+| `sessions`, `topics_studied` | integer | study sessions, distinct topics |
+| `engagement_time_seconds`, `page_views` | integer | sums over sessions (Firestore, §4) |
+| `max_scroll_depth_mean` | number | mean of the sessions' max scroll depth % |
+| `quizzes_first_attempt` | integer | topics with a verified first attempt (`quiz_prior_attempts = 0`, `quiz_score_verified = 1`) |
+| `quiz_first_score_mean` | number / empty | mean score of those first attempts; empty = none |
+| `quiz_attempts` | integer | all submitted attempts, retakes included |
+| `topics_completed` | integer | topics marked completed (self-reported) |
+| `learning_resource_clicks`, `code_copies` | integer / empty | sums over sessions with interaction tracking; empty if never tracked |
+| `ga4_linked` | 1 / 0 / empty | 1 = GA4 has data under this `participant_id`; empty = GA4 not fetched |
+| `ga4_engagement_seconds` | integer / empty | GA4 `userEngagementDuration` |
+| `ga4_views`, `ga4_sessions`, `ga4_engaged_sessions` | integer / empty | GA4 `screenPageViews`, `sessions`, `engagedSessions` |
+| `ga4_scroll_events` | integer / empty | GA4 `scroll` events (90 % depth, Enhanced measurement) |
+| `ga4_device` | text / empty | `deviceCategory` with the most GA4 sessions |
+| `ga4_lesson_completions`, `ga4_lab_completions`, `ga4_code_file_views`, `ga4_resource_clicks` | integer / empty | GA4 `lesson_complete`, `lab_complete`, `code_file_view`, `learning_resource_click` events on **every** page (RQ3); the Firestore counts only cover topic-page study sessions |
+
+GA4 columns cover only hits that carried `participant_id` (§6): check `ga4_views` against
+`page_views` in the pilot before relying on it.
 
 **`research_sessions.csv`** — one row per study session of a consenting participant.
 

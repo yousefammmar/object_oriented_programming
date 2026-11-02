@@ -4,6 +4,7 @@
  *   1. research.js Timer      active time, idle cut-off, hidden tab, no double counting
  *   2. quiz.js grade()        scoring against quiz-data.js, and the question bank's shape
  *   3. export_research.cjs    Firestore value decoding, consent filtering, missing values, re-scoring, CSV
+ *   4. export_research.cjs    participant file: GA4 report parsing and the join on participant_id
  * Browser behaviour (consent, sessions, Firestore rules, withdrawal) is covered by tools/verify_research.cjs.
  * Run: node tools/test_research.cjs   (npm run test:research)
  */
@@ -184,6 +185,49 @@ test('CSV: header row, quoting, empty cells for missing values', () => {
   const header = ex.csv(ex.SESSION_COLUMNS, out.sessionRows).split('\n')[0].split(',');
   ['research_id', 'session_id', 'topic_id', 'engagement_time_seconds', 'page_views', 'max_scroll_depth', 'quiz_status', 'quiz_score',
     'quiz_attempt_count', 'session_started_at', 'quiz_completed_at'].forEach((c) => assert.ok(header.includes(c), c));
+});
+
+/* 4. Participant file: Firestore totals + GA4, joined on research_id = participant_id */
+const ga4Reports = {
+  totals: { rows: [
+    { dimensionValues: [{ value: 'r1' }], metricValues: [{ value: '125.6' }, { value: '7' }, { value: '3' }, { value: '2' }] },
+    { dimensionValues: [{ value: '(not set)' }], metricValues: [{ value: '999' }, { value: '99' }, { value: '9' }, { value: '9' }] },
+    { dimensionValues: [{ value: 'gone' }], metricValues: [{ value: '50' }, { value: '2' }, { value: '1' }, { value: '1' }] }] },
+  events: { rows: [
+    { dimensionValues: [{ value: 'r1' }, { value: 'scroll' }], metricValues: [{ value: '4' }] },
+    { dimensionValues: [{ value: 'r1' }, { value: 'lab_complete' }], metricValues: [{ value: '2' }] }] },
+  device: { rows: [
+    { dimensionValues: [{ value: 'r1' }, { value: 'desktop' }], metricValues: [{ value: '1' }] },
+    { dimensionValues: [{ value: 'r1' }, { value: 'mobile' }], metricValues: [{ value: '2' }] }] }
+};
+test('GA4 reports: per participant, "(not set)" dropped, main device = most sessions', () => {
+  const g = ex.ga4ByParticipant(ga4Reports);
+  assert.deepStrictEqual(Object.keys(g).sort(), ['gone', 'r1']);
+  assert.deepStrictEqual(Object.assign({}, g.r1), { ga4_engagement_seconds: 126, ga4_views: 7, ga4_sessions: 3, ga4_engaged_sessions: 2,
+    ga4_scroll_events: 4, ga4_lesson_completions: 0, ga4_lab_completions: 2, ga4_code_file_views: 0, ga4_resource_clicks: 0, ga4_device: 'mobile' });
+  const req = ex.ga4Requests('2026-11-20');
+  assert.ok(Object.values(req).every((r) => r.dimensions[0].name === 'customUser:participant_id' && r.dateRanges[0].startDate === '2026-11-20'));
+});
+test('participants: totals, first verified attempts only, missing stays empty, GA4 joined on research_id', () => {
+  const row = (o) => Object.assign({ research_id: 'r1', topic_id: 'classes', engagement_time_seconds: 100, page_views: 2, max_scroll_depth: 80,
+    quiz_status: 'not_started', quiz_score: null, quiz_score_verified: null, quiz_prior_attempts: 0, quiz_attempt_count: 0, topic_completed: 0,
+    learning_resource_click_count: 1, code_copy_count: 0 }, o);
+  const rows = [
+    row({ quiz_status: 'completed', quiz_score: 75, quiz_score_verified: 1, quiz_attempt_count: 2, topic_completed: 1 }),
+    row({ topic_id: 'const', max_scroll_depth: 40, quiz_status: 'completed', quiz_score: 50, quiz_score_verified: 0, quiz_attempt_count: 1 }),
+    row({ topic_id: 'classes', quiz_status: 'completed', quiz_score: 100, quiz_score_verified: 1, quiz_prior_attempts: 2, quiz_attempt_count: 1 }),
+    row({ research_id: 'r2', learning_resource_click_count: null, code_copy_count: null })
+  ];
+  const [p1, p2] = ex.participants(rows, ex.ga4ByParticipant(ga4Reports));
+  assert.deepStrictEqual([p1.sessions, p1.topics_studied, p1.engagement_time_seconds, p1.page_views, p1.max_scroll_depth_mean,
+    p1.quizzes_first_attempt, p1.quiz_first_score_mean, p1.quiz_attempts, p1.topics_completed, p1.learning_resource_clicks],
+    [3, 2, 300, 6, 66.7, 1, 75, 4, 1, 3]);
+  assert.deepStrictEqual([p1.ga4_linked, p1.ga4_engagement_seconds, p1.ga4_device], [1, 126, 'mobile']);
+  assert.deepStrictEqual([p2.research_id, p2.quizzes_first_attempt, p2.quiz_first_score_mean, p2.learning_resource_clicks, p2.ga4_linked, p2.ga4_views],
+    ['r2', 0, null, undefined, 0, undefined]);
+  assert.ok(!ex.participants(rows, ex.ga4ByParticipant(ga4Reports)).some((p) => p.research_id === 'gone'), 'withdrawn GA4 id dropped');
+  assert.strictEqual(ex.participants(rows, null)[0].ga4_linked, null);
+  assert.strictEqual(ex.csv(ex.PARTICIPANT_COLUMNS, [p2]).split('\n')[1], 'r2,1,1,100,2,80,0,,0,0,,,0,,,,,,,,,,');
 });
 
 console.log(failed ? '\n' + failed + ' FAILED' : '\nAll research checks passed');

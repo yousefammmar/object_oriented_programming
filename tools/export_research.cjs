@@ -1,9 +1,15 @@
 #!/usr/bin/env node
 /**
- * export_research.cjs — ADMIN ONLY: export the research data to two analysis-ready CSV files.
+ * export_research.cjs — ADMIN ONLY: export the research data to three analysis-ready CSV files.
  *
  *   research_sessions.csv       one row per study session
  *   research_quiz_attempts.csv  one row per submitted quiz attempt
+ *   research_participants.csv   one row per participant: Firestore totals + their GA4 metrics, joined on
+ *                               research_id = GA4 user property participant_id (GA4 Data API)
+ *
+ * GA4 needs the service account added as Viewer on the GA4 property and the "Google Analytics Data API"
+ * enabled in the Firebase project's Google Cloud console. Without it the export still runs and the GA4
+ * columns stay empty. Property: --ga4-property <numeric id> (default below).
  *
  * Only participants whose consent record says "granted" (agreed) or "implied" (taking part by default,
  * never opted out) are exported; withdrawn, deleted or unknown participants are left out. Missing values are empty cells, never 0, so pandas reads them as NaN and
@@ -36,12 +42,15 @@ function siteGlobal(files) {
 
 /* ───────────── Firestore REST ───────────── */
 
+/** GA4 property "Object Oriented" (G-FEC09FLLMC), which receives every hit of the site's Google tag. */
+const GA4_PROPERTY = '558651328';
+
 async function token(keyFile) {
   const key = JSON.parse(fs.readFileSync(keyFile, 'utf8'));
   const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
   const iat = Math.floor(Date.now() / 1000);
   const body = b64({ alg: 'RS256', typ: 'JWT' }) + '.' + b64({
-    iss: key.client_email, scope: 'https://www.googleapis.com/auth/datastore',
+    iss: key.client_email, scope: 'https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/analytics.readonly',
     aud: key.token_uri || 'https://oauth2.googleapis.com/token', iat, exp: iat + 3600
   });
   const jwt = body + '.' + crypto.createSign('RSA-SHA256').update(body).sign(key.private_key).toString('base64url');
@@ -95,6 +104,53 @@ async function fetchAll(project, auth) {
   const sessions = rows.filter((r) => r.document && /\/researchParticipants\/[^/]+\/sessions\//.test(r.document.name))
     .map((r) => fields(r.document.fields));
   return { participants, sessions };
+}
+
+/* ───────────── GA4 Data API ───────────── */
+
+const GA4_ID = 'customUser:participant_id';
+/** GA4 event → column. The learning events cover every page (Labs, Code Files…), not only topic pages. */
+const GA4_EVENTS = { scroll: 'ga4_scroll_events', lesson_complete: 'ga4_lesson_completions', lab_complete: 'ga4_lab_completions',
+  code_file_view: 'ga4_code_file_views', learning_resource_click: 'ga4_resource_clicks' };
+
+/** The three GA4 reports, each broken down by participant_id. */
+function ga4Requests(startDate) {
+  const base = { dateRanges: [{ startDate, endDate: 'today' }], limit: 100000 };
+  return {
+    totals: Object.assign({ dimensions: [{ name: GA4_ID }],
+      metrics: ['userEngagementDuration', 'screenPageViews', 'sessions', 'engagedSessions'].map((name) => ({ name })) }, base),
+    events: Object.assign({ dimensions: [{ name: GA4_ID }, { name: 'eventName' }], metrics: [{ name: 'eventCount' }],
+      dimensionFilter: { filter: { fieldName: 'eventName', inListFilter: { values: Object.keys(GA4_EVENTS) } } } }, base),
+    device: Object.assign({ dimensions: [{ name: GA4_ID }, { name: 'deviceCategory' }], metrics: [{ name: 'sessions' }] }, base)
+  };
+}
+
+async function fetchGa4(property, auth, startDate) {
+  const reqs = ga4Requests(startDate);
+  const out = {};
+  for (const k of Object.keys(reqs)) {
+    const res = await fetch('https://analyticsdata.googleapis.com/v1beta/properties/' + property + ':runReport', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + auth, 'Content-Type': 'application/json' }, body: JSON.stringify(reqs[k])
+    });
+    if (!res.ok) throw new Error(res.status + ' ' + (await res.text()).slice(0, 300));
+    out[k] = await res.json();
+  }
+  return out;
+}
+
+/** runReport responses → { researchId: GA4 columns }. Rows without an ID ("(not set)") are dropped. */
+function ga4ByParticipant(reports) {
+  const rows = (r) => (r.rows || []).map((x) => ({ d: x.dimensionValues.map((v) => v.value), m: x.metricValues.map((v) => Number(v.value)) }))
+    .filter((x) => x.d[0] && x.d[0] !== '(not set)');
+  const by = {};
+  const get = (id) => (by[id] = by[id] || Object.assign({ ga4_engagement_seconds: 0, ga4_views: 0, ga4_sessions: 0, ga4_engaged_sessions: 0 },
+    ...Object.values(GA4_EVENTS).map((c) => ({ [c]: 0 })), { ga4_device: null }));
+  rows(reports.totals).forEach(({ d, m }) => Object.assign(get(d[0]),
+    { ga4_engagement_seconds: Math.round(m[0]), ga4_views: m[1], ga4_sessions: m[2], ga4_engaged_sessions: m[3] }));
+  rows(reports.events).forEach(({ d, m }) => { if (GA4_EVENTS[d[1]]) get(d[0])[GA4_EVENTS[d[1]]] = m[0]; });
+  const top = {}; // device with the most sessions
+  rows(reports.device).forEach(({ d, m }) => { if (!(top[d[0]] >= m[0])) { top[d[0]] = m[0]; get(d[0]).ga4_device = d[1]; } });
+  return by;
 }
 
 /* ───────────── Rows ───────────── */
@@ -180,6 +236,45 @@ function build(data, quiz, timeoutMs, now) {
   return { sessionRows, attemptRows, stats };
 }
 
+const PARTICIPANT_COLUMNS = ['research_id', 'sessions', 'topics_studied', 'engagement_time_seconds', 'page_views', 'max_scroll_depth_mean',
+  'quizzes_first_attempt', 'quiz_first_score_mean', 'quiz_attempts', 'topics_completed', 'learning_resource_clicks', 'code_copies',
+  'ga4_linked', 'ga4_engagement_seconds', 'ga4_views', 'ga4_sessions', 'ga4_engaged_sessions', 'ga4_scroll_events', 'ga4_device',
+  'ga4_lesson_completions', 'ga4_lab_completions', 'ga4_code_file_views', 'ga4_resource_clicks'];
+
+/**
+ * One row per participant: totals of their build() session rows (consenting participants only) plus their GA4
+ * metrics. GA4 IDs with no Firestore record (withdrawn) drop out. ga4 = null (not fetched) → GA4 columns empty.
+ * Quiz columns count only first attempts on a topic whose score was verified.
+ */
+function participants(sessionRows, ga4) {
+  const sum = (a, b) => (b === null || b === undefined ? a : (a || 0) + b);
+  const mean = (xs) => (xs.length ? Math.round(xs.reduce((s, x) => s + x, 0) / xs.length * 10) / 10 : null);
+  const by = {};
+  sessionRows.forEach((s) => {
+    const p = by[s.research_id] = by[s.research_id] || { sessions: 0, topics: new Set(), completed: new Set(), scroll: [], first: [] };
+    p.sessions++;
+    p.topics.add(s.topic_id);
+    if (s.topic_completed === 1) p.completed.add(s.topic_id);
+    if (typeof s.max_scroll_depth === 'number') p.scroll.push(s.max_scroll_depth);
+    if (s.quiz_status === 'completed' && s.quiz_prior_attempts === 0 && s.quiz_score_verified === 1) p.first.push(s.quiz_score);
+    p.engagement_time_seconds = sum(p.engagement_time_seconds, s.engagement_time_seconds);
+    p.page_views = sum(p.page_views, s.page_views);
+    p.quiz_attempts = sum(p.quiz_attempts, s.quiz_attempt_count);
+    p.learning_resource_clicks = sum(p.learning_resource_clicks, s.learning_resource_click_count);
+    p.code_copies = sum(p.code_copies, s.code_copy_count);
+  });
+  return Object.keys(by).sort().map((id) => {
+    const p = by[id];
+    const g = ga4 && ga4[id];
+    return Object.assign({
+      research_id: id, sessions: p.sessions, topics_studied: p.topics.size, engagement_time_seconds: p.engagement_time_seconds,
+      page_views: p.page_views, max_scroll_depth_mean: mean(p.scroll), quizzes_first_attempt: p.first.length,
+      quiz_first_score_mean: mean(p.first), quiz_attempts: p.quiz_attempts, topics_completed: p.completed.size,
+      learning_resource_clicks: p.learning_resource_clicks, code_copies: p.code_copies, ga4_linked: ga4 ? flag(!!g) : null
+    }, g || {});
+  });
+}
+
 /** RFC 4180 CSV; null/undefined → empty cell (missing). */
 function csv(columns, rows) {
   const cell = (v) => {
@@ -205,19 +300,35 @@ async function main() {
   const OOP = siteGlobal(['assets/js/config.js', 'assets/js/quiz-data.js']);
   const timeoutMs = OOP.config.research.sessionMinutes * 60000;
   const result = build(await fetchAll(project, auth), OOP.quizData, timeoutMs, new Date());
+  const property = opt('--ga4-property', GA4_PROPERTY);
+  const start = result.sessionRows.map((r) => r.session_started_at).filter(Boolean).sort()[0];
+  let ga4 = null;
+  if (process.env.FIRESTORE_EMULATOR_HOST) console.log('GA4: skipped (emulator)');
+  else if (!start) console.log('GA4: skipped (no sessions yet)');
+  else {
+    try { ga4 = ga4ByParticipant(await fetchGa4(property, auth, start.slice(0, 10))); } catch (e) {
+      console.warn('GA4: not fetched, GA4 columns left empty. ' + e.message + '\n     Check: the service account is a Viewer on GA4 property '
+        + property + ' and the Google Analytics Data API is enabled (docs/RESEARCH.md §8).');
+    }
+  }
+  const people = participants(result.sessionRows, ga4);
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, 'research_sessions.csv'), csv(SESSION_COLUMNS, result.sessionRows));
   fs.writeFileSync(path.join(out, 'research_quiz_attempts.csv'), csv(ATTEMPT_COLUMNS, result.attemptRows));
+  fs.writeFileSync(path.join(out, 'research_participants.csv'), csv(PARTICIPANT_COLUMNS, people));
   const s = result.stats;
   console.log('Project ' + project + (process.env.FIRESTORE_EMULATOR_HOST ? ' (emulator)' : ''));
   console.log('Participants exported: ' + s.participants + '   left out (withdrawn): ' + s.excludedParticipants);
   console.log('Sessions exported:     ' + s.sessions + '   left out: ' + s.excludedSessions);
   console.log('Quiz attempts:         ' + s.attempts + '   score not verified: ' + s.unverified);
-  console.log('Wrote ' + path.join(out, 'research_sessions.csv') + ' and research_quiz_attempts.csv');
+  console.log('With a first quiz:     ' + people.filter((p) => p.quizzes_first_attempt > 0).length + ' of ' + people.length + ' participants with sessions');
+  console.log('With GA4 data:         ' + (ga4 ? people.filter((p) => p.ga4_linked === 1).length + ' of ' + people.length + ' (GA4 property ' + property + ', since ' + start.slice(0, 10) + ')' : 'not fetched'));
+  console.log('Wrote ' + out + '/research_sessions.csv, research_quiz_attempts.csv and research_participants.csv');
 }
 
 if (require.main === module) {
   main().catch((e) => { console.error('Export failed:', e.message); process.exit(1); });
 } else {
-  module.exports = { value, fields, build, csv, rescore, SESSION_COLUMNS, ATTEMPT_COLUMNS };
+  module.exports = { value, fields, fetchAll, build, csv, rescore, participants, ga4Requests, ga4ByParticipant,
+    SESSION_COLUMNS, ATTEMPT_COLUMNS, PARTICIPANT_COLUMNS };
 }
